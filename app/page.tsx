@@ -66,8 +66,9 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="BOTTOPIA 홈">BOT<span>•</span>TOPIA</a>
         <nav className="nav" aria-label="주요 메뉴">
+          <a href="#work">PROMPT</a>
+          <button className="nav-link-button" onClick={() => { setWorkWorld('ORIGINAL LAB'); document.querySelector('#work')?.scrollIntoView(); }}>ORIGINAL LAB</button>
           <a href="#ecosystem">ECOSYSTEM</a>
-          <a href="#work">WORK</a>
           <a href="#about">ABOUT</a>
           <MemberLogin compact />
           <button className="nav-cta" onClick={() => setInquiryOpen(true)}>START A PROJECT ↗</button>
@@ -75,40 +76,10 @@ export default function Home() {
       </header>
 
       <section className="hero" id="top">
-        <p className="eyebrow">AI VISUAL STUDIO · SEOUL / EVERYWHERE</p>
-        <h1>
-          WE BUILD<br />
-          <span className="hero-line">W<span className="bot-eye" aria-hidden="true"><i /></span>RLDS</span>
-          <br />THAT MOVE.
-        </h1>
+        <h1>BOTTOPIA<span>.</span></h1>
         <div className="hero-bottom">
-          <p>아이디어를 살아 움직이는 이미지와 영상으로.<br />AI 기반 비주얼 크리에이티브 스튜디오.</p>
-          <a href="#work" className="round-link" aria-label="작업 보기">↓</a>
-        </div>
-      </section>
-
-      <div className="ticker" aria-label="서비스 영역">
-        <div>AI FILM <span>✦</span> CHARACTER <span>✦</span> CAMPAIGN <span>✦</span> MOTION <span>✦</span> AI FILM <span>✦</span> CHARACTER <span>✦</span> CAMPAIGN <span>✦</span> MOTION</div>
-      </div>
-
-      <section className="ecosystem" id="ecosystem">
-        <div className="ecosystem-intro">
-          <p className="eyebrow">SCROLL TO ENTER · BOTTOPIA ECOSYSTEM</p>
-          <h2>ONE BOT.<br />INFINITE<br /><em>WORLDS.</em></h2>
-          <p>아이디어가 캐릭터가 되고, 캐릭터가 이야기를 만들고, 이야기가 다시 누군가의 새로운 창작으로 이어지는 곳.</p>
-        </div>
-        <div className="orbit-system" aria-label="BOTTOPIA 창작 생태계">
-          <span className="space-grid" />
-          <span className="orbit-ring ring-one" />
-          <span className="orbit-ring ring-two" />
-          <span className="orbit-ring ring-three" />
-          <div className="orbit-bot" aria-hidden="true"><i /><b /><b /></div>
-          <div className="planet planet-idea"><i />IDEA<small>SEED 01</small></div>
-          <div className="planet planet-character"><i />CHARACTER<small>FORM 02</small></div>
-          <div className="planet planet-story"><i />STORY<small>WORLD 03</small></div>
-          <div className="planet planet-motion"><i />MOTION<small>MOVE 04</small></div>
-          <div className="planet planet-remix"><i />REMIX<small>SHARE 05</small></div>
-          <p className="orbit-caption">BOT.TOPIA / CREATIVE LOOP / ALWAYS IN MOTION</p>
+          <p>AI로 만든 영상과 사용한 프롬프트를 함께 아카이브하는 갤러리.<br />마음에 드는 세계를 복사하고 당신의 방식으로 다시 만들어보세요.</p>
+          <span>LIVE GALLERY · SEOUL</span>
         </div>
       </section>
 
@@ -130,7 +101,7 @@ export default function Home() {
                 onClick={() => setWorkWorld(world)}
               >
                 <small>0{index + 1}</small>
-                <span>{world}</span>
+                <span>{world === 'CREATOR ARCHIVE' ? 'PROMPT ARCHIVE' : world}</span>
                 <i aria-hidden="true">↗</i>
               </button>
             ))}
@@ -172,6 +143,21 @@ export default function Home() {
             </div>
           </section>
         )}
+      </section>
+
+      <section className="ecosystem" id="ecosystem">
+        <div className="ecosystem-intro">
+          <p className="eyebrow">SCROLL TO ENTER · BOTTOPIA ECOSYSTEM</p>
+          <h2>ONE BOT.<br />INFINITE<br /><em>WORLDS.</em></h2>
+          <p>아이디어가 캐릭터가 되고, 캐릭터가 이야기를 만들고, 이야기가 다시 누군가의 새로운 창작으로 이어지는 곳.</p>
+        </div>
+        <div className="orbit-system" aria-label="BOTTOPIA 창작 생태계">
+          <span className="space-grid" /><span className="orbit-ring ring-one" /><span className="orbit-ring ring-two" /><span className="orbit-ring ring-three" />
+          <div className="orbit-bot" aria-hidden="true"><i /><b /><b /></div>
+          <div className="planet planet-idea"><i />IDEA<small>SEED 01</small></div><div className="planet planet-character"><i />CHARACTER<small>FORM 02</small></div>
+          <div className="planet planet-story"><i />STORY<small>WORLD 03</small></div><div className="planet planet-motion"><i />MOTION<small>MOVE 04</small></div><div className="planet planet-remix"><i />REMIX<small>SHARE 05</small></div>
+          <p className="orbit-caption">BOT.TOPIA / CREATIVE LOOP / ALWAYS IN MOTION</p>
+        </div>
       </section>
 
       <section className="about" id="about">
