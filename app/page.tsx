@@ -15,14 +15,7 @@ type Project = {
   summary: string;
 };
 
-const projects: Project[] = [
-  { id: '01', title: 'NEON FAMILIAR', category: 'CHARACTER', year: '2026', className: 'art-neon', ratio: 'portrait', summary: '낯설지만 이상하게 친근한 디지털 존재. 캐릭터 개발부터 무빙 포트레이트까지 이어진 오리지널 시리즈.' },
-  { id: '02', title: 'SOFT MACHINE', category: 'AI FILM', year: '2026', className: 'art-soft', ratio: 'landscape', summary: '기계가 꿈을 꾼다면 어떤 질감일까. 실사와 비현실의 경계를 탐색한 30초 AI 아트 필름.' },
-  { id: '03', title: 'AFTER HUMAN', category: 'CAMPAIGN', year: '2026', className: 'art-human', ratio: 'portrait', summary: '패션과 기술의 다음 장면을 상상한 브랜드 비주얼 캠페인. 키비주얼과 숏폼 패키지로 제작.' },
-  { id: '04', title: 'PLASTIC HEAVEN', category: 'CAMPAIGN', year: '2025', className: 'art-plastic', ratio: 'square', summary: '과감한 컬러와 촉감이 살아있는 초현실 오브젝트를 중심으로 만든 소셜 캠페인.' },
-  { id: '05', title: 'DREAM DELIVERY', category: 'CHARACTER', year: '2025', className: 'art-dream', ratio: 'portrait', summary: '매일 밤 꿈을 배달하는 작은 로봇. 세계관, 캐릭터 시트, 에피소드 비주얼을 함께 설계했다.' },
-  { id: '06', title: 'NEW FOLKLORE', category: 'AI FILM', year: '2025', className: 'art-folk', ratio: 'landscape', summary: '한국적 상징을 미래적인 화면 언어로 다시 읽은 실험 영화. 60초, 9:16·16:9 동시 제작.' },
-];
+const projects: Project[] = [];
 
 const categories = ['ALL', 'AI FILM', 'CHARACTER', 'CAMPAIGN'] as const;
 const workWorlds = ['CREATOR ARCHIVE', 'ORIGINAL LAB'] as const;
@@ -32,6 +25,13 @@ const communityCopy = {
   en: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['WATCH.', 'LEARN.', 'REMIX.'], body: 'Works and prompts stay open to everyone. Join with Google to like, leave community notes, and connect with other makers.', steps: [['01 / WATCH', 'Explore the film and the tools behind it.'], ['02 / COPY', 'Copy the full prompt and run your own experiment.'], ['03 / CONNECT', 'Share results and discoveries through likes and notes.']], cta: 'A simple sign-up. An always-open archive.' },
   zh: { eyebrow: 'BOTTOPIA 社区 · 公开测试', title: ['观看。', '学习。', '再创造。'], body: '作品与提示词对所有人开放。使用 Google 加入后，可以点赞、留下社区笔记，并与其他创作者交流。', steps: [['01 / 观看', '自由探索影片与制作工具。'], ['02 / 复制', '复制完整提示词，开始自己的实验。'], ['03 / 连接', '通过点赞和笔记分享成果与发现。']], cta: '注册简单，档案始终开放。' },
   ja: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['見る。', '学ぶ。', '再創造する。'], body: '作品とプロンプトは誰でも見ることができます。Googleで参加すると、いいねやコミュニティノートを通して他のクリエイターとつながれます。', steps: [['01 / WATCH', '映像と制作ツールを自由に見ます。'], ['02 / COPY', 'プロンプトをコピーして自分で試します。'], ['03 / CONNECT', 'いいねとノートで成果や発見を共有します。']], cta: '参加はシンプルに。アーカイブはいつでもオープンに。' },
+} as const;
+
+const originalEmptyCopy = {
+  ko: { title: '아직 공개된 오리지널 작업이 없습니다.', body: '실제 BOTTOPIA 프로젝트가 완성되면 이곳에 직접 업로드됩니다.', link: '운영자 스튜디오에서 업로드하기 ↗' },
+  en: { title: 'NO ORIGINAL WORKS PUBLISHED YET.', body: 'Completed BOTTOPIA projects will be uploaded here directly.', link: 'UPLOAD FROM CREATOR STUDIO ↗' },
+  zh: { title: '尚未发布原创作品。', body: 'BOTTOPIA 的实际项目完成后将直接上传至此。', link: '前往创作者工作室上传 ↗' },
+  ja: { title: 'まだオリジナル作品は公開されていません。', body: 'BOTTOPIAの実際のプロジェクトが完成したら、ここに直接アップロードされます。', link: 'クリエイタースタジオからアップロード ↗' },
 } as const;
 
 const copy = {
@@ -93,13 +93,6 @@ const copy = {
   },
 } as const;
 
-const projectSummaries: Record<Locale, Record<string, string>> = {
-  ko: Object.fromEntries(projects.map((project) => [project.id, project.summary])),
-  en: { '01': 'An original series following an unfamiliar yet strangely friendly digital being, from character development to moving portrait.', '02': 'A 30-second AI art film exploring the texture of machine dreams and the boundary between reality and the unreal.', '03': 'A brand visual campaign imagining the next scene in fashion and technology, delivered as key visuals and short-form content.', '04': 'A social campaign centered on surreal objects with bold color and tactile detail.', '05': 'A small robot that delivers dreams every night, developed through worldbuilding, character sheets, and episode visuals.', '06': 'An experimental film translating Korean symbols into a futuristic visual language, produced in both 9:16 and 16:9.' },
-  zh: { '01': '一个陌生却又莫名亲切的数字生命原创系列，从角色开发延伸到动态肖像。', '02': '一部 30 秒 AI 艺术短片，探索机器梦境的质感与现实和非现实之间的边界。', '03': '想象时尚与科技下一幕的品牌视觉企划，包含主视觉与短视频套装。', '04': '以大胆色彩和真实质感的超现实物体为核心打造的社交媒体企划。', '05': '每晚配送梦境的小机器人，通过世界观、角色设定图与分集视觉完整呈现。', '06': '将韩国文化符号转化为未来视觉语言的实验影片，同时制作 9:16 与 16:9 版本。' },
-  ja: { '01': '見慣れないのにどこか親しみを感じるデジタル生命体。キャラクター開発からムービングポートレートまで展開したオリジナルシリーズ。', '02': '機械が見る夢の質感と、実写と非現実の境界を探る30秒のAIアートフィルム。', '03': 'ファッションとテクノロジーの次のシーンを想像したブランドビジュアルキャンペーン。キービジュアルとショート動画を制作。', '04': '大胆な色彩と触感を持つシュールなオブジェクトを中心にしたソーシャルキャンペーン。', '05': '毎晩夢を届ける小さなロボット。世界観、キャラクターシート、エピソードビジュアルまで設計。', '06': '韓国的な象徴を未来の映像言語で読み替えた実験映画。9:16と16:9を同時制作。' },
-};
-
 const localeEventName = 'bottopia-locale-change';
 
 function subscribeToLocale(onStoreChange: () => void) {
@@ -136,6 +129,7 @@ export default function Home() {
   const languageRef = useRef<HTMLDivElement>(null);
   const t = copy[locale];
   const community = communityCopy[locale];
+  const originalEmpty = originalEmptyCopy[locale];
 
   const visibleProjects = filter === 'ALL' ? projects : projects.filter((project) => project.category === filter);
 
@@ -266,16 +260,16 @@ export default function Home() {
           <section className="work-preview" id="original-lab-panel" role="tabpanel">
             <div className="section-head">
               <h2>{t.originalLab}</h2>
-              <p>01—06 / BOTTOPIA WORLD STUDIES</p>
+              <p>BOTTOPIA / ORIGINAL PROJECTS</p>
             </div>
-            <div className="filters" aria-label={t.workFilter}>
+            {projects.length > 0 && <div className="filters" aria-label={t.workFilter}>
               {categories.map((category) => (
                 <button key={category} className={filter === category ? 'active' : ''} onClick={() => setFilter(category)}>
                   {category} <sup>{category === 'ALL' ? projects.length : projects.filter((item) => item.category === category).length}</sup>
                 </button>
               ))}
-            </div>
-            <div className="project-grid">
+            </div>}
+            {projects.length === 0 ? <div className="archive-empty original-empty"><span>00 / ORIGINAL LAB</span><h3>{originalEmpty.title}</h3><p>{originalEmpty.body}</p><a href="/studio">{originalEmpty.link}</a></div> : <div className="project-grid">
               {visibleProjects.map((work) => (
                 <button className={`project-card ${work.ratio}`} key={work.id} onClick={() => setSelected(work)} aria-label={`${work.title} · ${t.projectDetails}`}>
                   <div className={`artwork ${work.className}`}>
@@ -290,7 +284,7 @@ export default function Home() {
                   </div>
                 </button>
               ))}
-            </div>
+            </div>}
           </section>
         )}
       </section>
@@ -366,7 +360,7 @@ export default function Home() {
             <div className="modal-copy">
               <p>{selected.id} / {selected.category} / {selected.year}</p>
               <h2 id="project-title">{selected.title}</h2>
-              <p>{projectSummaries[locale][selected.id] ?? selected.summary}</p>
+              <p>{selected.summary}</p>
               <button onClick={() => { setSelected(null); setInquiryOpen(true); }}>{t.similarProject}</button>
             </div>
           </article>
