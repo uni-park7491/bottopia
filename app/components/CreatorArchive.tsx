@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Locale } from '../i18n';
+import CommunityPanel from './CommunityPanel';
 
 type ArchiveWork = {
   id: string; title: string; summary: string; category: string; tool: string; model: string; prompt: string;
@@ -96,7 +97,7 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
               {work.videoUrl ? <video src={work.videoUrl} poster={work.posterUrl ?? undefined} muted loop autoPlay playsInline preload="metadata" /> : <span className={`demo-visual ${work.visualClass}`}><b /><i /></span>}
               <span className="tool-badge">{work.tool || 'AI TOOL'}</span><span className="media-badge">▶ VIDEO</span><span className="open-transmission">{t.viewPrompt}</span>
             </button>
-            <div className="transmission-meta"><div><h3>{work.title}</h3><p>{getSummary(work)}</p></div><span>♡ {work.copies}</span></div>
+            <div className="transmission-meta"><div><h3>{work.title}</h3><p>{getSummary(work)}</p></div><span>↗ {work.copies}</span></div>
             <p className="archive-author">@BOT.TOPIA</p>
           </article>
         ))}
@@ -110,6 +111,7 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
             <div className="archive-modal-copy"><p className="eyebrow">{active.category} · {active.tool || 'AI TOOL'} {active.model && `· ${active.model}`}</p><h2 id="archive-title">{active.title}</h2><p>{getSummary(active)}</p>
               <div className="prompt-block"><span>{t.prompt}</span><pre>{active.prompt}</pre></div>{active.negativePrompt && <div className="prompt-block negative"><span>{t.negative}</span><pre>{active.negativePrompt}</pre></div>}
               <button className="copy-prompt" onClick={() => copyPrompt(active)}>{copied ? t.copied : t.copy}</button>
+              <CommunityPanel workId={active.id} locale={locale} isDemo={active.id.startsWith('demo-')} />
             </div>
           </article>
         </div>

@@ -7,15 +7,16 @@ import { isSupabaseConfigured } from '../../lib/supabase/config';
 import type { Locale } from '../i18n';
 
 const authCopy = {
-  ko: { setup: 'GOOGLE 로그인 · 설정 필요', connecting: '연결 중…', logout: '로그아웃', login: 'GOOGLE로 로그인' },
-  en: { setup: 'GOOGLE LOGIN · SETUP REQUIRED', connecting: 'CONNECTING…', logout: 'LOGOUT', login: 'CONTINUE WITH GOOGLE' },
-  zh: { setup: 'GOOGLE 登录 · 需要设置', connecting: '连接中…', logout: '退出', login: '使用 GOOGLE 登录' },
-  ja: { setup: 'GOOGLEログイン · 設定が必要', connecting: '接続中…', logout: 'ログアウト', login: 'GOOGLEでログイン' },
+  ko: { setup: 'GOOGLE 가입 준비 중', connecting: '연결 중…', logout: '로그아웃', login: 'GOOGLE로 가입', error: '로그인을 시작하지 못했어요. 잠시 후 다시 시도해주세요.' },
+  en: { setup: 'GOOGLE SIGN-UP COMING SOON', connecting: 'CONNECTING…', logout: 'LOGOUT', login: 'JOIN WITH GOOGLE', error: 'Could not start sign-in. Please try again.' },
+  zh: { setup: 'GOOGLE 注册即将开放', connecting: '连接中…', logout: '退出', login: '使用 GOOGLE 加入', error: '无法开始登录，请稍后重试。' },
+  ja: { setup: 'GOOGLE登録 準備中', connecting: '接続中…', logout: 'ログアウト', login: 'GOOGLEで参加', error: 'ログインを開始できませんでした。もう一度お試しください。' },
 } as const;
 
 export default function MemberLogin({ compact = false, locale = 'ko' }: { compact?: boolean; locale?: Locale }) {
   const [user, setUser] = useState<User | null>(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   const t = authCopy[locale];
 
   useEffect(() => {
@@ -27,12 +28,16 @@ export default function MemberLogin({ compact = false, locale = 'ko' }: { compac
   }, []);
 
   async function signIn() {
-    setBusy(true);
-    const supabase = createBrowserSupabaseClient();
-    await supabase.auth.signInWithOAuth({
+    if (!isSupabaseConfigured) return;
+    setBusy(true); setError('');
+    const { error: signInError } = await createBrowserSupabaseClient().auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
+        queryParams: { prompt: 'select_account' },
+      },
     });
+    if (signInError) { setBusy(false); setError(t.error); }
   }
 
   async function signOut() {
@@ -41,10 +46,21 @@ export default function MemberLogin({ compact = false, locale = 'ko' }: { compac
     window.location.href = '/';
   }
 
-  if (!isSupabaseConfigured) return compact ? null : <p className="auth-note">{t.setup}</p>;
+  if (!isSupabaseConfigured) return compact ? (
+    <a className="member-auth compact pending" href="#community" aria-label={t.setup}>
+      <GoogleMark /> {t.login}
+    </a>
+  ) : <p className="auth-note">{t.setup}</p>;
   return (
-    <button className={`member-auth ${compact ? 'compact' : ''}`} type="button" onClick={user ? signOut : signIn} disabled={busy}>
-      {busy ? t.connecting : user ? `${user.email?.split('@')[0]} · ${t.logout}` : t.login}
-    </button>
+    <span className="member-auth-wrap">
+      <button className={`member-auth ${compact ? 'compact' : ''}`} type="button" onClick={user ? signOut : signIn} disabled={busy}>
+        {!user && <GoogleMark />}{busy ? t.connecting : user ? `${user.email?.split('@')[0]} · ${t.logout}` : t.login}
+      </button>
+      {error && !compact && <span className="auth-error" role="status">{error}</span>}
+    </span>
   );
+}
+
+function GoogleMark() {
+  return <span className="google-mark" aria-hidden="true">G</span>;
 }

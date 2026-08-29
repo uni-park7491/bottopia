@@ -6,10 +6,10 @@ AI 영상 포트폴리오, 프롬프트 아카이브, Google 회원 로그인을
 
 - Next.js 16 / React 19
 - Supabase Auth: Google OAuth 회원가입·로그인
-- Supabase Postgres: 작품과 프롬프트 메타데이터
+- Supabase Postgres: 작품, 프롬프트, 좋아요와 커뮤니티 노트
 - Supabase Storage: 영상·커버 직접 업로드(최대 500MB)
 - Vercel 배포 준비
-- 공개 아카이브, 프롬프트 복사, 소유자 전용 `/studio`
+- 공개 아카이브, 프롬프트 복사, Google 회원 좋아요·댓글, 소유자 전용 `/studio`
 
 ## 1. Supabase 설정
 
@@ -44,6 +44,6 @@ npm run dev
 ## 보안 모델
 
 - 포트폴리오와 공개된 영상은 누구나 볼 수 있습니다.
-- Google 사용자는 회원가입/로그인할 수 있습니다.
+- Google 사용자는 별도 비밀번호 없이 회원가입/로그인하고 좋아요와 커뮤니티 노트를 남길 수 있습니다.
 - 업로드 URL 발급, 작품 등록·삭제는 서버가 `SITE_OWNER_EMAIL`과 일치하는 로그인 사용자에게만 허용합니다.
 - Storage 업로드는 짧게 유효한 signed upload URL을 사용하므로 대용량 영상이 Vercel 서버를 통과하지 않습니다.

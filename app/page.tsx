@@ -27,6 +27,13 @@ const projects: Project[] = [
 const categories = ['ALL', 'AI FILM', 'CHARACTER', 'CAMPAIGN'] as const;
 const workWorlds = ['CREATOR ARCHIVE', 'ORIGINAL LAB'] as const;
 
+const communityCopy = {
+  ko: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['보고.', '배우고.', '다시 만들기.'], body: '작품과 프롬프트는 누구에게나 공개됩니다. Google로 가입하면 좋아요와 커뮤니티 노트를 남기며 다른 창작자와 연결될 수 있어요.', steps: [['01 / WATCH', '영상과 제작 도구를 자유롭게 살펴봅니다.'], ['02 / COPY', '전체 프롬프트를 복사해 직접 실험합니다.'], ['03 / CONNECT', '좋아요와 노트로 결과와 발견을 나눕니다.']], cta: '가입은 간단하게, 감상은 언제나 공개로.' },
+  en: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['WATCH.', 'LEARN.', 'REMIX.'], body: 'Works and prompts stay open to everyone. Join with Google to like, leave community notes, and connect with other makers.', steps: [['01 / WATCH', 'Explore the film and the tools behind it.'], ['02 / COPY', 'Copy the full prompt and run your own experiment.'], ['03 / CONNECT', 'Share results and discoveries through likes and notes.']], cta: 'A simple sign-up. An always-open archive.' },
+  zh: { eyebrow: 'BOTTOPIA 社区 · 公开测试', title: ['观看。', '学习。', '再创造。'], body: '作品与提示词对所有人开放。使用 Google 加入后，可以点赞、留下社区笔记，并与其他创作者交流。', steps: [['01 / 观看', '自由探索影片与制作工具。'], ['02 / 复制', '复制完整提示词，开始自己的实验。'], ['03 / 连接', '通过点赞和笔记分享成果与发现。']], cta: '注册简单，档案始终开放。' },
+  ja: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['見る。', '学ぶ。', '再創造する。'], body: '作品とプロンプトは誰でも見ることができます。Googleで参加すると、いいねやコミュニティノートを通して他のクリエイターとつながれます。', steps: [['01 / WATCH', '映像と制作ツールを自由に見ます。'], ['02 / COPY', 'プロンプトをコピーして自分で試します。'], ['03 / CONNECT', 'いいねとノートで成果や発見を共有します。']], cta: '参加はシンプルに。アーカイブはいつでもオープンに。' },
+} as const;
+
 const copy = {
   ko: {
     home: 'BOTTOPIA 홈', menu: '주요 메뉴', language: '언어 선택', currentLanguage: '현재 언어',
@@ -128,6 +135,7 @@ export default function Home() {
   const [languageOpen, setLanguageOpen] = useState(false);
   const languageRef = useRef<HTMLDivElement>(null);
   const t = copy[locale];
+  const community = communityCopy[locale];
 
   const visibleProjects = filter === 'ALL' ? projects : projects.filter((project) => project.category === filter);
 
@@ -285,6 +293,18 @@ export default function Home() {
             </div>
           </section>
         )}
+      </section>
+
+      <section className="community-manifesto" id="community">
+        <div className="community-lead">
+          <p className="eyebrow">{community.eyebrow}</p>
+          <h2>{community.title[0]}<br />{community.title[1]}<br /><em>{community.title[2]}</em></h2>
+          <p>{community.body}</p>
+        </div>
+        <div className="community-path">
+          {community.steps.map(([label, description]) => <article key={label}><span>{label}</span><p>{description}</p></article>)}
+          <div className="community-join"><p>{community.cta}</p><MemberLogin locale={locale} /></div>
+        </div>
       </section>
 
       <section className="ecosystem" id="ecosystem">
