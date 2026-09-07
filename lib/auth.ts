@@ -1,15 +1,17 @@
 import { isSupabaseConfigured } from './supabase/config';
 import { createServerSupabaseClient } from './supabase/server';
+import { isSiteOwner } from './auth-policy';
 
 export async function getCurrentUser() {
   if (!isSupabaseConfigured) return null;
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user;
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase.auth.getUser();
+    return error ? null : data.user;
+  } catch { return null; }
 }
 
 export async function getOwnerUser() {
   const user = await getCurrentUser();
-  const ownerEmail = process.env.SITE_OWNER_EMAIL?.trim().toLowerCase();
-  return user?.email?.trim().toLowerCase() === ownerEmail ? user : null;
+  return isSiteOwner(user, process.env.SITE_OWNER_USER_ID, process.env.SITE_OWNER_EMAIL) ? user : null;
 }
