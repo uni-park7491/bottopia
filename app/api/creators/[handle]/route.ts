@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '../../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../../lib/supabase/config';
 import { normalizeHandle } from '../../../../lib/profile-policy';
-import { publicProfileSelect, serializeProfile, toPublicCreator, type ProfileRow } from '../../../../lib/profiles';
+import { profileColumns, serializeProfile, toPublicCreator, type ProfileRow } from '../../../../lib/profiles';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,10 +12,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ handle: st
   const handle = normalizeHandle(input);
   if (!handle) return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
   const admin = createAdminClient();
-  const result = await admin.from('profiles').select(publicProfileSelect).eq('handle', handle).maybeSingle();
+  const result = await admin.from('profiles').select(await profileColumns(admin)).eq('handle', handle).maybeSingle().returns<ProfileRow>();
   if (result.error || !result.data) return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
   const profile = serializeProfile(result.data as ProfileRow);
-  const visible = profile.creatorStatus === 'APPROVED' || profile.role === 'FOUNDING_CREATOR' || profile.role === 'ADMIN';
+  const visible = profile.creatorStatus !== 'SUSPENDED' && (profile.creatorStatus === 'APPROVED' || profile.role === 'FOUNDING_CREATOR' || profile.role === 'ADMIN');
   if (!visible) return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
 
   const works = await admin.from('works').select('*').eq('creator_id', profile.id).eq('published', true).order('created_at', { ascending: false });
@@ -38,5 +38,5 @@ export async function GET(_: Request, { params }: { params: Promise<{ handle: st
     remixOf: row.remix_of ?? null,
   }));
 
-  return NextResponse.json({ profile: toPublicCreator(profile), works: serializedWorks }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } });
+  return NextResponse.json({ profile: toPublicCreator(profile), works: serializedWorks }, { headers: { 'Cache-Control': 'no-store' } });
 }

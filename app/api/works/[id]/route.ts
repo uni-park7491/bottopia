@@ -3,6 +3,7 @@ import { createAdminClient } from '../../../../lib/supabase/admin';
 import { getOwnerUser } from '../../../../lib/auth';
 import { isSupabaseConfigured } from '../../../../lib/supabase/config';
 import { profilesById, toPublicCreator } from '../../../../lib/profiles';
+import { guardMutation } from '../../../../lib/request-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,14 +37,18 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   } }, { headers: { 'Cache-Control': 'private, no-store' } });
 }
 
-export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await getOwnerUser())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const owner = await getOwnerUser();
+  if (!owner) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const blocked = await guardMutation(request, 'work-delete', 30, owner.id);
+  if (blocked) return blocked;
   const { id } = await params;
   const admin = createAdminClient();
   const { data: work } = await admin.from('works').select('video_key,poster_key').eq('id', id).maybeSingle();
   if (!work) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  await admin.storage.from('works').remove([work.video_key, work.poster_key].filter(Boolean) as string[]);
+  const removed = await admin.storage.from('works').remove([work.video_key, work.poster_key].filter(Boolean) as string[]);
+  if (removed.error) return NextResponse.json({ error: '파일을 삭제하지 못했습니다. 다시 시도해주세요.' }, { status: 503 });
   const { error } = await admin.from('works').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: '작품 정보를 삭제하지 못했습니다. 다시 시도해주세요.' }, { status: 503 });
   return NextResponse.json({ ok: true });
 }

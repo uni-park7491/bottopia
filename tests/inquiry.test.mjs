@@ -27,6 +27,6 @@ test('inquiries remain private and owner-readable through the server API', () =>
 test('portfolio exposes a shareable full project route', () => {
   const archive = readFileSync(new URL('../app/components/CreatorArchive.tsx', import.meta.url), 'utf8');
   const page = readFileSync(new URL('../app/works/[id]/page.tsx', import.meta.url), 'utf8');
-  assert.match(archive, /href=\{`\/works\/\$\{featured\.id\}`\}/);
+  assert.match(archive, /href=\{`\/works\/\$\{work\.id\}`\}/);
   assert.match(page, /<WorkDetail id=\{id\}/);
 });

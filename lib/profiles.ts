@@ -13,6 +13,7 @@ export type ProfileRow = {
   youtube_url: string | null;
   tiktok_url: string | null;
   website_url: string | null;
+  contact_email: string | null;
   available_for_work: boolean;
   role: ProfileRole;
   creator_status: CreatorStatus;
@@ -32,6 +33,7 @@ export type PublicProfile = {
   youtubeUrl: string | null;
   tiktokUrl: string | null;
   websiteUrl: string | null;
+  contactEmail: string | null;
   availableForWork: boolean;
   role: ProfileRole;
   creatorStatus: CreatorStatus;
@@ -52,13 +54,22 @@ export function toPublicCreator(profile: PublicProfile): PublicCreator {
     youtubeUrl: profile.youtubeUrl,
     tiktokUrl: profile.tiktokUrl,
     websiteUrl: profile.websiteUrl,
+    contactEmail: profile.contactEmail,
     availableForWork: profile.availableForWork,
     role: profile.role,
     createdAt: profile.createdAt,
   };
 }
 
-export const publicProfileSelect = 'id,handle,display_name,bio,location,tools,instagram_url,x_url,youtube_url,tiktok_url,website_url,available_for_work,role,creator_status,created_at,updated_at';
+export const publicProfileSelect = 'id,handle,display_name,bio,location,tools,instagram_url,x_url,youtube_url,tiktok_url,website_url,contact_email,available_for_work,role,creator_status,created_at,updated_at';
+const legacyProfileSelect = 'id,handle,display_name,bio,location,tools,instagram_url,x_url,youtube_url,tiktok_url,website_url,available_for_work,role,creator_status,created_at,updated_at';
+
+// Keep existing profile reads working during an additive schema rollout.
+export async function profileColumns(admin: SupabaseClient): Promise<typeof publicProfileSelect | typeof legacyProfileSelect> {
+  const check = await admin.from('profiles').select('contact_email').limit(0);
+  return check.error?.code === '42703' || check.error?.code === 'PGRST204'
+    ? legacyProfileSelect : publicProfileSelect;
+}
 
 export function serializeProfile(row: ProfileRow): PublicProfile {
   return {
@@ -73,6 +84,7 @@ export function serializeProfile(row: ProfileRow): PublicProfile {
     youtubeUrl: row.youtube_url,
     tiktokUrl: row.tiktok_url,
     websiteUrl: row.website_url,
+    contactEmail: row.contact_email ?? null,
     availableForWork: row.available_for_work,
     role: row.role,
     creatorStatus: row.creator_status,
@@ -97,6 +109,7 @@ export function profileDraftFromUser(user: User): PublicProfile {
     youtubeUrl: null,
     tiktokUrl: null,
     websiteUrl: null,
+    contactEmail: null,
     availableForWork: false,
     role: 'MEMBER',
     creatorStatus: 'PENDING',
@@ -105,7 +118,8 @@ export function profileDraftFromUser(user: User): PublicProfile {
 }
 
 export async function ensureProfile(admin: SupabaseClient, user: User): Promise<{ profile: PublicProfile; persisted: boolean }> {
-  const existing = await admin.from('profiles').select(publicProfileSelect).eq('id', user.id).maybeSingle();
+  const columns = await profileColumns(admin);
+  const existing = await admin.from('profiles').select(columns).eq('id', user.id).maybeSingle().returns<ProfileRow>();
   if (existing.data) return { profile: serializeProfile(existing.data as ProfileRow), persisted: true };
 
   const draft = profileDraftFromUser(user);
@@ -114,7 +128,7 @@ export async function ensureProfile(admin: SupabaseClient, user: User): Promise<
       id: user.id,
       handle,
       display_name: draft.displayName,
-    }).select(publicProfileSelect).single();
+    }).select(columns).single().returns<ProfileRow>();
     if (created.data) return { profile: serializeProfile(created.data as ProfileRow), persisted: true };
     if (created.error?.code !== '23505') break;
   }
@@ -124,7 +138,7 @@ export async function ensureProfile(admin: SupabaseClient, user: User): Promise<
 export async function profilesById(admin: SupabaseClient, ids: string[]): Promise<Map<string, PublicProfile>> {
   const unique = [...new Set(ids.filter(Boolean))];
   if (!unique.length) return new Map();
-  const result = await admin.from('profiles').select(publicProfileSelect).in('id', unique);
+  const result = await admin.from('profiles').select(await profileColumns(admin)).in('id', unique).returns<ProfileRow[]>();
   if (result.error) return new Map();
   return new Map((result.data ?? []).map((row) => {
     const profile = serializeProfile(row as ProfileRow);

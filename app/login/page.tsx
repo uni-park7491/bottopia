@@ -1,6 +1,6 @@
+import MemberLogin from '../components/MemberLogin';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import MemberLogin from '../components/MemberLogin';
 import type { Locale } from '../i18n';
 import { safeReturnPath } from '../../lib/auth-policy';
 
@@ -21,7 +21,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const next = safeReturnPath(typeof params.next === 'string' ? params.next : '/');
   return (
     <main className="login-shell" lang={locale}>
-      <header className="login-header"><Link className="brand" href="/">BOT<span>•</span>TOPIA</Link><Link href="/">{t.back} ↗</Link></header>
+
       <section className="login-layout">
         <div className="login-intro"><p className="eyebrow">BOTTOPIA COMMUNITY</p><h1>{t.title}</h1><p>{t.body}</p><span className="login-orbit" aria-hidden="true"><i /></span></div>
         <div className="login-card">

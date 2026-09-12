@@ -1,14 +1,16 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '../../lib/supabase/client';
 import { uploadError } from '../../lib/upload-policy';
+import FileDropInput from '../components/FileDropInput';
 
 type StudioWork = { id: string; title: string; category: string; filename: string; fileSize: number; published: boolean; createdAt: string };
 type UploadTicket = { workId: string; path: string; token: string; error?: string };
 
 export default function StudioUploader() {
+  const inFlight = useRef(false);
   const [works, setWorks] = useState<StudioWork[]>([]);
   const [status, setStatus] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -39,6 +41,8 @@ export default function StudioUploader() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setStatus('uploading'); setMessage('영상 전송을 준비하고 있습니다…');
     const form = event.currentTarget;
     const data = new FormData(form);
@@ -79,10 +83,12 @@ export default function StudioUploader() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || '작품 등록에 실패했습니다.');
-      form.reset(); setStatus('done'); setMessage('새 작품이 영상과 프롬프트를 포함해 공개 아카이브에 등록되었습니다.'); await refresh();
+      form.reset(); setStatus('done');
+      setMessage(data.get('published') === 'true' ? '작품과 프롬프트가 공개되었습니다.' : '비공개 초안으로 저장되었습니다.');
+      await refresh().catch(() => setMessage('작품은 저장되었습니다. 목록을 새로고침해주세요.'));
     } catch (error) {
       setStatus('error'); setMessage(error instanceof Error ? error.message : '업로드에 실패했습니다.');
-    }
+    } finally { inFlight.current = false; }
   }
 
   async function remove(work: StudioWork) {
@@ -95,7 +101,7 @@ export default function StudioUploader() {
     <div className="studio-grid">
       <form className="upload-form" onSubmit={submit}>
         <div className="studio-profile-callout"><div><span>CREATOR IDENTITY</span><p>작품에 표시될 이름과 소셜 링크를 먼저 설정할 수 있습니다.</p></div><Link href="/profile">EDIT MY PROFILE ↗</Link></div>
-        <div className="upload-drop"><span>01 / ARTWORK VIDEO</span><input required type="file" name="video" accept="video/mp4,video/webm,video/quicktime" /><p>작품 영상 · MP4 · WEBM · MOV / MAX 50MB</p></div>
+        <FileDropInput label="작품 영상" required name="video" accept="video/mp4,video/webm,video/quicktime" disabled={status === 'uploading'} validate={file => uploadError('video', file.type, file.size)} hint="MP4 · WEBM · MOV / 최대 50MB" />
         <div className="form-grid">
           <label>TITLE<input required name="title" placeholder="작품 제목" maxLength={100} /></label>
           <label>CATEGORY<select name="category" defaultValue="STORY"><option>STORY</option><option>CHARACTER</option><option>KNOWLEDGE</option><option>EXPERIMENT</option><option>BRAND FILM</option></select></label>
@@ -110,7 +116,7 @@ export default function StudioUploader() {
           <label className="wide">NEGATIVE PROMPT · OPTIONAL<textarea name="negativePrompt" rows={4} placeholder="네거티브 프롬프트가 있다면 입력하세요." maxLength={8000} /></label>
           <label className="wide">PROCESS NOTES · OPTIONAL<textarea name="processNotes" rows={6} placeholder="아이디어, 레퍼런스, 제작 순서, 모델별 수정 사항처럼 다른 창작자가 재현하는 데 필요한 과정을 적어주세요." maxLength={6000} /></label>
           <label>VIDEO LENGTH · SEC<input name="durationSeconds" inputMode="numeric" placeholder="15" /></label>
-          <label>COVER IMAGE · OPTIONAL<input type="file" name="poster" accept="image/jpeg,image/png,image/webp,image/avif" /></label>
+          <FileDropInput label="커버 이미지 · 선택" name="poster" accept="image/jpeg,image/png,image/webp,image/avif" disabled={status === 'uploading'} validate={file => uploadError('poster', file.type, file.size)} hint="JPG · PNG · WebP · AVIF / 최대 10MB" />
           <label className="publish-check"><input type="checkbox" name="published" value="true" defaultChecked /> 바로 공개하기</label>
         </div>
         <button className="upload-submit" type="submit" disabled={status === 'uploading'}>{status === 'uploading' ? 'UPLOADING ARTWORK...' : 'PUBLISH ARTWORK ↗'}</button>

@@ -1,26 +1,13 @@
 'use client';
 
-import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import CreatorArchive from './components/CreatorArchive';
-import MemberLogin from './components/MemberLogin';
-import { isLocale, localeOptions, type Locale } from './i18n';
+import { useSiteLocale } from './useSiteLocale';
 
-type Project = {
-  id: string;
-  title: string;
-  category: 'AI FILM' | 'CHARACTER' | 'CAMPAIGN';
-  year: string;
-  className: string;
-  ratio: 'portrait' | 'landscape' | 'square';
-  summary: string;
-};
 
-const projects: Project[] = [];
-
-const categories = ['ALL', 'AI FILM', 'CHARACTER', 'CAMPAIGN'] as const;
-type SiteSection = 'feed' | 'original' | 'community' | 'ecosystem' | 'about';
+type SiteSection = 'feed' | 'community' | 'ecosystem' | 'about';
 
 const communityCopy = {
   ko: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['보고.', '배우고.', '다시 만들기.'], body: '작품과 프롬프트는 누구에게나 공개됩니다. Google·네이버·카카오로 가입하면 좋아요와 커뮤니티 노트를 남기며 다른 창작자와 연결될 수 있어요.', steps: [['01 / WATCH', '영상과 제작 도구를 자유롭게 살펴봅니다.'], ['02 / COPY', '전체 프롬프트를 복사해 직접 실험합니다.'], ['03 / CONNECT', '좋아요와 노트로 결과와 발견을 나눕니다.']], cta: '감상과 프롬프트 복사는 자유롭게. 좋아요와 댓글을 남길 때만 로그인하세요.' },
@@ -29,12 +16,69 @@ const communityCopy = {
   ja: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['見る。', '学ぶ。', '再創造する。'], body: '作品とプロンプトは誰でも見ることができます。Google・NAVER・Kakaoで参加すると、いいねやコミュニティノートを通して他のクリエイターとつながれます。', steps: [['01 / WATCH', '映像と制作ツールを自由に見ます。'], ['02 / COPY', 'プロンプトをコピーして自分で試します。'], ['03 / CONNECT', 'いいねとノートで成果や発見を共有します。']], cta: '視聴とコピーは自由に。いいねやコメントをするときだけログイン。' },
 } as const;
 
-const originalEmptyCopy = {
-  ko: { title: '아직 공개된 오리지널 작업이 없습니다.', body: '실제 BOTTOPIA 프로젝트가 완성되면 이곳에 직접 업로드됩니다.', link: '운영자 스튜디오에서 업로드하기 ↗' },
-  en: { title: 'NO ORIGINAL WORKS PUBLISHED YET.', body: 'Completed BOTTOPIA projects will be uploaded here directly.', link: 'UPLOAD FROM CREATOR STUDIO ↗' },
-  zh: { title: '尚未发布原创作品。', body: 'BOTTOPIA 的实际项目完成后将直接上传至此。', link: '前往创作者工作室上传 ↗' },
-  ja: { title: 'まだオリジナル作品は公開されていません。', body: 'BOTTOPIAの実際のプロジェクトが完成したら、ここに直接アップロードされます。', link: 'クリエイタースタジオからアップロード ↗' },
+const networkCopy = {
+  ko: {
+    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
+    title: '작품이 사람을 만나고,\n사람이 다음 세계를 만듭니다.',
+    body: '작품을 공개하는 데서 끝나지 않습니다. 제작 과정을 나누고, 서로의 기술을 발견하고, 함께할 크리에이터와 실제 프로젝트를 만나는 네트워크를 만듭니다.',
+    paths: [
+      ['01 / SHOW', '작품과 제작 과정을 한곳에 기록합니다.'],
+      ['02 / CONNECT', '필요한 역할과 크리에이터를 발견합니다.'],
+      ['03 / COLLAB', '협업 제안과 프로젝트 의뢰로 연결됩니다.'],
+    ],
+    badge: 'FOUNDING CREATOR',
+    foundingTitle: 'BOTTOPIA의 첫 크리에이터가 되어주세요.',
+    foundingBody: '금전 보상 대신, 초기 활동을 함께 만든 기록과 발견될 기회를 제공합니다. 배지는 판매하지 않으며 첫 모집 기간에 승인된 활동 멤버에게만 남습니다.',
+    perks: ['영구 파운딩 배지', '런칭 큐레이션 우선 소개', '협업 모집 우선 참여'],
+    cta: '크리에이터 프로필 만들기 ↗',
+  },
+  en: {
+    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
+    title: 'WORK MEETS PEOPLE.\nPEOPLE BUILD NEW WORLDS.',
+    body: 'It goes beyond publishing a finished piece. Share the process, discover complementary skills, and meet creators and projects worth building with.',
+    paths: [
+      ['01 / SHOW', 'Keep your work and process together.'],
+      ['02 / CONNECT', 'Discover the right roles and creators.'],
+      ['03 / COLLAB', 'Turn a connection into a collaboration or brief.'],
+    ],
+    badge: 'FOUNDING CREATOR',
+    foundingTitle: 'BECOME ONE OF BOTTOPIA’S FIRST CREATORS.',
+    foundingBody: 'Instead of a cash reward, early members receive a lasting record of helping shape the network and more chances to be discovered. The badge is never sold.',
+    perks: ['PERMANENT FOUNDING BADGE', 'LAUNCH SPOTLIGHT', 'EARLY COLLAB ACCESS'],
+    cta: 'CREATE YOUR PROFILE ↗',
+  },
+  zh: {
+    eyebrow: 'BOTTOPIA / AI 创作者网络',
+    title: '作品连接创作者，\n创作者构建新世界。',
+    body: '这里不只展示完成作品。分享制作过程，发现互补的技能，并遇见值得共同完成的创作者与项目。',
+    paths: [
+      ['01 / 展示', '集中记录作品与制作过程。'],
+      ['02 / 连接', '发现合适的角色与创作者。'],
+      ['03 / 协作', '把联系转化为合作或项目委托。'],
+    ],
+    badge: 'FOUNDING CREATOR',
+    foundingTitle: '成为 BOTTOPIA 的首批创作者。',
+    foundingBody: '初期不提供现金奖励，而是保留共同建立社区的身份记录，并优先获得展示机会。该徽章不会出售。',
+    perks: ['永久创始成员徽章', '上线精选优先展示', '优先参与合作招募'],
+    cta: '创建创作者资料 ↗',
+  },
+  ja: {
+    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
+    title: '作品が人と出会い、\n人が次の世界をつくる。',
+    body: '完成作品を公開するだけではありません。制作過程を共有し、互いのスキルを見つけ、一緒につくるクリエイターやプロジェクトと出会うネットワークです。',
+    paths: [
+      ['01 / SHOW', '作品と制作過程を一か所に記録します。'],
+      ['02 / CONNECT', '必要な役割とクリエイターを見つけます。'],
+      ['03 / COLLAB', '出会いをコラボや依頼につなげます。'],
+    ],
+    badge: 'FOUNDING CREATOR',
+    foundingTitle: 'BOTTOPIA最初のクリエイターになりませんか。',
+    foundingBody: '金銭報酬ではなく、初期のネットワークを一緒につくった記録と、発見される機会を提供します。バッジを販売することはありません。',
+    perks: ['永久ファウンディングバッジ', 'ローンチ特集への優先掲載', 'コラボ募集への先行参加'],
+    cta: 'クリエイタープロフィールを作る ↗',
+  },
 } as const;
+
 
 const ecosystemPlanetCopy = {
   ko: [
@@ -126,75 +170,26 @@ const copy = {
   },
 } as const;
 
-const localeEventName = 'bottopia-locale-change';
-
-function subscribeToLocale(onStoreChange: () => void) {
-  window.addEventListener('storage', onStoreChange);
-  window.addEventListener(localeEventName, onStoreChange);
-  return () => {
-    window.removeEventListener('storage', onStoreChange);
-    window.removeEventListener(localeEventName, onStoreChange);
-  };
-}
-
-let fallbackLocale: Locale = 'ko';
-function readLocale(): Locale {
-  try {
-    const savedLocale = window.localStorage.getItem('bottopia-locale');
-    return isLocale(savedLocale) ? savedLocale : fallbackLocale;
-  } catch { return fallbackLocale; }
-}
-
-function readServerLocale(): Locale {
-  return 'ko';
-}
-
-function saveLocale(locale: Locale) {
-  fallbackLocale = locale;
-  try { window.localStorage.setItem('bottopia-locale', locale); } catch { /* Keep this tab usable when storage is blocked. */ }
-  window.dispatchEvent(new Event(localeEventName));
-}
-
 export default function Home() {
   const pathname = usePathname();
-  const section: SiteSection = pathname === '/original' ? 'original' : pathname === '/community' ? 'community' : pathname === '/ecosystem' ? 'ecosystem' : pathname === '/about' ? 'about' : 'feed';
-  const [filter, setFilter] = useState<(typeof categories)[number]>('ALL');
-  const [selected, setSelected] = useState<Project | null>(null);
+  const section: SiteSection = pathname === '/community' ? 'community' : pathname === '/ecosystem' ? 'ecosystem' : pathname === '/about' ? 'about' : 'feed';
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
   const [inquirySending, setInquirySending] = useState(false);
   const [activePlanet, setActivePlanet] = useState<string | null>(null);
-  const locale = useSyncExternalStore(subscribeToLocale, readLocale, readServerLocale);
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const languageRef = useRef<HTMLDivElement>(null);
+  const locale = useSiteLocale();
   const t = copy[locale];
   const community = communityCopy[locale];
-  const originalEmpty = originalEmptyCopy[locale];
+  const network = networkCopy[locale];
   const planets = ecosystemPlanetCopy[locale];
   const selectedPlanet = planets.find((planet) => planet.key === activePlanet) ?? null;
 
-  const visibleProjects = filter === 'ALL' ? projects : projects.filter((project) => project.category === filter);
-
-  useEffect(() => {
-    const option = localeOptions.find((item) => item.code === locale);
-    document.documentElement.lang = option?.htmlLang ?? locale;
-  }, [locale]);
-
-  useEffect(() => {
-    const closeLanguageMenu = (event: PointerEvent) => {
-      if (!languageRef.current?.contains(event.target as Node)) setLanguageOpen(false);
-    };
-    window.addEventListener('pointerdown', closeLanguageMenu);
-    return () => window.removeEventListener('pointerdown', closeLanguageMenu);
-  }, []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setSelected(null);
         setInquiryOpen(false);
-        setLanguageOpen(false);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -205,14 +200,15 @@ export default function Home() {
     event.preventDefault();
     setInquirySending(true);
     setCopyFailed(false);
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     try {
       const response = await fetch('/api/inquiries', {
         method: 'POST', headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ name: data.get('name'), contact: data.get('contact'), projectType: data.get('project'), timelineBudget: data.get('range'), brief: data.get('brief'), website: data.get('website'), locale }),
       });
       if (!response.ok) throw new Error();
-      event.currentTarget.reset();
+      form.reset();
       setCopied(true);
     } catch { setCopyFailed(true); }
     finally { setInquirySending(false); }
@@ -234,66 +230,14 @@ export default function Home() {
 
   return (
     <main>
-      <header className="site-header">
-        <Link className="brand" href="/" aria-label={t.home}>BOT<span>•</span>TOPIA</Link>
-        <nav className="nav" aria-label={t.menu}>
-          <Link href="/" aria-current={section === 'feed' ? 'page' : undefined}>{t.nav.prompt}</Link>
-          <Link href="/original" aria-current={section === 'original' ? 'page' : undefined}>{t.nav.lab}</Link>
-          <Link href="/creators">{t.nav.creators}</Link>
-          <Link href="/ecosystem" aria-current={section === 'ecosystem' ? 'page' : undefined}>{t.nav.ecosystem}</Link>
-          <Link href="/community" aria-current={section === 'community' ? 'page' : undefined}>{t.nav.community}</Link>
-          <Link href="/about" aria-current={section === 'about' ? 'page' : undefined}>{t.nav.about}</Link>
-          <MemberLogin compact locale={locale} />
-          <button className="nav-cta" onClick={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.nav.project}</button>
-          <div className="language-switcher" ref={languageRef}>
-            <button
-              className="language-toggle"
-              type="button"
-              aria-label={`${t.language}: ${localeOptions.find((option) => option.code === locale)?.label}`}
-              aria-haspopup="menu"
-              aria-expanded={languageOpen}
-              onClick={() => setLanguageOpen((open) => !open)}
-            >
-              <span className="globe-icon" aria-hidden="true" />
-              <span>{localeOptions.find((option) => option.code === locale)?.shortLabel}</span>
-            </button>
-            {languageOpen && (
-              <div className="language-menu" role="menu" aria-label={t.language}>
-                <p>{t.language}</p>
-                {localeOptions.map((option) => (
-                  <button
-                    key={option.code}
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={locale === option.code}
-                    className={locale === option.code ? 'active' : ''}
-                    onClick={() => { saveLocale(option.code); setLanguageOpen(false); }}
-                  >
-                    <span>{option.shortLabel}</span>
-                    <b>{option.label}</b>
-                    <i aria-hidden="true">{locale === option.code ? '●' : '○'}</i>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </nav>
-        <nav className="mobile-section-nav" aria-label={t.menu}>
-          <Link href="/" aria-current={section === 'feed' ? 'page' : undefined}>{t.nav.prompt}</Link>
-          <Link href="/original" aria-current={section === 'original' ? 'page' : undefined}>{t.nav.lab}</Link>
-          <Link href="/creators">{t.nav.creators}</Link>
-          <Link href="/ecosystem" aria-current={section === 'ecosystem' ? 'page' : undefined}>{t.nav.ecosystem}</Link>
-          <Link href="/community" aria-current={section === 'community' ? 'page' : undefined}>{t.nav.community}</Link>
-          <Link href="/about" aria-current={section === 'about' ? 'page' : undefined}>{t.nav.about}</Link>
-        </nav>
-      </header>
+
 
       {section === 'feed' && <>
         <section className="hero portfolio-hero" id="top">
-          <div className="portfolio-hero-top"><p className="eyebrow feed-eyebrow">BOTTOPIA / OPEN AI FILM &amp; CREATOR COMMUNITY</p><span>FOUNDED IN SEOUL · 2026</span></div>
-          <h1>WORLDS<br /><em>IN MOTION.</em></h1>
+          <div className="portfolio-hero-top"><p className="eyebrow feed-eyebrow">BOTTOPIA / AI FILM &amp; CREATOR NETWORK</p><span>FOUNDED IN SEOUL · 2026</span></div>
+          <h1>{({ ko: <>창작을 발견하고,<br /><em>다음 장면을 함께.</em></>, en: <>Discover a world.<br /><em>Make the next scene.</em></>, zh: <>发现创作，<br /><em>一起创造下一幕。</em></>, ja: <>創作を見つけ、<br /><em>次のシーンを一緒に。</em></> })[locale]}</h1>
           <div className="hero-bottom portfolio-hero-bottom">
-            <p><b>{t.hero[0]}</b><br />{t.hero[1]}<br /><span className="hero-open-line">WATCH THE WORK. LEARN THE PROCESS. MAKE YOUR VERSION.</span></p>
+            <p>{({ ko: 'AI 영상과 제작 과정을 나누는 크리에이터 공간. 작품을 발견하고, 프롬프트를 배우고, 함께할 사람을 만나세요.', en: 'A space for AI films and their makers. Explore the work, learn the prompts, and find your next collaborator.', zh: '分享 AI 影像与创作过程。发现作品，学习提示词，认识未来的合作伙伴。', ja: 'AI映像と制作プロセスを共有する場所。作品とプロンプトを見つけ、次の仲間に出会おう。' })[locale]}</p>
             <div><a href="#work">{({ ko: '작품 둘러보기 ↓', en: 'EXPLORE WORK ↓', zh: '探索作品 ↓', ja: '作品を見る ↓' })[locale]}</a><Link className="feed-upload" href="/profile">{({ ko: '크리에이터로 참여 ↗', en: 'JOIN AS A CREATOR ↗', zh: '成为创作者 ↗', ja: 'クリエイターとして参加 ↗' })[locale]}</Link></div>
           </div>
         </section>
@@ -305,39 +249,19 @@ export default function Home() {
             <article><span>02</span><h3>BUILD</h3><p>{({ ko: '도구와 모델을 조합해 움직이는 세계를 제작합니다.', en: 'Combine tools and models to build a world in motion.', zh: '组合工具与模型，构建动态世界。', ja: 'ツールとモデルを組み合わせ、動く世界を制作します。' })[locale]}</p></article>
             <article><span>03</span><h3>OPEN</h3><p>{({ ko: '프롬프트와 제작 정보를 공개해 다음 창작으로 연결합니다.', en: 'Open the prompt and production notes for the next maker.', zh: '公开提示词与制作信息，连接下一次创作。', ja: 'プロンプトと制作情報を公開し、次の創作へつなぎます。' })[locale]}</p></article>
           </div>
+          <div className="home-network" id="network">
+            <header className="home-network-head">
+              <div><p className="eyebrow">{network.eyebrow}</p><h2>{network.title}</h2></div>
+              <p>{network.body}</p>
+            </header>
+            <div className="home-network-paths">
+              {network.paths.map(([label, description]) => <article key={label}><span>{label}</span><p>{description}</p></article>)}
+            </div>
+            <Link className="network-join" href="/profile">{network.cta}</Link>
+          </div>
           <div className="home-contact-band"><p>{({ ko: '브랜드, 아티스트, 새로운 세계를 위한 AI 필름.', en: 'AI FILMS FOR BRANDS, ARTISTS, AND NEW WORLDS.', zh: '为品牌、艺术家与新世界制作 AI 影片。', ja: 'ブランド、アーティスト、新しい世界のためのAIフィルム。' })[locale]}</p><button onClick={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.nav.project}</button></div>
         </section>
       </>}
-
-      {section === 'original' && <section className="work-preview section-page" id="original-lab-panel">
-        <div className="section-head">
-          <h2>{t.originalLab}</h2>
-          <p>BOTTOPIA / ORIGINAL PROJECTS</p>
-        </div>
-        {projects.length > 0 && <div className="filters" aria-label={t.workFilter}>
-          {categories.map((category) => (
-            <button key={category} className={filter === category ? 'active' : ''} onClick={() => setFilter(category)}>
-              {category} <sup>{category === 'ALL' ? projects.length : projects.filter((item) => item.category === category).length}</sup>
-            </button>
-          ))}
-        </div>}
-        {projects.length === 0 ? <div className="archive-empty original-empty"><span>00 / ORIGINAL LAB</span><h3>{originalEmpty.title}</h3><p>{originalEmpty.body}</p><Link href="/studio">{originalEmpty.link}</Link></div> : <div className="project-grid">
-          {visibleProjects.map((work) => (
-            <button className={`project-card ${work.ratio}`} key={work.id} onClick={() => setSelected(work)} aria-label={`${work.title} · ${t.projectDetails}`}>
-              <div className={`artwork ${work.className}`}>
-                <span className="art-number">{work.id}</span>
-                <span className="art-orbit" />
-                <span className="art-core" />
-                <span className="view-tag">{t.viewProject}</span>
-              </div>
-              <div className="project-meta">
-                <h3>{work.title}</h3>
-                <span>{work.category} · {work.year}</span>
-              </div>
-            </button>
-          ))}
-        </div>}
-      </section>}
 
       {section === 'community' && <section className="community-manifesto section-page" id="community">
         <div className="community-lead">
@@ -414,21 +338,6 @@ export default function Home() {
           <Link href="/about">{t.backTop}</Link>
         </footer>
       </section></>}
-
-      {selected && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-          <article className="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelected(null)} aria-label={t.close}>×</button>
-            <div className={`modal-art artwork ${selected.className}`}><span className="art-orbit" /><span className="art-core" /></div>
-            <div className="modal-copy">
-              <p>{selected.id} / {selected.category} / {selected.year}</p>
-              <h2 id="project-title">{selected.title}</h2>
-              <p>{selected.summary}</p>
-              <button onClick={() => { setSelected(null); setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.similarProject}</button>
-            </div>
-          </article>
-        </div>
-      )}
 
       {inquiryOpen && (
         <div className="modal-backdrop inquiry-backdrop" role="presentation" onMouseDown={() => setInquiryOpen(false)}>

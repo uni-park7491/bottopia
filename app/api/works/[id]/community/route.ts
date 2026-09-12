@@ -1,3 +1,5 @@
+import { guardMutation } from '../../../../../lib/request-guard';
+import { readJsonObject } from '../../../../../lib/request-policy';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '../../../../../lib/auth';
 import { isSiteOwner } from '../../../../../lib/auth-policy';
@@ -38,7 +40,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return unavailable();
   const { id } = await params;
   if (!uuid.test(id)) return NextResponse.json({ error: 'Invalid work id' }, { status: 400 });
-  const body = await request.json().catch(() => null);
+  const blocked = await guardMutation(request, 'community', 60, user.id);
+  if (blocked) return blocked;
+  const body = await readJsonObject(request);
   if (!body || typeof body !== 'object') return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   const admin = createAdminClient();
   const { data: work, error: workError } = await admin.from('works').select('id').eq('id', id).eq('published', true).maybeSingle();
@@ -72,6 +76,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return unavailable();
   const { id } = await params;
+  const blocked = await guardMutation(request, 'comment-delete', 60, user.id);
+  if (blocked) return blocked;
   const commentId = request.nextUrl.searchParams.get('commentId');
   if (!uuid.test(id) || !commentId || !uuid.test(commentId)) return NextResponse.json({ error: 'Invalid work or comment id' }, { status: 400 });
   const admin = createAdminClient();

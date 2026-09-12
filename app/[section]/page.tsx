@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import BottopiaPage from '../page';
 
 const sections = ['original', 'community', 'ecosystem', 'about'] as const;
@@ -26,5 +26,6 @@ export async function generateMetadata({ params }: { params: Promise<{ section: 
 export default async function SectionPage({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
   if (!sections.includes(section as Section)) notFound();
+  if (section === 'original') redirect('/?collection=originals#work');
   return <BottopiaPage />;
 }

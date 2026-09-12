@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import CommunityPanel from '../../components/CommunityPanel';
-import MemberLogin from '../../components/MemberLogin';
 import { copyText } from '../../../lib/clipboard';
 import { creatorInitials } from '../../../lib/profile-policy';
 import type { PublicCreator } from '../../../lib/profiles';
@@ -46,10 +45,7 @@ export default function WorkDetail({ id }: { id: string }) {
 
   const year = new Date(work.createdAt).getFullYear();
   return <main className="work-detail-shell">
-    <header className="work-detail-header">
-      <Link className="brand" href="/">BOT<span>•</span>TOPIA</Link>
-      <nav><Link href="/">WORK</Link><Link href="/original">ORIGINALS</Link><Link href="/creators">CREATORS</Link><Link href="/ecosystem">LAB</Link><MemberLogin compact /></nav>
-    </header>
+
     <section className="case-hero">
       <div className="case-index"><span>{work.workType} / {year}</span><b>{work.category}</b></div>
       <h1>{work.title}</h1>

@@ -1,3 +1,5 @@
+import { guardMutation } from '../../../lib/request-guard';
+import { readJsonObject } from '../../../lib/request-policy';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../lib/supabase/config';
@@ -26,7 +28,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!isSupabaseConfigured || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ error: 'Inquiry service is not configured' }, { status: 503 });
-  const parsed = parseInquiry(await request.json().catch(() => null));
+  const blocked = await guardMutation(request, 'inquiry', 5);
+  if (blocked) return blocked;
+  const parsed = parseInquiry(await readJsonObject(request));
   if (!parsed.data) return NextResponse.json({ error: parsed.error }, { status: 400 });
 
   const admin = createAdminClient();

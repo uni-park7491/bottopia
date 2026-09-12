@@ -5,6 +5,13 @@ export const MAX_POSTER_BYTES = 10 * 1024 * 1024;
 const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 
+export function workMediaId(videoKey: string, posterKey: unknown): string | null {
+  const match = /^works\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})\/video\.(mp4|webm|mov)$/i.exec(videoKey);
+  if (!match) return null;
+  if (posterKey && (typeof posterKey !== 'string' || !new RegExp('^works/' + match[1] + '/poster\\.(jpg|jpeg|png|webp|avif)$', 'i').test(posterKey))) return null;
+  return match[1];
+}
+
 export function uploadError(kind: unknown, type: unknown, size: unknown): string | null {
   if (kind !== 'video' && kind !== 'poster') return '올바른 업로드 종류를 선택해주세요.';
   const video = kind === 'video';

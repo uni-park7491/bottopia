@@ -10,7 +10,7 @@ const projectUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const publicKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serverKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 assert.ok(projectUrl && publicKey && serverKey, 'Supabase configuration is required');
-const site = new URL(process.env.NEXT_PUBLIC_SITE_URL);
+const site = new URL(process.env.CHECK_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
 assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(site.hostname), 'Only run this check against a local site');
 const clientOptions = {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -25,7 +25,7 @@ async function check(name, action) {
   catch { failed++; console.error(`FAIL ${name} (credentials and response details withheld)`); }
 }
 
-for (const [table, field] of [['works', 'id'], ['work_comments', 'id'], ['work_reactions', 'work_id']]) {
+for (const [table, field] of [['works', 'id'], ['work_comments', 'id'], ['work_reactions', 'work_id'], ['profiles', 'id'], ['project_inquiries', 'id']]) {
   await check(`server can read ${table}`, async () => {
     const result = await admin.from(table).select(field, { head: true, count: 'exact' });
     assert.equal(result.error, null);

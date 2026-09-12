@@ -1,7 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { creatorInitials, normalizeHandle, normalizeSocialUrl, validHandle } from '../lib/profile-policy.ts';
+import { creatorInitials, normalizeHandle, normalizeSocialUrl, validHandle, publicContactEmail } from '../lib/profile-policy.ts';
+
+test('contact email requires explicit consent and supports revocation', () => {
+  assert.equal(publicContactEmail('private@example.com', false), null);
+  assert.equal(publicContactEmail('private@example.com', 'true'), null);
+  assert.equal(publicContactEmail(undefined, undefined), null);
+  assert.equal(publicContactEmail(' hello+crew@example.com ', true), 'hello+crew@example.com');
+  for (const invalid of ['', 'wrong', 'a@b.com?bcc=evil@example.com', 'a@b.com\r\nBcc:evil@example.com', 'a'.repeat(255)+'@b.com']) {
+    assert.throws(() => publicContactEmail(invalid, true));
+  }
+});
 
 test('creator handles normalize to a stable public URL segment', () => {
   assert.equal(normalizeHandle('  BOT Topia__Crew  '), 'bot-topia-crew');

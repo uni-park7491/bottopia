@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '../../../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../../../lib/supabase/config';
+import { guardMutation } from '../../../../../lib/request-guard';
 
-export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!isSupabaseConfigured || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ error: 'Archive not configured' }, { status: 503 });
   const { id } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return NextResponse.json({ error: 'Invalid work id' }, { status: 400 });
   const admin = createAdminClient();
+  const blocked = await guardMutation(request, 'copy', 120);
+  if (blocked) return blocked;
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await admin.from('works').select('copies').eq('id', id).eq('published', true).maybeSingle();
     if (error) return NextResponse.json({ error: 'Could not read work' }, { status: 503 });

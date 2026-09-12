@@ -1,7 +1,10 @@
+import { guardMutation } from '../../../lib/request-guard';
+import { readJsonObject } from '../../../lib/request-policy';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../lib/supabase/config';
 import { getOwnerUser } from '../../../lib/auth';
+import { workMediaId, uploadError } from '../../../lib/upload-policy';
 import { ensureProfile, profilesById, toPublicCreator, type PublicProfile } from '../../../lib/profiles';
 
 export const dynamic = 'force-dynamic';
@@ -35,25 +38,34 @@ export async function GET(request: NextRequest) {
   let query = admin.from('works').select('*').order('created_at', { ascending: false });
   if (!studioScope) query = query.eq('published', true);
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: '작품을 불러오지 못했습니다.' }, { status: 503 });
   const rows = (data ?? []) as WorkRow[];
   const profiles = await profilesById(admin, rows.map((row) => row.creator_id ?? ''));
   return NextResponse.json({ works: rows.map((row) => serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null)), configured: true }, {
-    headers: { 'Cache-Control': 'private, no-store' },
+    headers: { 'Cache-Control': studioScope ? 'private, no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' },
   });
 }
 
 export async function POST(request: NextRequest) {
   const owner = await getOwnerUser();
   if (!owner) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const body = await request.json();
+  const blocked = await guardMutation(request, 'work-create', 20, owner.id);
+  if (blocked) return blocked;
+  const body = await readJsonObject(request);
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: '잘못된 요청입니다.' }, { status: 400 });
   const title = String(body.title ?? '').trim().slice(0, 100);
   const prompt = String(body.prompt ?? '').trim().slice(0, 16000);
   const videoKey = String(body.videoKey ?? '');
-  if (!title || !prompt || !videoKey.startsWith('works/')) return NextResponse.json({ error: '제목, 프롬프트, 영상은 필수입니다.' }, { status: 400 });
-  const id = videoKey.split('/')[1] || crypto.randomUUID();
+  const id = workMediaId(videoKey, body.posterKey);
+  if (!title || !prompt || !id) return NextResponse.json({ error: '제목, 프롬프트와 올바른 영상 경로가 필요합니다.' }, { status: 400 });
   const slugBase = title.toLowerCase().normalize('NFKD').replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 55) || 'work';
   const admin = createAdminClient();
+  const videoInfo = await admin.storage.from('works').info(videoKey);
+  if (videoInfo.error || uploadError('video', videoInfo.data?.contentType, videoInfo.data?.size)) return NextResponse.json({ error: '영상 전송이 완료되지 않았거나 지원하지 않는 파일입니다.' }, { status: 400 });
+  if (body.posterKey) {
+    const posterInfo = await admin.storage.from('works').info(String(body.posterKey));
+    if (posterInfo.error || uploadError('poster', posterInfo.data?.contentType, posterInfo.data?.size)) return NextResponse.json({ error: '커버 이미지 전송을 확인해주세요.' }, { status: 400 });
+  }
   const ensured = await ensureProfile(admin, owner);
   if (ensured.persisted && ensured.profile.role !== 'FOUNDING_CREATOR') {
     await admin.from('profiles').update({ role: 'FOUNDING_CREATOR', creator_status: 'APPROVED' }).eq('id', owner.id);
@@ -64,7 +76,7 @@ export async function POST(request: NextRequest) {
     tool: String(body.tool ?? '').slice(0, 80), model: String(body.model ?? '').slice(0, 80), prompt,
     negative_prompt: String(body.negativePrompt ?? '').slice(0, 8000), video_key: videoKey,
     poster_key: body.posterKey || null, original_filename: String(body.originalFilename ?? 'video.mp4').slice(0, 255),
-    content_type: String(body.contentType ?? 'video/mp4').slice(0, 100), file_size: Number(body.fileSize) || 0,
+    content_type: videoInfo.data.contentType, file_size: videoInfo.data.size,
     duration_seconds: Number(body.durationSeconds) || null, published: Boolean(body.published), owner_email: owner.email ?? '',
   };
   const extendedRecord = {
@@ -80,6 +92,6 @@ export async function POST(request: NextRequest) {
   if (error && ['PGRST204', '42703', '42P01'].includes(error.code ?? '')) {
     ({ error } = await admin.from('works').insert(baseRecord));
   }
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: '작품을 저장하지 못했습니다.' }, { status: 503 });
   return NextResponse.json({ ok: true, id }, { status: 201 });
 }

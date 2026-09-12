@@ -7,6 +7,17 @@ export type CreatorStatus = (typeof creatorStatuses)[number];
 export const socialFields = ['instagramUrl', 'xUrl', 'youtubeUrl', 'tiktokUrl', 'websiteUrl'] as const;
 export type SocialField = (typeof socialFields)[number];
 
+// Only explicitly published contact addresses are stored. Never use auth email as a fallback.
+export function publicContactEmail(value: unknown, publish: unknown): string | null {
+  if (publish !== true) return null;
+  if (typeof value !== 'string') throw new Error('공개할 연락 이메일을 입력해주세요.');
+  const email = value.trim();
+  if (email.length > 254 || !/^[A-Za-z0-9.!#$%&'*+/=^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$/.test(email)) {
+    throw new Error('올바른 연락 이메일을 입력해주세요.');
+  }
+  return email;
+}
+
 export function normalizeHandle(value: unknown): string {
   return String(value ?? '')
     .trim()

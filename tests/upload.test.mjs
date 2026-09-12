@@ -1,7 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { uploadError, MAX_VIDEO_BYTES, MAX_POSTER_BYTES } from '../lib/upload-policy.ts';
+import { uploadError, MAX_VIDEO_BYTES, MAX_POSTER_BYTES, workMediaId } from '../lib/upload-policy.ts';
+
+test('work paths exclude avatars, traversal, and another work cover', () => {
+  const id = '11111111-1111-4111-8111-111111111111';
+  assert.equal(workMediaId(`works/${id}/video.mp4`, `works/${id}/poster.webp`), id);
+  assert.equal(workMediaId(`works/${id}/video.mp4`, 'avatars/owner/avatar.webp'), null);
+  assert.equal(workMediaId(`works/${id}/video.mp4`, 'works/22222222-2222-4222-8222-222222222222/poster.webp'), null);
+  assert.equal(workMediaId(`works/${id}/video.mp4`, `works/${id}/posterXwebp`), null);
+  assert.equal(workMediaId('works/../../avatar.webp', null), null);
+});
 
 test('Free plan accepts supported videos up to 50MB, never 500MB', () => {
   for (const mime of ['video/mp4', 'video/webm', 'video/quicktime']) {
@@ -41,6 +50,7 @@ test('artwork feed previews on hover and exposes prompt copying', () => {
   assert.match(archive, /className="transmission-prompt"/);
   assert.match(archive, /onClick=\{\(\) => copyPrompt\(work\)\}/);
   assert.match(studio, /<textarea required name="prompt"/);
-  assert.match(archive, /className="featured-work"/);
+  assert.match(archive, /className="archive-grid"/);
+  assert.doesNotMatch(archive, /className="featured-work"/);
   assert.match(archive, /VIEW FULL PROJECT|프로젝트 전체 보기/);
 });
