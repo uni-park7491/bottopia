@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './refinement.css';
 import SiteHeader from './components/SiteHeader';
+import Link from 'next/link';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" data-scroll-behavior="smooth">
-      <body><SiteHeader />{children}</body>
+      <body><SiteHeader />{children}<div style={{ padding: '24px', textAlign: 'center', fontSize: '14px', lineHeight: 1.8 }}><Link href="/privacy">개인정보처리방침 · Privacy Policy</Link></div></body>
     </html>
   );
 }

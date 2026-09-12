@@ -31,6 +31,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <MemberLogin locale={locale} returnTo={next} />
           <Link className="login-skip" href="/">{({ ko: '로그인 없이 홈 피드 보기 →', en: 'Browse the home feed without signing in →', zh: '无需登录，浏览首页 →', ja: 'ログインせずにホームフィードを見る →' })[locale]}</Link>
           <p className="login-privacy">{t.privacy}</p>
+          <p className="login-privacy"><Link href="/privacy">{({ ko: '개인정보처리방침', en: 'Privacy Policy', zh: '隐私政策', ja: 'プライバシーポリシー' })[locale]}</Link></p>
           <nav className="login-languages" aria-label="Language">{(['ko', 'en', 'zh', 'ja'] as const).map((lang, i) => <Link key={lang} lang={lang} aria-current={lang === locale ? 'page' : undefined} href={`/login?${new URLSearchParams({ lang, next, ...(typeof params.error === 'string' ? { error: params.error } : {}) })}`}>{['한국어', 'English', '中文', '日本語'][i]}</Link>)}</nav>
         </div>
       </section>
