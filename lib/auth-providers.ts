@@ -3,7 +3,9 @@ import type { Provider } from '@supabase/supabase-js';
 export const authProviders = [
   { id: 'google', provider: 'google', name: 'Google', enabled: process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === 'true' },
   { id: 'naver', provider: 'custom:naver', name: 'NAVER', enabled: process.env.NEXT_PUBLIC_AUTH_NAVER_ENABLED === 'true' },
-  { id: 'kakao', provider: 'kakao', name: 'Kakao', enabled: process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED === 'true' },
+  // Explicitly enabled by the site owner. Supabase still enforces the actual OAuth configuration.
+  // Do not let the stale deployment-only flag hide this configured provider again.
+  { id: 'kakao', provider: 'kakao', name: 'Kakao', enabled: true },
 ] as const satisfies readonly { id: string; provider: Provider; name: string; enabled: boolean }[];
 
 export type AuthProvider = (typeof authProviders)[number];

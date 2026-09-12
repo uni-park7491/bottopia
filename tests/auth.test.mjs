@@ -44,6 +44,9 @@ test('immutable owner ID takes priority even for email-less users', () => {
 test('provider ordering and Naver OIDC identifier', () => {
   assert.deepEqual(authProviders.map(p => p.provider), ['google', 'custom:naver', 'kakao']);
 });
+test('owner-enabled Kakao login does not depend on stale deployment flags', () => {
+  assert.equal(authProviders.find(p => p.id === 'kakao').enabled, true);
+});
 for (const provider of authProviders) {
   test(`${provider.id} OAuth preserves return page and locale`, () => {
     const payload = oauthOptions(provider, 'http://127.0.0.1:3000', '/studio?draft=1', 'ja');
