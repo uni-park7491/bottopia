@@ -8,7 +8,7 @@ export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'su
   const isQwen = engine === 'qwen';
   const [text, setText] = useState(''), [voice, setVoice] = useState('F1'), [speed, setSpeed] = useState(1);
   const [allowed, setAllowed] = useState(false), [busy, setBusy] = useState(false), [status, setStatus] = useState('');
-  const [result, setResult] = useState<{ url: string; blob: Blob; seconds: number; text: string } | null>(null);
+  const [result, setResult] = useState<{ url: string; blob: Blob; seconds: number; text: string; voice: string } | null>(null);
   const worker = useRef<Worker | null>(null), timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const running = useRef(false), currentUrl = useRef('');
   function dispose() { worker.current?.terminate(); worker.current = null; if (timer.current) clearTimeout(timer.current); timer.current = null; running.current = false; }
@@ -34,7 +34,7 @@ export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'su
           if (!(data.wav instanceof ArrayBuffer) || data.wav.byteLength < 44 || !Number.isFinite(data.seconds) || data.seconds <= 0) { fail('음성 파일이 올바르지 않습니다.'); return; }
           const blob = new Blob([data.wav], { type: 'audio/wav' }), url = URL.createObjectURL(blob);
           if (currentUrl.current) URL.revokeObjectURL(currentUrl.current);
-          currentUrl.current = url; setResult({ url, blob, seconds: data.seconds, text: submitted });
+          currentUrl.current = url; setResult({ url, blob, seconds: data.seconds, text: submitted, voice });
           dispose(); setBusy(false); setStatus('음성이 완성되었습니다. 재생하거나 WAV 파일을 내려받으세요.');
         }
       };
@@ -47,18 +47,20 @@ export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'su
     <div className="tools-columns"><div>
       <nav className="tts-engines" aria-label="TTS 모델 선택">
         <a href="/tools/tts?model=supertonic" aria-current={!isQwen ? 'page' : undefined}><strong>Supertonic 3</strong><span>여성·남성 목소리 · 약 400MB</span></a>
-        <a href="/tools/tts?model=qwen" aria-current={isQwen ? 'page' : undefined}><strong>Qwen3-TTS</strong><span>한국어 음성 · 약 1.48GB</span></a>
+        <a href="/tools/tts?model=qwen" aria-current={isQwen ? 'page' : undefined}><strong>Qwen3-TTS</strong><span>여성·남성 목소리 · 약 1.48GB</span></a>
       </nav>
-      <p className="tool-help">{isQwen ? 'Qwen3-TTS 1.7B · 다운로드 후 이 기기에서 생성합니다. 최신 데스크톱 Chrome 또는 Edge를 사용해주세요. 기본 음색으로 생성하며 음성 복제는 제공하지 않습니다.' : 'Supertonic 3 · 목소리와 읽는 속도를 선택할 수 있습니다.'} 모델을 변경하면 화면이 이동하므로 결과를 먼저 저장해주세요.</p>
+      <p className="tool-help">{isQwen ? 'Qwen3-TTS 1.7B Base · 준비된 여성·남성 AI 샘플을 기준으로 음성을 생성합니다. CustomVoice·VoiceDesign 모델은 아닙니다. 최신 데스크톱 Chrome 또는 Edge를 사용해주세요.' : 'Supertonic 3 · 목소리와 읽는 속도를 선택할 수 있습니다.'} 모델을 변경하면 화면이 이동하므로 결과를 먼저 저장해주세요.</p>
       <label className="tool-field">읽을 대사 · {text.length}/500자<textarea rows={7} maxLength={500} disabled={busy} value={text} onChange={e => setText(e.target.value)} placeholder="안녕하세요. 봇토피아에서 새로운 이야기를 시작합니다." /></label>
-      {!isQwen && <div className="scene-fields"><label className="tool-field">목소리<select disabled={busy} value={voice} onChange={e => setVoice(e.target.value)}><option value="F1">여성 목소리 · F1</option><option value="M1">남성 목소리 · M1</option></select></label><label className="tool-field">속도 · {speed.toFixed(1)}배<input type="range" min="0.8" max="1.3" step="0.1" disabled={busy} value={speed} onChange={e => setSpeed(Number(e.target.value))} /></label></div>}
+      <div className="scene-fields"><label className="tool-field">목소리<select disabled={busy} value={voice} onChange={e => setVoice(e.target.value)}><option value="F1">여성 목소리 · F1</option><option value="M1">남성 목소리 · M1</option></select></label>{!isQwen && <label className="tool-field">속도 · {speed.toFixed(1)}배<input type="range" min="0.8" max="1.3" step="0.1" disabled={busy} value={speed} onChange={e => setSpeed(Number(e.target.value))} /></label>}</div>
+      {isQwen && <p className="tool-help">목소리는 AI 기준 샘플의 음색을 따르며 결과에 따라 차이가 있습니다. 감정·연기 지시문은 아직 지원하지 않으므로, 괄호 지문 없이 읽을 대사만 입력해주세요.</p>}
+      {isQwen && <p className="tool-help">기준 음성은 Supertonic 3로 생성한 AI 샘플입니다. <a href="/vendor/supertonic/MODEL-LICENSE.txt" target="_blank" rel="noopener noreferrer">기준 음성의 이용 제한</a>을 확인해주세요. 타인 사칭·괴롭힘 등에 사용할 수 없으며 공개 시 AI 생성 음성임을 표시해야 합니다.</p>}
       <label className="story-consent"><input type="checkbox" checked={allowed} disabled={busy} onChange={e => setAllowed(e.target.checked)} />음성 모델 다운로드 허용 · 최초 약 {isQwen ? '1.48GB' : '400MB'}. Wi-Fi 사용 권장.</label>
       <p className="tool-help">Hugging Face에서 모델을 받으며 IP 등 일반 접속 정보가 해당 서비스에 전달됩니다. 대사와 음성은 이 기기에서 처리하고 서버에 업로드하지 않습니다. 기기에 따라 수 분 걸릴 수 있습니다.</p>
       <div className="tools-actions"><button className="tool-primary" disabled={busy || !allowed || !text.trim()} onClick={generate}>{busy ? '음성 생성 중…' : '음성 만들기'}</button>{busy && <button onClick={() => { dispose(); setBusy(false); setStatus('중단했습니다. 기존 음성은 유지됩니다.'); }}>중단</button>}</div>
       <p role="status">{status}</p>
       {isQwen ? <details><summary>모델 및 사용 조건</summary><p>Qwen3-TTS는 <a href="/vendor/qwen-tts/MODEL-LICENSE.txt" target="_blank" rel="noopener noreferrer">Apache-2.0 라이선스</a> 모델입니다. 타인의 대사·저작물 권리를 확인하고 사칭 등 해로운 용도로 사용하지 마세요. AI 생성 음성임을 표시해주세요. 기기 저장 공간 및 실행 메모리가 필요하며 캐시는 브라우저에서 삭제될 수 있습니다.</p><a href="/vendor/qwen-tts/NOTICE.md" target="_blank" rel="noopener noreferrer">오픈소스 출처</a></details> : <details><summary>모델 및 사용 조건</summary><p>Supertonic 3의 <a href="/vendor/supertonic/MODEL-LICENSE.txt" target="_blank" rel="noopener noreferrer">Open RAIL-M 라이선스 전문</a>과 부속서 A의 이용 제한이 적용됩니다. 불법 이용, 사칭, 괴롭힘, 타인에게 해를 끼치는 허위정보 생성 등 제한된 용도로 사용할 수 없습니다. 결과를 공개할 때 AI 생성 음성임을 명확히 표시해야 합니다. 타인의 대사·저작물 권리도 확인해주세요. 음성 복제 기능은 제공하지 않습니다.</p><a href="/vendor/supertonic/NOTICE.md" target="_blank" rel="noopener noreferrer">오픈소스 출처</a></details>}
     </div><aside className="tool-preview"><span className="preview-label">AUDIO PREVIEW</span><h3>들어보고, 저장하세요.</h3>{result ? <>
-      <p>{result.seconds.toFixed(1)}초 · WAV · AI 생성 음성</p>
+      <p>{result.seconds.toFixed(1)}초 · {result.voice === 'M1' ? '남성' : '여성'} 목소리 · WAV · AI 생성 음성</p>
       <audio key={result.url} controls preload="metadata" src={result.url} aria-label="생성된 내레이션 재생" style={{ width: '100%' }} onError={() => setStatus('음성 재생에 실패했습니다. 다시 생성해주세요.')} />
       <div className="tools-actions"><button onClick={() => { downloadFile(result.blob, 'bottopia-ai-narration.wav'); setStatus('WAV 다운로드를 요청했습니다. 저장된 파일을 확인해주세요.'); }}>음성 WAV 내려받기</button></div>
       <p className="story-review-text">{result.text}</p>

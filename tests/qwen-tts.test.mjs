@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { runInNewContext } from 'node:vm';
 import { encodeSpeech, splitSpeech, validateSpeech } from '../public/vendor/supertonic/audio-utils.mjs';
+import { referenceVoice, loadReferenceVoice } from '../public/vendor/qwen-tts/voices.mjs';
 const read = p => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 test('Qwen downloads are pinned and execution never sends entered text to a server', () => {
  const worker = read('public/vendor/qwen-tts/worker.mjs');
@@ -37,35 +38,67 @@ test('TTS retains consent, real playback, download and forced worker cancellatio
  assert.match(ui,/!allowed/); assert.match(ui,/worker.current\?\.terminate\(\)/);
  assert.match(ui,/<audio.*controls/); assert.match(ui,/downloadFile\(result.blob/);
  assert.match(ui,/isQwen \? '\/vendor\/qwen-tts\/worker.mjs'/);
+ assert.match(ui,/text: submitted, voice/);
+ assert.match(ui,/result.voice === 'M1'/);
+ assert.doesNotMatch(ui,/!isQwen && <div className="scene-fields"/);
 });
 
-async function exercise({ text='안녕하세요.', truncated=false, silent=false, isolated=true, supported=true }={}) {
- const messages=[]; let disposed=0, loaded=0;
+async function exercise({ text='안녕하세요.', voice='F1', truncated=false, silent=false, isolated=true, supported=true, supportsSpeakerReference=true }={}) {
+ const messages=[], references=[]; let disposed=0, loaded=0;
  const self={crossOriginIsolated:isolated,postMessage:message=>messages.push(message)};
  class Bridge {
   async loadModelFromUrl(){loaded++;}
   async loadMultimodalProjector(){}
-  async getTextToSpeechCapabilities(){return {supported,sampleRate:24000,channels:1};}
-  async synthesizeSpeech(){return {pcm:Float32Array.from({length:24000},(_,i)=>silent?0:Math.sin(i/10)),sampleRate:24000,channels:1,truncated};}
+  async getTextToSpeechCapabilities(){return {supported,supportsSpeakerReference,sampleRate:24000,channels:1};}
+  async synthesizeSpeech(options){references.push(options.speakerAudio);return {pcm:Float32Array.from({length:24000},(_,i)=>silent?0:Math.sin(i/10)),sampleRate:24000,channels:1,truncated};}
   async dispose(){disposed++;}
  }
  const source=read('public/vendor/qwen-tts/worker.mjs').replace(/^import .*;\n/gm,'').replaceAll('import.meta.url',JSON.stringify('https://bottopia.studio/vendor/qwen-tts/worker.mjs'));
- runInNewContext(source,{self,LlamaWebGpuBridge:Bridge,encodeSpeech,splitSpeech,validateSpeech,URL,Float32Array,console:{error(){}}});
- await self.onmessage({data:{text}});
- return {messages,disposed,loaded};
+ runInNewContext(source,{self,LlamaWebGpuBridge:Bridge,encodeSpeech,splitSpeech,validateSpeech,referenceVoice,loadReferenceVoice:async voice=>voice,URL,Float32Array,console:{error(){}}});
+ await self.onmessage({data:{text,voice}});
+ return {messages,disposed,loaded,references};
 }
 test('Qwen worker success emits playable PCM16 WAV and disposes the engine',async()=>{
  const {messages,disposed}=await exercise();const result=messages.find(m=>m.type==='result');
  assert.equal(result.seconds,1);assert.equal(result.wav.byteLength,48044);assert.equal(disposed,1);
 });
 test('Qwen rejects incomplete, silent and unsupported output rather than showing success',async()=>{
- for(const options of [{truncated:true},{silent:true},{supported:false}]){
+ for(const options of [{truncated:true},{silent:true},{supported:false},{supportsSpeakerReference:false}]){
   const {messages,disposed}=await exercise(options);
   assert.equal(messages.some(m=>m.type==='result'),false);assert.equal(messages.at(-1).type,'error');assert.equal(disposed,1);
  }
 });
 test('Qwen rejects invalid input and non-isolated contexts before downloading',async()=>{
- for(const options of [{text:''},{text:'가'.repeat(501)},{isolated:false}]){
+ for(const options of [{text:''},{text:'가'.repeat(501)},{isolated:false},{voice:'invalid'}]){
   const {messages,loaded}=await exercise(options);assert.equal(loaded,0);assert.equal(messages.at(-1).type,'error');
  }
+});
+test('Both selected voices reach synthesis, including every chunk',async()=>{
+ for(const voice of ['F1','M1']) {
+  const result=await exercise({voice,text:'가'.repeat(210)});
+  assert.equal(result.messages.at(-1).type,'result');
+  assert.ok(result.references.length>1);
+  assert.ok(result.references.every(reference=>reference===voice));
+ }
+});
+test('Voice references reject unknown IDs, failed downloads and non-WAV responses',async()=>{
+ assert.throws(()=>referenceVoice('../../secrets'));
+ assert.throws(()=>referenceVoice(undefined));
+ await assert.rejects(loadReferenceVoice('F1',async()=>({ok:false})));
+ await assert.rejects(loadReferenceVoice('F1',async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(44)})));
+});
+test('Bundled female and male references are distinct, valid bounded WAVs',async()=>{
+ const hashes=[];
+ for(const voice of ['F1','M1']) {
+  const bytes=readFileSync(referenceVoice(voice));
+  const loaded=await loadReferenceVoice(voice,async()=>({ok:true,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}));
+  assert.equal(loaded.length,bytes.length);
+  assert.equal(bytes.readUInt16LE(20),1); // PCM
+  assert.equal(bytes.readUInt16LE(22),1); // mono
+  assert.equal(bytes.readUInt32LE(24),24000);
+  assert.equal(bytes.readUInt16LE(34),16);
+  assert.ok(bytes.length>144000 && bytes.length<1000000);
+  hashes.push(createHash('sha256').update(bytes).digest('hex'));
+ }
+ assert.notEqual(hashes[0],hashes[1]);
 });

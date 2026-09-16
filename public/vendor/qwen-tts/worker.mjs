@@ -1,5 +1,6 @@
 import { LlamaWebGpuBridge } from './llama_webgpu_bridge.js';
 import { encodeSpeech, splitSpeech, validateSpeech } from '../supertonic/audio-utils.mjs';
+import { referenceVoice, loadReferenceVoice } from './voices.mjs';
 
 const base = 'https://huggingface.co/ggml-org/Qwen3-TTS-12Hz-1.7B-Base-GGUF/resolve/ca27d74bc954b73dadab5b71ca265d87fc861a7c';
 const modelUrl = `${base}/Qwen3-TTS-12Hz-1.7B-Base-Q4_K_M.gguf`;
@@ -13,7 +14,9 @@ self.onmessage = async ({ data }) => {
   let bridge, projectorObjectUrl;
   try {
     const text = validateSpeech(data.text, 'F1', 1);
+    referenceVoice(data.voice);
     if (!self.crossOriginIsolated) throw new Error('Qwen 실행 화면을 새로고침한 뒤 다시 시도해주세요.');
+    const speakerAudio = await loadReferenceVoice(data.voice);
     bridge = new LlamaWebGpuBridge({
       disableWorker: true, preferMemory64: true,
       coreModuleUrlMem64: new URL('./llama_webgpu_core_mem64.js', import.meta.url).href,
@@ -43,11 +46,12 @@ self.onmessage = async ({ data }) => {
     await bridge.loadMultimodalProjector(projectorObjectUrl || projectorUrl);
     const capabilities = await bridge.getTextToSpeechCapabilities();
     if (!capabilities.supported || capabilities.sampleRate !== 24000 || capabilities.channels !== 1) throw new Error('이 브라우저에서 Qwen 음성 엔진을 실행할 수 없습니다.');
+    if (!capabilities.supportsSpeakerReference) throw new Error('현재 엔진이 목소리 선택을 지원하지 않습니다. 화면을 새로고침해주세요.');
     const chunks = splitSpeech(text, 100), audio = [];
     let length = 0;
     for (let i = 0; i < chunks.length; i++) {
       const result = await bridge.synthesizeSpeech({
-        text: chunks[i], language: 'ko', maxFrames: 720,
+        text: chunks[i], language: 'ko', speakerAudio, maxFrames: 720,
         onProgress: event => progress(`음성 생성 ${i + 1}/${chunks.length} · ${event.framesGenerated || 0} 프레임`),
       });
       if (result.truncated) throw new Error('문장을 끝까지 읽지 못했습니다. 대사를 짧게 나누어 다시 시도해주세요.');
