@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="login-intro"><p className="eyebrow">BOTTOPIA COMMUNITY</p><h1>{t.title}</h1><p>{t.body}</p><span className="login-orbit" aria-hidden="true"><i /></span></div>
         <div className="login-card">
           <p className="eyebrow">WELCOME TO BOTTOPIA</p><h2>{t.subtitle}</h2><p className="login-description">{t.account}</p>
-          {next === '/studio' && <p className="login-description">{({ ko: '영상 업로드는 로그인한 BOTTOPIA 운영자만 이용할 수 있습니다. 홈 피드와 영상 감상은 로그인 없이 열려 있어요.', en: 'Uploads are for the signed-in BOTTOPIA owner. The home feed and videos are open without sign-in.', zh: '仅登录的 BOTTOPIA 运营者可以上传视频。首页与视频无需登录即可浏览。', ja: '動画のアップロードはログインしたBOTTOPIA運営者のみ利用できます。フィードと動画はログインなしで見られます。' })[locale]}</p>}
+          {next.startsWith('/studio') && <p className="login-description">{({ ko: '로그인 후 크리에이터 승인 상태를 확인하고 작품을 공유할 수 있습니다. 홈 피드와 프롬프트는 로그인 없이 열려 있어요.', en: 'Sign in to check your creator approval and share work. Browsing works and prompts needs no sign-in.', zh: '登录后可查看创作者审核状态并分享作品。浏览作品与提示词无需登录。', ja: 'ログイン後、クリエイターの承認状況を確認して作品を共有できます。作品とプロンプトの閲覧はログイン不要です。' })[locale]}</p>}
           {params.error && <p className="login-notice" role="alert">{params.error === 'setup' ? t.setup : t.error}</p>}
           <MemberLogin locale={locale} returnTo={next} />
           <Link className="login-skip" href="/">{({ ko: '로그인 없이 홈 피드 보기 →', en: 'Browse the home feed without signing in →', zh: '无需登录，浏览首页 →', ja: 'ログインせずにホームフィードを見る →' })[locale]}</Link>

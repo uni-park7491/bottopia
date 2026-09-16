@@ -11,7 +11,7 @@ passed++;
 for (const [path, expected] of [
   ['/', 'WORLDS'], ['/login', '네이버로 계속하기'],
   ['/login?lang=en', 'Continue with Kakao'], ['/login?lang=zh', '使用 NAVER 继续'],
-  ['/login?lang=ja', 'Googleで続ける'], ['/studio', '영상 업로드는 로그인한 BOTTOPIA 운영자만'],
+  ['/login?lang=ja', 'Googleで続ける'], ['/studio', '로그인 후 크리에이터 승인 상태를 확인'],
   ['/login?error=oauth', '로그인이 취소되었거나 완료되지 않았어요.'],
 ]) {
   const response = await read(path);

@@ -1,0 +1,27 @@
+{
+  "purpose": "Manual semantic regression against real local model output; passing unit tests is not a substitute.",
+  "passRule": "Every case preserves all required actor/action pairs, explicit ending and revision scope; no contradictory roles or repeated ending paragraphs. Record raw output and pass/fail evidence per case.",
+  "cases": [
+    {
+      "id": "servant-agency",
+      "topic": "노비가 퇴근하려는데 집사가 마지막 짐을 나르라고 한다. 노비는 집사에게 반대쪽 손잡이를 부탁하고 함께 대문 밖으로 나간다. 문을 닫고 노비가 집사에게 오늘은 같이 퇴근하자고 말하는 따뜻한 코미디.",
+      "runtime": 60,
+      "required": ["집사가 노비에게 마지막 짐을 나르라고 한다", "노비가 집사에게 손잡이를 들어달라고 부탁한다", "노비가 함께 퇴근하자고 제안한다", "두 사람이 같이 퇴근한다"],
+      "revision": "등장인물의 행동과 결말은 유지하고 배경을 비 오는 저녁으로 바꿔줘."
+    },
+    {
+      "id": "courier-recipient",
+      "topic": "택배 기사 민수가 잘못 배달된 상자를 찾는다. 주민 지우가 상자를 돌려주며 우산을 빌려준다. 민수는 다음 날 우산과 감사 편지를 지우에게 돌려준다.",
+      "runtime": 30,
+      "required": ["민수가 택배 기사다", "지우가 민수에게 우산을 빌려준다", "민수가 지우에게 우산과 감사 편지를 돌려준다"],
+      "revision": "다음 날 장면을 대사 없이 행동으로만 보여줘. 물건을 주고받는 사람은 바꾸지 마."
+    },
+    {
+      "id": "robot-choice",
+      "topic": "작은 로봇이 버려진 화분을 발견한다. 배터리가 부족하지만 남은 전력으로 자동 급수기를 작동시킨다. 다음 날 아이가 살아난 식물을 보고 로봇을 충전해준다.",
+      "runtime": 60,
+      "required": ["로봇이 남은 전력으로 급수기를 작동시킨다", "식물이 살아난 뒤 아이가 로봇을 충전한다", "급수 선택이 충전 도움을 받는 결과로 이어진다"],
+      "revision": "결말을 유지하고 로봇의 망설임을 조금 더 보여줘."
+    }
+  ]
+}

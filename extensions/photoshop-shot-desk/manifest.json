@@ -1,0 +1,10 @@
+{
+  "manifestVersion": 5,
+  "id": "studio.bottopia.shotdesk",
+  "name": "BOTTOPIA Shot Desk",
+  "version": "0.1.0",
+  "main": "index.html",
+  "host": { "app": "PS", "minVersion": "24.2.0", "data": { "apiVersion": 2 } },
+  "entrypoints": [{ "type": "panel", "id": "shotdesk", "label": { "default": "BOTTOPIA Shot Desk" }, "minimumSize": { "width": 280, "height": 320 }, "preferredDockedSize": { "width": 360, "height": 600 } }],
+  "requiredPermissions": { "localFileSystem": "request" }
+}

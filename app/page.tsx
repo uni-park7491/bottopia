@@ -233,12 +233,12 @@ export default function Home() {
 
 
       {section === 'feed' && <>
-        <section className="hero portfolio-hero" id="top">
+        <section className="hero portfolio-hero discovery-hero" id="top">
           <div className="portfolio-hero-top"><p className="eyebrow feed-eyebrow">BOTTOPIA / AI FILM &amp; CREATOR NETWORK</p><span>FOUNDED IN SEOUL · 2026</span></div>
           <h1>{({ ko: <>창작을 발견하고,<br /><em>다음 장면을 함께.</em></>, en: <>Discover a world.<br /><em>Make the next scene.</em></>, zh: <>发现创作，<br /><em>一起创造下一幕。</em></>, ja: <>創作を見つけ、<br /><em>次のシーンを一緒に。</em></> })[locale]}</h1>
           <div className="hero-bottom portfolio-hero-bottom">
             <p>{({ ko: 'AI 영상과 제작 과정을 나누는 크리에이터 공간. 작품을 발견하고, 프롬프트를 배우고, 함께할 사람을 만나세요.', en: 'A space for AI films and their makers. Explore the work, learn the prompts, and find your next collaborator.', zh: '分享 AI 影像与创作过程。发现作品，学习提示词，认识未来的合作伙伴。', ja: 'AI映像と制作プロセスを共有する場所。作品とプロンプトを見つけ、次の仲間に出会おう。' })[locale]}</p>
-            <div><a href="#work">{({ ko: '작품 둘러보기 ↓', en: 'EXPLORE WORK ↓', zh: '探索作品 ↓', ja: '作品を見る ↓' })[locale]}</a><Link className="feed-upload" href="/profile">{({ ko: '크리에이터로 참여 ↗', en: 'JOIN AS A CREATOR ↗', zh: '成为创作者 ↗', ja: 'クリエイターとして参加 ↗' })[locale]}</Link></div>
+            <div><Link className="feed-upload" href="/studio">{({ ko: '내 작품 공유하기', en: 'Share your work', zh: '分享作品', ja: '作品を共有' })[locale]}</Link><Link href="/creators">{({ ko: '크리에이터 만나기', en: 'Meet creators', zh: '认识创作者', ja: 'クリエイターに出会う' })[locale]}</Link></div>
           </div>
         </section>
         <section className="worlds-hub section-page" id="work"><CreatorArchive locale={locale} /></section>
@@ -259,7 +259,7 @@ export default function Home() {
             </div>
             <Link className="network-join" href="/profile">{network.cta}</Link>
           </div>
-          <div className="home-contact-band"><p>{({ ko: '브랜드, 아티스트, 새로운 세계를 위한 AI 필름.', en: 'AI FILMS FOR BRANDS, ARTISTS, AND NEW WORLDS.', zh: '为品牌、艺术家与新世界制作 AI 影片。', ja: 'ブランド、アーティスト、新しい世界のためのAIフィルム。' })[locale]}</p><button onClick={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.nav.project}</button></div>
+          <div className="home-contact-band"><p>{({ ko: '완성한 장면이 있나요? 만드는 과정까지 함께 나눠주세요.', en: 'Made something? Share the scene and how you made it.', zh: '完成了新作品？分享场景与制作过程。', ja: '新しいシーンができたら、つくり方も共有しましょう。' })[locale]}</p><Link href="/studio">{({ ko: '내 작품 공유하기', en: 'Share your work', zh: '分享作品', ja: '作品を共有' })[locale]}</Link></div>
         </section>
       </>}
 
@@ -275,9 +275,22 @@ export default function Home() {
         </div>
       </section>}
 
-      {section === 'ecosystem' && <section className="ecosystem section-page" id="ecosystem">
+      {section === 'about' && <section className="about section-page" id="about">
+        <div className="about-label">
+          <p>( {t.aboutLabel} )</p>
+          <div className="tiny-bot" aria-hidden="true"><span /></div>
+          <a className="about-lab-link" href="#lab">{({ ko: '창작 랩 살펴보기 ↓', en: 'Explore the creative lab ↓', zh: '探索创作实验室 ↓', ja: '創作ラボを見る ↓' })[locale]}</a>
+        </div>
+        <div className="about-copy">
+          <h2>{t.aboutTitle[0]}<br />{t.aboutTitle[1]}<br /><em>{t.aboutTitle[2]}</em></h2>
+          <p>{t.aboutBody}</p>
+          <dl className="about-credentials"><div><dt>ROLE</dt><dd>AI FILM DIRECTOR</dd></div><div><dt>FOCUS</dt><dd>VISUAL WORLDBUILDING</dd></div><div><dt>BASE</dt><dd>SEOUL / KOREA</dd></div></dl>
+        </div>
+      </section>}
+
+      {section === 'about' && <section className="ecosystem section-page about-lab" id="lab">
         <div className="ecosystem-intro">
-          <p className="eyebrow">{t.ecosystemEyebrow}</p>
+          <p className="eyebrow">{({ ko: 'BOTTOPIA 소개 / 창작 랩', en: 'ABOUT BOTTOPIA / CREATIVE LAB', zh: '关于 BOTTOPIA / 创作实验室', ja: 'BOTTOPIAについて / 創作ラボ' })[locale]}</p>
           <h2>{t.ecosystemTitle[0]}<br />{t.ecosystemTitle[1]}<br /><em>{t.ecosystemTitle[2]}</em></h2>
           <p>{t.ecosystemBody}</p>
         </div>
@@ -302,17 +315,7 @@ export default function Home() {
         </div>
       </section>}
 
-      {section === 'about' && <><section className="about section-page" id="about">
-        <div className="about-label">
-          <p>( {t.aboutLabel} )</p>
-          <div className="tiny-bot" aria-hidden="true"><span /></div>
-        </div>
-        <div className="about-copy">
-          <h2>{t.aboutTitle[0]}<br />{t.aboutTitle[1]}<br /><em>{t.aboutTitle[2]}</em></h2>
-          <p>{t.aboutBody}</p>
-          <dl className="about-credentials"><div><dt>ROLE</dt><dd>AI FILM DIRECTOR</dd></div><div><dt>FOCUS</dt><dd>VISUAL WORLDBUILDING</dd></div><div><dt>BASE</dt><dd>SEOUL / KOREA</dd></div></dl>
-        </div>
-      </section>
+      {section === 'about' && <>
 
       <section className="services" aria-labelledby="services-title">
         <p className="eyebrow" id="services-title">{t.whatWeMake}</p>

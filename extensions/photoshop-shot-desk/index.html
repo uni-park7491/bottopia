@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+body { padding: 16px; color: #eee; font-size: 13px; }
+h2 { font-size: 19px; margin-bottom: 12px; }
+p { margin: 12px 0; line-height: 1.5; }
+button, select { margin-bottom: 12px; width: 100%; min-height: 36px; }
+textarea { width: 100%; height: 260px; margin-bottom: 12px; }
+</style></head><body>
+<h2>BOTTOPIA Shot Desk</h2>
+<p>샷리스트와 참고 이미지를 편집 가능한 콘티 보드로 옮깁니다. 4개 샷씩 페이지가 나뉘며 이미지 생성·자동 공개는 없습니다.</p>
+<button id="open">작업 파일 열기</button>
+<p>이미지 연결은 현재 세션에서만 유지됩니다. 다른 작업 파일을 열면 연결이 초기화되며, 이미 만든 Photoshop 문서는 그대로 남습니다.</p>
+<select id="shots" disabled><option>파일을 먼저 선택해주세요</option></select>
+<textarea id="preview" readonly></textarea>
+<button id="image" disabled>선택한 샷에 참고 이미지 넣기</button>
+<p id="imageName">PNG/JPEG · 파일당 10MB, 16메가픽셀 이하</p>
+<button id="removeImage" disabled>이 샷의 이미지 연결 해제</button>
+<label for="pages">콘티 페이지</label><select id="pages" disabled></select>
+<button id="board" disabled>선택한 페이지를 새 콘티 보드로 만들기</button>
+<button id="savePsd" disabled>만든 콘티 보드 PSD 저장</button>
+<button id="savePng" disabled>만든 콘티 보드 PNG 사본 저장</button>
+<button id="create" disabled>선택한 샷으로 새 제작 노트 만들기</button>
+<p id="status">파일은 이 기기에서만 읽습니다. 기존 문서는 수정하지 않습니다.</p>
+<script src="index.js"></script>
+</body></html>

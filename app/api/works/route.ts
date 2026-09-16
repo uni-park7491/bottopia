@@ -3,8 +3,9 @@ import { readJsonObject } from '../../../lib/request-policy';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../lib/supabase/config';
-import { getOwnerUser } from '../../../lib/auth';
-import { workMediaId, uploadError } from '../../../lib/upload-policy';
+import { getCurrentUser, getOwnerUser } from '../../../lib/auth';
+import { getCreatorAccess } from '../../../lib/creator-access';
+import { workMediaId, memberMediaId, uploadError } from '../../../lib/upload-policy';
 import { ensureProfile, profilesById, toPublicCreator, type PublicProfile } from '../../../lib/profiles';
 
 export const dynamic = 'force-dynamic';
@@ -33,22 +34,28 @@ function serialize(row: WorkRow, creator: PublicProfile | null = null) {
 export async function GET(request: NextRequest) {
   if (!isSupabaseConfigured || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ works: [], configured: false });
   const studioScope = request.nextUrl.searchParams.get('scope') === 'all';
+  const mine = request.nextUrl.searchParams.get('scope') === 'mine';
+  const user = mine ? await getCurrentUser() : null;
+  if (mine && !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (studioScope && !(await getOwnerUser())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const admin = createAdminClient();
   let query = admin.from('works').select('*').order('created_at', { ascending: false });
-  if (!studioScope) query = query.eq('published', true);
+  if (mine) query = query.eq('creator_id', user!.id);
+  else if (!studioScope) query = query.eq('published', true);
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: '작품을 불러오지 못했습니다.' }, { status: 503 });
   const rows = (data ?? []) as WorkRow[];
   const profiles = await profilesById(admin, rows.map((row) => row.creator_id ?? ''));
   return NextResponse.json({ works: rows.map((row) => serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null)), configured: true }, {
-    headers: { 'Cache-Control': studioScope ? 'private, no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' },
+    headers: { 'Cache-Control': studioScope || mine ? 'private, no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' },
   });
 }
 
 export async function POST(request: NextRequest) {
-  const owner = await getOwnerUser();
-  if (!owner) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const access = await getCreatorAccess();
+  if (!access) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!access.canUpload) return NextResponse.json({ error: '크리에이터 승인 후 업로드할 수 있습니다.' }, { status: 403 });
+  const owner = access.user;
   const blocked = await guardMutation(request, 'work-create', 20, owner.id);
   if (blocked) return blocked;
   const body = await readJsonObject(request);
@@ -56,10 +63,18 @@ export async function POST(request: NextRequest) {
   const title = String(body.title ?? '').trim().slice(0, 100);
   const prompt = String(body.prompt ?? '').trim().slice(0, 16000);
   const videoKey = String(body.videoKey ?? '');
-  const id = workMediaId(videoKey, body.posterKey);
+  const id = access.isOwner ? workMediaId(videoKey, body.posterKey) : memberMediaId(videoKey, body.posterKey, owner.id);
   if (!title || !prompt || !id) return NextResponse.json({ error: '제목, 프롬프트와 올바른 영상 경로가 필요합니다.' }, { status: 400 });
   const slugBase = title.toLowerCase().normalize('NFKD').replace(/[^a-z0-9가-힣]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 55) || 'work';
   const admin = createAdminClient();
+  const remixOf = String(body.remixOf ?? '').trim();
+  if (remixOf) {
+    if (!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(remixOf) || remixOf === id) return NextResponse.json({ error: '올바른 원작을 선택해주세요.' }, { status: 400 });
+    const source = await admin.from('works').select('id').eq('id', remixOf).eq('published', true).maybeSingle();
+    if (source.error) return NextResponse.json({ error: '원작을 확인하지 못했습니다.' }, { status: 503 });
+    if (!source.data) return NextResponse.json({ error: '공개된 원작만 연결할 수 있습니다.' }, { status: 400 });
+  }
+  if (body.workType === 'REMIX' && !remixOf) return NextResponse.json({ error: '재창작할 원작을 선택해주세요.' }, { status: 400 });
   const videoInfo = await admin.storage.from('works').info(videoKey);
   if (videoInfo.error || uploadError('video', videoInfo.data?.contentType, videoInfo.data?.size)) return NextResponse.json({ error: '영상 전송이 완료되지 않았거나 지원하지 않는 파일입니다.' }, { status: 400 });
   if (body.posterKey) {
@@ -67,7 +82,8 @@ export async function POST(request: NextRequest) {
     if (posterInfo.error || uploadError('poster', posterInfo.data?.contentType, posterInfo.data?.size)) return NextResponse.json({ error: '커버 이미지 전송을 확인해주세요.' }, { status: 400 });
   }
   const ensured = await ensureProfile(admin, owner);
-  if (ensured.persisted && ensured.profile.role !== 'FOUNDING_CREATOR') {
+  if (!ensured.persisted) return NextResponse.json({ error: '프로필 저장을 먼저 완료해주세요.' }, { status: 503 });
+  if (access.isOwner && ensured.profile.role !== 'FOUNDING_CREATOR') {
     await admin.from('profiles').update({ role: 'FOUNDING_CREATOR', creator_status: 'APPROVED' }).eq('id', owner.id);
   }
   const baseRecord = {
@@ -77,21 +93,19 @@ export async function POST(request: NextRequest) {
     negative_prompt: String(body.negativePrompt ?? '').slice(0, 8000), video_key: videoKey,
     poster_key: body.posterKey || null, original_filename: String(body.originalFilename ?? 'video.mp4').slice(0, 255),
     content_type: videoInfo.data.contentType, file_size: videoInfo.data.size,
-    duration_seconds: Number(body.durationSeconds) || null, published: Boolean(body.published), owner_email: owner.email ?? '',
+    duration_seconds: Number.isSafeInteger(Number(body.durationSeconds)) && Number(body.durationSeconds) > 0 && Number(body.durationSeconds) <= 86400 ? Number(body.durationSeconds) : null, published: body.published === true, owner_email: owner.email ?? '',
   };
   const extendedRecord = {
     ...baseRecord,
     creator_id: ensured.persisted ? owner.id : null,
-    work_type: ['ORIGINAL', 'COMMUNITY', 'REMIX'].includes(String(body.workType)) ? String(body.workType) : 'ORIGINAL',
-    remix_of: /^[0-9a-f-]{36}$/i.test(String(body.remixOf ?? '')) ? String(body.remixOf) : null,
+    work_type: remixOf ? 'REMIX' : access.isOwner && body.workType === 'ORIGINAL' ? 'ORIGINAL' : 'COMMUNITY',
+    remix_of: remixOf || null,
     process_notes: String(body.processNotes ?? '').trim().slice(0, 6000),
     aspect_ratio: String(body.aspectRatio ?? '').trim().slice(0, 30),
     seed: String(body.seed ?? '').trim().slice(0, 120),
   };
-  let { error } = await admin.from('works').insert(extendedRecord);
-  if (error && ['PGRST204', '42703', '42P01'].includes(error.code ?? '')) {
-    ({ error } = await admin.from('works').insert(baseRecord));
-  }
+  // Ownership must never be silently dropped on an older database schema.
+  const { error } = await admin.from('works').insert(extendedRecord);
   if (error) return NextResponse.json({ error: '작품을 저장하지 못했습니다.' }, { status: 503 });
   return NextResponse.json({ ok: true, id }, { status: 201 });
 }

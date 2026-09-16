@@ -8,12 +8,12 @@ import { localeOptions } from '../i18n';
 import { useSiteLocale, saveLocale } from '../useSiteLocale';
 
 const labels = {
-  ko: ['작품', '크리에이터', '랩', '커뮤니티', '소개', '프로젝트 문의'],
-  en: ['Work', 'Creators', 'Lab', 'Community', 'About', 'Start a project'],
-  zh: ['作品', '创作者', '实验室', '社区', '关于', '项目咨询'],
-  ja: ['作品', 'クリエイター', 'ラボ', 'コミュニティ', '紹介', '制作の相談'],
+  ko: ['탐색', '창작 도구', '크리에이터', '커뮤니티', '소개', '작품 올리기'],
+  en: ['Explore', 'Tools', 'Creators', 'Community', 'About', 'Upload work'],
+  zh: ['探索', '创作工具', '创作者', '社区', '关于', '上传作品'],
+  ja: ['探索', '創作ツール', 'クリエイター', 'コミュニティ', '紹介', '作品を投稿'],
 };
-const paths = ['/', '/creators', '/ecosystem', '/community', '/about'];
+const paths = ['/', '/tools', '/creators', '/community', '/about'];
 export default function SiteHeader() {
   const pathname = usePathname();
   const locale = useSiteLocale();
@@ -23,7 +23,7 @@ export default function SiteHeader() {
     <nav className="primary-navigation" aria-label={locale === 'ko' ? '주 메뉴' : 'Main navigation'}>
       {paths.map((path, i) => <Link key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</Link>)}
     </nav>
-    <div className="header-actions"><Link className="header-inquiry" href="/about#contact">{labels[locale][5]}</Link><MemberLogin compact locale={locale} />
+    <div className="header-actions"><Link className="header-inquiry" href="/studio">{labels[locale][5]}</Link><MemberLogin compact locale={locale} />
       <label className="locale-select"><span className="globe-icon" aria-hidden="true" /><span className="sr-only">언어 / Language</span><select value={locale} onChange={e => saveLocale(e.target.value as typeof locale)}>{localeOptions.map(x => <option key={x.code} value={x.code}>{x.label}</option>)}</select></label>
     </div>
   </header>;

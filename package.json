@@ -13,9 +13,11 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
+    "@mlc-ai/web-llm": "0.2.85",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "next": "16.3.3",
+    "onnxruntime-web": "1.22.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "sharp": "0.35.4"

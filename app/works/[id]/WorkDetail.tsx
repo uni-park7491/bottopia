@@ -14,6 +14,7 @@ type Work = {
   durationSeconds: number | null; copies: number; createdAt: string;
   creator: PublicCreator | null; workType: string; remixOf: string | null; processNotes: string; aspectRatio: string; seed: string;
   remixes: Array<{ id: string; title: string; posterUrl: string | null; creator: PublicCreator | null }>;
+  source: { id: string; title: string; creator: PublicCreator | null } | null;
 };
 
 export default function WorkDetail({ id }: { id: string }) {
@@ -74,8 +75,8 @@ export default function WorkDetail({ id }: { id: string }) {
         <pre>{work.prompt}</pre>
         {work.negativePrompt && <div className="case-negative"><span>NEGATIVE PROMPT</span><pre>{work.negativePrompt}</pre></div>}
         {work.processNotes && <div className="case-process-notes"><span>PROCESS NOTES</span><p>{work.processNotes}</p></div>}
-        {work.remixOf && <div className="case-remix-source"><span>REMIX SOURCE</span><Link href={`/works/${work.remixOf}`}>VIEW ORIGINAL WORK ↗</Link></div>}
-        <div className="case-remix-action"><div><span>MAKE YOUR VERSION</span><p>프롬프트를 복사해 새로운 결과를 만들고, 이후 원작과 연결해 공개할 수 있습니다.</p></div><button onClick={copyPrompt}>{copied ? 'PROMPT COPIED ✓' : 'COPY TO REMIX ↗'}</button></div>
+        {work.remixOf && <div className="case-remix-source"><span>원작 출처</span>{work.source ? <div><Link href={`/works/${work.source.id}`}>{work.source.title} ↗</Link>{work.source.creator && <p><Link href={`/creators/${work.source.creator.handle}`}>{work.source.creator.displayName} · @{work.source.creator.handle}</Link></p>}</div> : <p>원작이 비공개로 전환되었거나 더 이상 제공되지 않습니다.</p>}</div>}
+        <div className="case-remix-action"><div><span>MAKE YOUR VERSION</span><p>프롬프트를 복사해 외부 AI 도구에서 만들어보세요. 완성된 결과를 이 원작에 연결할 수 있습니다. 같은 프롬프트도 도구와 설정에 따라 결과가 달라집니다.</p></div><button onClick={copyPrompt}>{copied ? 'PROMPT COPIED ✓' : 'COPY TO REMIX ↗'}</button><Link href={`/studio?remix=${work.id}`}>내 버전 올리기</Link></div>
         {work.creator && <section className="case-creator-profile"><div className="creator-avatar" aria-hidden="true">{creatorInitials(work.creator.displayName)}</div><div><span>CREATOR PROFILE</span><h2>{work.creator.displayName}</h2><p>{work.creator.bio || `@${work.creator.handle}`}</p><div className="case-creator-links"><Link href={`/creators/${work.creator.handle}`}>ALL WORKS ↗</Link>{work.creator.instagramUrl && <a href={work.creator.instagramUrl} target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a>}{work.creator.xUrl && <a href={work.creator.xUrl} target="_blank" rel="noopener noreferrer">X ↗</a>}{work.creator.youtubeUrl && <a href={work.creator.youtubeUrl} target="_blank" rel="noopener noreferrer">YOUTUBE ↗</a>}{work.creator.websiteUrl && <a href={work.creator.websiteUrl} target="_blank" rel="noopener noreferrer">WEBSITE ↗</a>}</div></div></section>}
         {work.remixes.length > 0 && <section className="case-remix-grid"><header><span>REMIX LINEAGE</span><b>{work.remixes.length} VERSIONS</b></header><div>{work.remixes.map((remix) => <Link href={`/works/${remix.id}`} key={remix.id}>{remix.posterUrl ? <span className="case-remix-poster"><Image src={remix.posterUrl} alt="" fill sizes="(max-width: 700px) 100vw, 33vw" unoptimized /></span> : <span className="media-placeholder" />}<b>{remix.title}<small>{remix.creator ? `@${remix.creator.handle}` : 'BOTTOPIA CREATOR'}</small></b></Link>)}</div></section>}
         <CommunityPanel workId={work.id} locale="ko" isDemo={false} />

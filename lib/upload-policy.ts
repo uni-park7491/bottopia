@@ -1,6 +1,22 @@
 // Keep these limits aligned with supabase/schema.sql and the project's Free plan.
 export const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 export const MAX_POSTER_BYTES = 10 * 1024 * 1024;
+export const MEMBER_UPLOADS_PER_HOUR = 3;
+
+export function canUploadWork(isOwner: boolean, creatorStatus: unknown): boolean {
+  return isOwner || creatorStatus === 'APPROVED';
+}
+
+export function canManageWork(userId: string, creatorId: unknown, isOwner: boolean): boolean {
+  return Boolean(userId) && (isOwner || userId === creatorId);
+}
+
+export function memberMediaId(videoKey: string, posterKey: unknown, userId: string): string | null {
+  // Namespace is derived from the authenticated session, never supplied by the browser.
+  const prefix = `members/${userId}/`;
+  if (!videoKey.startsWith(prefix) || (posterKey && (typeof posterKey !== 'string' || !posterKey.startsWith(prefix)))) return null;
+  return workMediaId(`works/${videoKey.slice(prefix.length)}`, posterKey ? `works/${String(posterKey).slice(prefix.length)}` : null);
+}
 
 const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
