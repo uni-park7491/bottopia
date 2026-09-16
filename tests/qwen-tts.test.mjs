@@ -25,12 +25,24 @@ test('Qwen runtime matches the pinned upstream release checksums', () => {
  }
 });
 test('Qwen route requires login; isolation is not applied to the whole site', () => {
- const route=read('app/tools/tts/page.tsx'), config=read('next.config.ts');
+ const route=read('app/tools/page.tsx'), config=read('next.config.ts');
  assert.match(route,/getCurrentUser\(\)/);
  assert.match(route,/redirect\(`/);
- assert.match(config,/source: '\/tools\/tts', has: \[\{ type: 'query' as const, key: 'model', value: 'qwen'/);
- assert.match(config,/source: '\/vendor\/qwen-tts\/:path\*'/);
+ assert.match(config,/source: '\/tools\/:path\*'/);
+ assert.match(config,/source: '\/vendor\/:path\*'/);
+ assert.match(config,/source: '\/_next\/static\/:path\*'/);
  assert.match(config,/Cross-Origin-Embedder-Policy/);
+});
+test('Model selection never navigates or discards text/audio, and resets download consent',()=>{
+ const ui=read('app/tools/LocalNarration.tsx');
+ assert.doesNotMatch(ui,/href="\/tools\/tts|window.location|router.push/);
+ assert.match(ui,/selectEngine\('qwen'\)/);
+ assert.match(ui,/setEngine\(next\); setAllowed\(false\)/);
+ const start=ui.indexOf('function selectEngine');
+ const select=ui.slice(start,ui.indexOf('useEffect(',start));
+ assert.match(select,/if \(busy \|\| next === engine\) return/);
+ assert.doesNotMatch(select,/setText|setResult|revokeObjectURL/);
+ assert.match(read('app/tools/tts/page.tsx'),/redirect\(`\/tools\?tab=audio&model=/);
 });
 test('TTS retains consent, real playback, download and forced worker cancellation', () => {
  const ui=read('app/tools/LocalNarration.tsx');

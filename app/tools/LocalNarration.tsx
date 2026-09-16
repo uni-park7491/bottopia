@@ -1,10 +1,9 @@
 'use client';
-/* Full document navigation is required to enter the COOP/COEP-isolated TTS route. */
-/* eslint-disable @next/next/no-html-link-for-pages */
 import { useEffect, useRef, useState } from 'react';
 import { downloadFile } from './download';
 
-export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'supertonic' | 'qwen' }) {
+export default function LocalNarration({ engine: initialEngine = 'supertonic' }: { engine?: 'supertonic' | 'qwen' }) {
+  const [engine, setEngine] = useState(initialEngine);
   const isQwen = engine === 'qwen';
   const [text, setText] = useState(''), [voice, setVoice] = useState('F1'), [speed, setSpeed] = useState(1);
   const [allowed, setAllowed] = useState(false), [busy, setBusy] = useState(false), [status, setStatus] = useState('');
@@ -12,6 +11,10 @@ export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'su
   const worker = useRef<Worker | null>(null), timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const running = useRef(false), currentUrl = useRef('');
   function dispose() { worker.current?.terminate(); worker.current = null; if (timer.current) clearTimeout(timer.current); timer.current = null; running.current = false; }
+  function selectEngine(next: 'supertonic' | 'qwen') {
+    if (busy || next === engine) return;
+    setEngine(next); setAllowed(false); setStatus('');
+  }
   useEffect(() => () => { worker.current?.terminate(); if (timer.current) clearTimeout(timer.current); if (currentUrl.current) URL.revokeObjectURL(currentUrl.current); }, []);
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (text.trim() || result || running.current) { event.preventDefault(); event.returnValue = ''; } };
@@ -46,10 +49,10 @@ export default function LocalNarration({ engine = 'supertonic' }: { engine?: 'su
     <header className="tool-section-head"><div><p className="story-beta">TTS WORKSPACE · BETA</p><h2>문장에 목소리를 더하세요.</h2><p>TTS는 텍스트를 음성으로 변환하는 기능입니다. 여기서 듣고 WAV 파일로 저장할 수 있습니다.</p></div></header>
     <div className="tools-columns"><div>
       <nav className="tts-engines" aria-label="TTS 모델 선택">
-        <a href="/tools/tts?model=supertonic" aria-current={!isQwen ? 'page' : undefined}><strong>Supertonic 3</strong><span>여성·남성 목소리 · 약 400MB</span></a>
-        <a href="/tools/tts?model=qwen" aria-current={isQwen ? 'page' : undefined}><strong>Qwen3-TTS</strong><span>여성·남성 목소리 · 약 1.48GB</span></a>
+        <button type="button" disabled={busy} aria-pressed={!isQwen} onClick={() => selectEngine('supertonic')}><strong>Supertonic 3</strong><span>여성·남성 목소리 · 약 400MB</span></button>
+        <button type="button" disabled={busy} aria-pressed={isQwen} onClick={() => selectEngine('qwen')}><strong>Qwen3-TTS</strong><span>여성·남성 목소리 · 약 1.48GB</span></button>
       </nav>
-      <p className="tool-help">{isQwen ? 'Qwen3-TTS 1.7B Base · 준비된 여성·남성 AI 샘플을 기준으로 음성을 생성합니다. CustomVoice·VoiceDesign 모델은 아닙니다. 최신 데스크톱 Chrome 또는 Edge를 사용해주세요.' : 'Supertonic 3 · 목소리와 읽는 속도를 선택할 수 있습니다.'} 모델을 변경하면 화면이 이동하므로 결과를 먼저 저장해주세요.</p>
+      <p className="tool-help">{isQwen ? 'Qwen3-TTS 1.7B Base · 준비된 여성·남성 AI 샘플을 기준으로 음성을 생성합니다. CustomVoice·VoiceDesign 모델은 아닙니다. 최신 데스크톱 Chrome 또는 Edge를 사용해주세요.' : 'Supertonic 3 · 목소리와 읽는 속도를 선택할 수 있습니다.'} 모델을 바꿔도 입력한 대사와 기존 음성은 유지됩니다.</p>
       <label className="tool-field">읽을 대사 · {text.length}/500자<textarea rows={7} maxLength={500} disabled={busy} value={text} onChange={e => setText(e.target.value)} placeholder="안녕하세요. 봇토피아에서 새로운 이야기를 시작합니다." /></label>
       <div className="scene-fields"><label className="tool-field">목소리<select disabled={busy} value={voice} onChange={e => setVoice(e.target.value)}><option value="F1">여성 목소리 · F1</option><option value="M1">남성 목소리 · M1</option></select></label>{!isQwen && <label className="tool-field">속도 · {speed.toFixed(1)}배<input type="range" min="0.8" max="1.3" step="0.1" disabled={busy} value={speed} onChange={e => setSpeed(Number(e.target.value))} /></label>}</div>
       {isQwen && <p className="tool-help">목소리는 AI 기준 샘플의 음색을 따르며 결과에 따라 차이가 있습니다. 감정·연기 지시문은 아직 지원하지 않으므로, 괄호 지문 없이 읽을 대사만 입력해주세요.</p>}

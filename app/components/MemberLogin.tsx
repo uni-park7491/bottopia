@@ -25,6 +25,8 @@ export default function MemberLogin({ compact = false, locale = 'ko', returnTo }
   const [error, setError] = useState('');
   const t = authCopy[locale];
   const next = safeReturnPath(returnTo ?? pathname);
+  // Enter the workspace with its isolation headers even for an existing login.
+  const ContinueLink = next.split('?')[0].startsWith('/tools') ? 'a' : Link;
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -66,7 +68,7 @@ export default function MemberLogin({ compact = false, locale = 'ko', returnTo }
       <button className={`member-auth ${compact ? 'compact' : ''}`} type="button" onClick={signOut} disabled={Boolean(busy)}>
         {busy ? t.connecting : `${user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'BOTTOPIAN'} · ${t.logout}`}
       </button>
-      {!compact && <Link className="auth-continue" href={next}>{t.continue}</Link>}
+      {!compact && <ContinueLink className="auth-continue" href={next}>{t.continue}</ContinueLink>}
       {error && <span className="auth-error" role="alert">{error}</span>}
     </span>
   );

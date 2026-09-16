@@ -1,4 +1,6 @@
 'use client';
+/* Document navigation only when crossing the isolated workspace boundary. */
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -16,14 +18,15 @@ const labels = {
 const paths = ['/', '/tools', '/creators', '/community', '/about'];
 export default function SiteHeader() {
   const pathname = usePathname();
+  const WorkspaceLink = pathname.startsWith('/tools') ? 'a' : Link;
   const locale = useSiteLocale();
   useEffect(() => { document.documentElement.lang = localeOptions.find(x => x.code === locale)?.htmlLang || locale; }, [locale]);
   return <header className="site-header unified-header">
-    <Link className="brand" href="/" aria-label="BOTTOPIA">BOT<span>•</span>TOPIA</Link>
+    <WorkspaceLink className="brand" href="/" aria-label="BOTTOPIA">BOT<span>•</span>TOPIA</WorkspaceLink>
     <nav className="primary-navigation" aria-label={locale === 'ko' ? '주 메뉴' : 'Main navigation'}>
-      {paths.map((path, i) => <Link key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</Link>)}
+      {paths.map((path, i) => { const NavLink = path === '/tools' ? 'a' : WorkspaceLink; return <NavLink key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</NavLink>; })}
     </nav>
-    <div className="header-actions"><Link className="header-inquiry" href="/studio">{labels[locale][5]}</Link><MemberLogin compact locale={locale} />
+    <div className="header-actions"><WorkspaceLink className="header-inquiry" href="/studio">{labels[locale][5]}</WorkspaceLink><MemberLogin compact locale={locale} />
       <label className="locale-select"><span className="globe-icon" aria-hidden="true" /><span className="sr-only">언어 / Language</span><select value={locale} onChange={e => saveLocale(e.target.value as typeof locale)}>{localeOptions.map(x => <option key={x.code} value={x.code}>{x.label}</option>)}</select></label>
     </div>
   </header>;

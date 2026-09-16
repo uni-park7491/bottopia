@@ -11,8 +11,10 @@ const nextConfig: NextConfig = {
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
       { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
     ] }, ...[
-      { source: '/tools/tts', has: [{ type: 'query' as const, key: 'model', value: 'qwen' }] },
-      { source: '/vendor/qwen-tts/:path*' },
+      { source: '/tools/:path*' },
+      // Dedicated workers need the same embedder policy as their document.
+      { source: '/vendor/:path*' },
+      { source: '/_next/static/:path*' },
     ].map(rule => ({ ...rule, headers: [
       { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
       { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
