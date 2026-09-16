@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { runInNewContext } from 'node:vm';
 import { encodeSpeech, splitSpeech, validateSpeech } from '../public/vendor/supertonic/audio-utils.mjs';
 import { referenceVoice, loadReferenceVoice } from '../public/vendor/qwen-tts/voices.mjs';
+import { validateLanguage, languagesFor } from '../public/vendor/tts-languages.mjs';
 const read = p => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 test('Qwen downloads are pinned and execution never sends entered text to a server', () => {
  const worker = read('public/vendor/qwen-tts/worker.mjs');
@@ -55,21 +56,38 @@ test('TTS retains consent, real playback, download and forced worker cancellatio
  assert.doesNotMatch(ui,/!isQwen && <div className="scene-fields"/);
 });
 
-async function exercise({ text='안녕하세요.', voice='F1', truncated=false, silent=false, isolated=true, supported=true, supportsSpeakerReference=true }={}) {
- const messages=[], references=[]; let disposed=0, loaded=0;
+async function exercise({ text='안녕하세요.', voice='F1', language='ko', truncated=false, silent=false, isolated=true, supported=true, supportsSpeakerReference=true }={}) {
+ const messages=[], references=[], languages=[]; let disposed=0, loaded=0;
  const self={crossOriginIsolated:isolated,postMessage:message=>messages.push(message)};
  class Bridge {
   async loadModelFromUrl(){loaded++;}
   async loadMultimodalProjector(){}
   async getTextToSpeechCapabilities(){return {supported,supportsSpeakerReference,sampleRate:24000,channels:1};}
-  async synthesizeSpeech(options){references.push(options.speakerAudio);return {pcm:Float32Array.from({length:24000},(_,i)=>silent?0:Math.sin(i/10)),sampleRate:24000,channels:1,truncated};}
+  async synthesizeSpeech(options){references.push(options.speakerAudio);languages.push(options.language);return {pcm:Float32Array.from({length:24000},(_,i)=>silent?0:Math.sin(i/10)),sampleRate:24000,channels:1,truncated};}
   async dispose(){disposed++;}
  }
  const source=read('public/vendor/qwen-tts/worker.mjs').replace(/^import .*;\n/gm,'').replaceAll('import.meta.url',JSON.stringify('https://bottopia.studio/vendor/qwen-tts/worker.mjs'));
- runInNewContext(source,{self,LlamaWebGpuBridge:Bridge,encodeSpeech,splitSpeech,validateSpeech,referenceVoice,loadReferenceVoice:async voice=>voice,URL,Float32Array,console:{error(){}}});
- await self.onmessage({data:{text,voice}});
- return {messages,disposed,loaded,references};
+ runInNewContext(source,{self,LlamaWebGpuBridge:Bridge,encodeSpeech,splitSpeech,validateSpeech,validateLanguage,referenceVoice,loadReferenceVoice:async voice=>voice,URL,Float32Array,console:{error(){}}});
+ await self.onmessage({data:{text,voice,language}});
+ return {messages,disposed,loaded,references,languages};
 }
+test('Language allowlists match pinned engines and reject unsupported values',()=>{
+ assert.equal(languagesFor('qwen').length,10);
+ assert.equal(languagesFor('supertonic').length,31);
+ assert.equal(validateLanguage('qwen'), 'ko');
+ for(const bad of ['ar','../../en',null,{},'']) assert.throws(()=>validateLanguage('qwen',bad));
+ assert.throws(()=>validateLanguage('supertonic','zh'));
+ assert.throws(()=>languagesFor('paid-api'));
+});
+test('Selected languages reach every Qwen chunk and invalid values stop before download',async()=>{
+ for(const [language] of languagesFor('qwen')) {
+  const result=await exercise({language});
+  assert.deepEqual(result.languages,[language]);
+  assert.equal(result.messages.at(-1).type,'result');
+ }
+ const rejected=await exercise({language:'ar'});
+ assert.equal(rejected.loaded,0); assert.equal(rejected.messages.at(-1).type,'error');
+});
 test('Qwen worker success emits playable PCM16 WAV and disposes the engine',async()=>{
  const {messages,disposed}=await exercise();const result=messages.find(m=>m.type==='result');
  assert.equal(result.seconds,1);assert.equal(result.wav.byteLength,48044);assert.equal(disposed,1);

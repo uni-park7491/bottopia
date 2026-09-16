@@ -1,6 +1,7 @@
 import { LlamaWebGpuBridge } from './llama_webgpu_bridge.js';
 import { encodeSpeech, splitSpeech, validateSpeech } from '../supertonic/audio-utils.mjs';
 import { referenceVoice, loadReferenceVoice } from './voices.mjs';
+import { validateLanguage } from '../tts-languages.mjs';
 
 const base = 'https://huggingface.co/ggml-org/Qwen3-TTS-12Hz-1.7B-Base-GGUF/resolve/ca27d74bc954b73dadab5b71ca265d87fc861a7c';
 const modelUrl = `${base}/Qwen3-TTS-12Hz-1.7B-Base-Q4_K_M.gguf`;
@@ -14,6 +15,7 @@ self.onmessage = async ({ data }) => {
   let bridge, projectorObjectUrl;
   try {
     const text = validateSpeech(data.text, 'F1', 1);
+    const language = validateLanguage('qwen', data.language);
     referenceVoice(data.voice);
     if (!self.crossOriginIsolated) throw new Error('Qwen 실행 화면을 새로고침한 뒤 다시 시도해주세요.');
     const speakerAudio = await loadReferenceVoice(data.voice);
@@ -51,7 +53,7 @@ self.onmessage = async ({ data }) => {
     let length = 0;
     for (let i = 0; i < chunks.length; i++) {
       const result = await bridge.synthesizeSpeech({
-        text: chunks[i], language: 'ko', speakerAudio, maxFrames: 720,
+        text: chunks[i], language, speakerAudio, maxFrames: 720,
         onProgress: event => progress(`음성 생성 ${i + 1}/${chunks.length} · ${event.framesGenerated || 0} 프레임`),
       });
       if (result.truncated) throw new Error('문장을 끝까지 읽지 못했습니다. 대사를 짧게 나누어 다시 시도해주세요.');
