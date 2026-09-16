@@ -87,3 +87,9 @@
   .creative-tools .story-builder > .workspace-storage { grid-column:2; grid-row:4; margin:16px 0; }
   .creative-tools .story-builder > fieldset.story-inputs:first-of-type { grid-column:1; grid-row:3 / span 2; margin:0 0 24px; }
 }
+.tts-engines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.tts-engines a { padding: 16px; border: 1px solid #d8d4e8; border-radius: 14px; text-decoration: none; background: #fff; display: grid; gap: 6px; }
+.tts-engines a[aria-current="page"] { border-color: #6650df; background: #f2efff; box-shadow: inset 0 0 0 1px #6650df; }
+.tts-engines strong { font-size: 16px; }
+.tts-engines span { font-size: 13px; line-height: 1.5; color: #615a75; }
+@media (max-width: 420px) { .tts-engines { grid-template-columns: 1fr; } }
