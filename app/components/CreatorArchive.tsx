@@ -44,6 +44,7 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
   const t = { ...archiveCopy[locale], ...{
     ko: { eyebrow: 'COMMUNITY WORKS', title: '지금, 크리에이터들의 장면', intro: '영상에서 영감을 얻고, 프롬프트와 제작 과정을 나누세요.', emptyBody: '첫 장면을 함께 채워주세요. 승인된 크리에이터는 작품과 프롬프트를 공유할 수 있습니다.', ownerLink: '내 작품 공유 준비하기' },
     en: { eyebrow: 'COMMUNITY WORKS', title: 'Scenes from our creators', intro: 'Discover films, prompts, and the process behind them.', emptyBody: 'Help make the first scene. Approved creators can share work and prompts.', ownerLink: 'Prepare to share your work' },
@@ -53,7 +54,9 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     let live = true;
-    fetch('/api/works').then((response) => response.ok ? response.json() : Promise.reject())
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    fetch('/api/works', { signal: controller.signal }).then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
         if (!live) return;
         const published: ArchiveWork[] = data.works ?? [];
@@ -63,9 +66,9 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
         if (requested) setActive(published.find((work) => work.id === requested) ?? null);
       })
       .catch(() => { if (live) setLoadFailed(true); })
-      .finally(() => { if (live) setLoading(false); });
-    return () => { live = false; };
-  }, []);
+      .finally(() => { window.clearTimeout(timeout); if (live) setLoading(false); });
+    return () => { live = false; window.clearTimeout(timeout); controller.abort(); };
+  }, [retry]);
 
   useEffect(() => {
     const close = (event: KeyboardEvent) => event.key === 'Escape' && setActive(null);
@@ -114,12 +117,12 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
       <div className="feed-filters" aria-label={t.filter}>{categoryInfo.map(item => <button key={item.key} aria-pressed={category === item.key} onClick={() => { setCategory(item.key); setLimit(24); }}>{t.categories[item.key]}</button>)}<button className="original-filter" aria-pressed={originalsOnly} onClick={() => { setOriginalsOnly(!originalsOnly); setLimit(24); }}>{ko ? 'BOTTOPIA 오리지널' : 'BOTTOPIA Originals'}</button></div>
       <div className="feed-status"><p>{originalsOnly ? (ko ? '봇토피아가 직접 제작한 공식 작품입니다.' : 'Official work created by BOTTOPIA.') : (ko ? '작품과 제작 과정을 함께 둘러보세요.' : 'Discover the work and the process behind it.')}</p><span>{visible.length} {t.works}</span></div>
     </div>
-    {loading ? <div className="archive-empty" role="status">{t.syncing}</div> : loadFailed ? <div className="archive-empty" role="alert">{ko ? '작품을 불러오지 못했습니다. 새로고침해 주세요.' : 'Unable to load works. Please refresh.'}</div> : visible.length === 0 ? <div className="archive-empty"><h3>{works.length ? (ko ? '조건에 맞는 작품이 없습니다.' : 'No matching works.') : t.emptyTitle}</h3><p>{works.length ? (ko ? '다른 검색어나 분류를 선택해 주세요.' : 'Try another search or category.') : t.emptyBody}</p>{works.length > 0 ? <button onClick={() => { setCategory('ALL'); setQuery(''); setOriginalsOnly(false); }}>{ko ? '필터 초기화' : 'Reset filters'}</button> : <Link href="/studio">{t.ownerLink}</Link>}</div> : <>
+    {loading ? <div className="archive-loading" role="status"><p>{t.syncing}</p><div className="archive-grid" aria-hidden="true">{[0,1,2].map(i => <div className="archive-skeleton" key={i} />)}</div></div> : loadFailed ? <div className="archive-empty" role="alert"><p>{ko ? '작품을 불러오지 못했습니다. 연결을 확인하고 다시 시도해주세요.' : 'Unable to load works. Check your connection and try again.'}</p><button onClick={() => { setLoadFailed(false); setLoading(true); setRetry(value => value + 1); }}>{ko ? '다시 불러오기' : 'Try again'}</button></div> : visible.length === 0 ? <div className="archive-empty"><h3>{works.length ? (ko ? '조건에 맞는 작품이 없습니다.' : 'No matching works.') : t.emptyTitle}</h3><p>{works.length ? (ko ? '다른 검색어나 분류를 선택해 주세요.' : 'Try another search or category.') : t.emptyBody}</p>{works.length > 0 ? <button onClick={() => { setCategory('ALL'); setQuery(''); setOriginalsOnly(false); }}>{ko ? '필터 초기화' : 'Reset filters'}</button> : <Link href="/studio">{t.ownerLink}</Link>}</div> : <>
       {gridWorks.length > 0 && <div className="archive-grid">{gridWorks.map((work, index) => <article className="transmission-card" key={work.id}>
         <button className="video-frame" onMouseEnter={(event) => playPreview(event.currentTarget)} onMouseLeave={(event) => stopPreview(event.currentTarget)} onFocus={(event) => playPreview(event.currentTarget)} onBlur={(event) => stopPreview(event.currentTarget)} onClick={() => setActive(work)} aria-label={`${work.title} · ${t.promptAria}`}>
           {work.videoUrl ? <PreviewVideo src={work.videoUrl} poster={work.posterUrl ?? undefined} /> : <span className="media-placeholder" />}<span className="tool-badge">{work.tool || 'AI TOOL'}</span><span className="media-badge">{String(index + 1).padStart(2, '0')}</span><span className="open-transmission">{t.open}</span>
         </button>
-        <div className="transmission-meta"><div>{work.creator && <Link className="transmission-creator" href={`/creators/${work.creator.handle}`}>@{work.creator.handle} ↗</Link>}<h3><Link href={`/works/${work.id}`}>{work.title}</Link></h3><p>{work.summary}</p></div><span>{work.workType || 'ORIGINAL'}<br />{work.category}<br />{new Date(work.createdAt).getFullYear()}</span></div>
+        <div className="transmission-meta"><div>{work.creator && <Link prefetch={false} className="transmission-creator" href={`/creators/${work.creator.handle}`}>@{work.creator.handle} ↗</Link>}<h3><Link prefetch={false} href={`/works/${work.id}`}>{work.title}</Link></h3><p>{work.summary}</p></div><span>{work.workType || 'ORIGINAL'}<br />{work.category}<br />{new Date(work.createdAt).getFullYear()}</span></div>
         <div className="transmission-prompt"><div><span>{t.prompt}</span><p>{work.prompt}</p></div><button className={copiedId === work.id ? 'copied' : ''} onClick={() => copyPrompt(work)}>{copiedId === work.id ? t.copied : t.copy}</button></div>
       {copyFailedId === work.id && <p className="prompt-copy-error" role="alert">{clipboardError[locale]}</p>}
       </article>)}</div>}

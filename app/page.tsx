@@ -233,6 +233,7 @@ export default function Home() {
 
 
       {section === 'feed' && <>
+        <link rel="preload" href="/api/works" as="fetch" crossOrigin="anonymous" />
         <section className="hero portfolio-hero discovery-hero" id="top">
           <div className="portfolio-hero-top"><p className="eyebrow feed-eyebrow">BOTTOPIA / AI FILM &amp; CREATOR NETWORK</p><span>FOUNDED IN SEOUL · 2026</span></div>
           <h1>{({ ko: <>창작을 발견하고,<br /><em>다음 장면을 함께.</em></>, en: <>Discover a world.<br /><em>Make the next scene.</em></>, zh: <>发现创作，<br /><em>一起创造下一幕。</em></>, ja: <>創作を見つけ、<br /><em>次のシーンを一緒に。</em></> })[locale]}</h1>
