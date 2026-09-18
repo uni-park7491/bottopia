@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './refinement.css';
+import './site-theme.css';
 import SiteHeader from './components/SiteHeader';
 import Link from 'next/link';
 
@@ -27,7 +28,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" data-scroll-behavior="smooth">
+    <html lang="ko" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `(()=>{let t;try{t=localStorage.getItem('bottopia-theme')}catch{}document.documentElement.dataset.theme=t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'})()` }} /></head>
       <body><SiteHeader />{children}<div style={{ padding: '24px', textAlign: 'center', fontSize: '14px', lineHeight: 1.8 }}><Link href="/privacy">개인정보처리방침 · Privacy Policy</Link></div></body>
     </html>
   );

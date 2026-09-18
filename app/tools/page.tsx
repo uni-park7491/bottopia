@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import CreativeTools from './CreativeTools';
 import './tools.css';
 import './workspace.css';
+import './studio-theme.css';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth';
 

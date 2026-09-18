@@ -1,7 +1,7 @@
-export function validateSpeech(text, voice, speed) {
+export function validateSpeech(text, voice, speed, options = {}) {
   if (typeof text !== 'string' || !text.trim() || text.length > 500 || /[\u0000-\u0008]/.test(text) || !/[\p{L}\p{N}]/u.test(text)) throw new Error('읽을 대사를 1~500자로 입력해주세요.');
-  if (!['F1', 'M1'].includes(voice)) throw new Error('지원하지 않는 목소리입니다.');
-  if (!Number.isFinite(speed) || speed < 0.8 || speed > 1.3) throw new Error('속도를 확인해주세요.');
+  if (!(options.voices || ['F1', 'M1']).includes(voice)) throw new Error('지원하지 않는 목소리입니다.');
+  if (!Number.isFinite(speed) || speed < (options.min ?? 0.8) || speed > (options.max ?? 1.3)) throw new Error('속도를 확인해주세요.');
   return text.trim();
 }
 export function splitSpeech(text, limit = 100) {

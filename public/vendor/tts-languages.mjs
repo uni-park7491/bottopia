@@ -11,6 +11,7 @@ export const speechLanguages = [
 ];
 const qwen = new Set(['ko', 'en', 'ja', 'zh', 'de', 'es', 'fr', 'it', 'pt', 'ru']);
 export function languagesFor(engine) {
+  if (engine === 'kokoro') return speechLanguages.filter(([code]) => code === 'en');
   if (!['qwen', 'supertonic'].includes(engine)) throw new Error('지원하지 않는 음성 모델입니다.');
   return speechLanguages.filter(([code]) => engine === 'qwen' ? qwen.has(code) : code !== 'zh');
 }

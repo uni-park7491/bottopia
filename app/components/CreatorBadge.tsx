@@ -1,4 +1,7 @@
 export default function CreatorBadge({ role }: { role: string }) {
-  const label = role === 'ADMIN' ? '운영팀' : role === 'FOUNDING_CREATOR' ? '초기 크리에이터' : role === 'CREATOR' ? '크리에이터' : '멤버';
-  return <span className="creator-badge" title="활동 역할 표시입니다. 등급이나 본인 인증 표시는 아닙니다."><span aria-hidden="true">✦</span>{label}</span>;
+  return <span className="creator-badge" data-role={role} role="img" aria-label="봇토피아 멤버 뱃지" title="봇토피아 멤버 뱃지 · 본인 인증 표시는 아닙니다.">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z" fill="currentColor" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+    </svg>
+  </span>;
 }

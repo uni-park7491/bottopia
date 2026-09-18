@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   if (!(await getOwnerUser())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const admin = createAdminClient();
-  const { data, error } = await admin.from('project_inquiries').select('id,name,contact,project_type,timeline_budget,brief,locale,status,created_at').order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await admin.from('project_inquiries').select('id,name,contact,project_type,timeline_budget,brief,locale,status,created_at').neq('project_type','TOOL_FEEDBACK').order('created_at', { ascending: false }).limit(100);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ inquiries: (data ?? []).map((item) => ({
     id: item.id,

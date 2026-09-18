@@ -193,7 +193,17 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .creator-profile-card > a { font-size: 14px; line-height: 1.6; }
 .creator-profile-hero { grid-template-columns: 96px minmax(180px,.8fr) minmax(0,1.2fr); gap: 32px; align-items: start; }
 .creator-profile-avatar { width: 96px; height: 96px; box-shadow: none; }
-.creator-badge,.creator-profile-card > .creator-badge { display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 4px 9px; margin: 0; border: 1px solid #d5cbef; border-radius: 999px; background: #f0ebfc; color: #51408c; font: 600 12px/1.4 Arial,sans-serif; letter-spacing: 0; }
+.creator-badge,.creator-profile-card > .creator-badge { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 18px; width: 18px; height: 18px; padding: 0; margin: 0; border: 0; background: transparent; color: #2684ed; line-height: 1; vertical-align: middle; }
+.creator-badge svg { display: block; flex-shrink: 0; }
+.creator-avatar-badged { position: relative; width: fit-content; height: fit-content; align-self: start; }
+.creator-avatar-badged > .creator-badge { position: absolute; z-index: 1; top: -3px; right: -3px; width: 23px; height: 23px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px #0002; }
+.creator-directory-copy h2:first-child { margin-top: 0; }
+.creator-card-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; }
+.creator-card-actions > a { color: var(--acid); font-size: 14px; line-height: 1.6; }
+.creator-availability { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.5; font-weight: 550; color: #286348; white-space: nowrap; }
+.creator-availability::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.creator-directory .creator-availability { color: #bcdcc7; }
+.creator-profile-availability { margin: -16px 0 20px; }
 .creator-profile-card > .creator-badge { margin-top: 20px; }
 .creator-badge-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .creator-badge-row > span:not(.creator-badge) { color: #526052; font-size: 12px; }

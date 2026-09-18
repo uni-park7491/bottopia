@@ -10,22 +10,24 @@ self.onmessage = async ({ data }) => {
   if (busy) return;
   busy = true;
   try {
-    const text = validateSpeech(data.text, data.voice, data.speed);
+    const text = validateSpeech(data.text, data.voice, data.speed, { voices: ['F1','F2','F3','F4','F5','M1','M2','M3','M4','M5'], min: 0.5, max: 2 });
     const language = validateLanguage('supertonic', data.language);
-    if (!model) model = await loadTextToSpeech(`${base}/onnx`, { executionProviders: ['wasm'] }, (name, current, total) => self.postMessage({ type: 'progress', message: `음성 모델 준비 중 (${current}/${total}) · 최초 다운로드는 시간이 걸립니다.` }));
+    if (!model) model = await loadTextToSpeech(`${base}/onnx`, { executionProviders: ['wasm'] }, (name, current, total) => self.postMessage({ type: 'progress', phase: 'downloading', message: `음성 모델 준비 중 (${current}/${total}) · 최초 다운로드는 시간이 걸립니다.` }));
     const style = await loadVoiceStyle([`${base}/voice_styles/${data.voice}.json`]);
-    self.postMessage({ type: 'progress', message: '이 기기에서 음성을 생성하고 있습니다.' });
+    self.postMessage({ type: 'progress', phase: 'generating', message: '이 기기에서 음성을 생성하고 있습니다.' });
     // Bound chunks even when the input contains no punctuation.
     const chunks = splitSpeech(text);
     const samples = [];
     for (let i = 0; i < chunks.length; i++) {
-      const result = await model.textToSpeech.call(chunks[i], language, style, 8, data.speed);
+      const result = await model.textToSpeech.call(chunks[i], language, style, 8, data.speed, 0.3, (step, total) => {
+        self.postMessage({ type: 'progress', phase: 'generating', scope: 'step', percent: (step - 1) / total * 100, message: `음성 생성 ${i + 1}/${chunks.length} · 현재 합성 ${step}/${total}단계` });
+      });
       const count = Math.min(result.wav.length, Math.ceil(result.duration[0] * model.textToSpeech.sampleRate));
       if (!Number.isFinite(count) || count < 1) throw new Error('음성 생성 결과가 비어 있습니다.');
       for (let j = 0; j < count; j++) samples.push(result.wav[j]);
       if (samples.length > model.textToSpeech.sampleRate * 180) throw new Error('음성이 너무 깁니다. 대사를 줄여주세요.');
       if (i + 1 < chunks.length) for (let j = 0; j < model.textToSpeech.sampleRate * 0.2; j++) samples.push(0);
-      self.postMessage({ type: 'progress', message: `음성 생성 중 (${i + 1}/${chunks.length})` });
+      self.postMessage({ type: 'progress', phase: 'generating', percent: Math.min(99, (i + 1) / chunks.length * 100), message: `음성 구간 완료 (${i + 1}/${chunks.length}) · 파일 구성 중` });
     }
     const wav = encodeSpeech(samples, model.textToSpeech.sampleRate);
     style.ttl.dispose(); style.dp.dispose();

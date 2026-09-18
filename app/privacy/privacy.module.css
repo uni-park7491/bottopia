@@ -5,10 +5,10 @@
 .page section { margin-top: 40px; scroll-margin-top: 100px; }
 .page ul { padding-left: 22px; }
 .page li { margin-bottom: 14px; }
-.page a { color: #5140bb; text-decoration: underline; text-underline-offset: 4px; }
+.page a { color: var(--site-accent,#5140bb); text-decoration: underline; text-underline-offset: 4px; }
 .page a:focus-visible { outline: 2px solid #5140bb; outline-offset: 5px; }
 .page nav { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
 .eyebrow { font-size: 12px; letter-spacing: .1em; font-weight: 700; }
-.notice { padding: 12px 16px; border: 1px solid #9b8ed4; border-radius: 8px; background: #eee8ff; }
+.notice { padding: 12px 16px; border: 1px solid var(--site-line,#9b8ed4); border-radius: 8px; background: var(--site-soft,#eee8ff); }
 .english { padding-top: 40px; border-top: 1px solid #d8d0ea; }
 .back { display: inline-block; margin-top: 32px; }

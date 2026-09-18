@@ -2,12 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read = name => readFileSync(new URL(`../app/tools/${name}`, import.meta.url),'utf8');
-test('workspace exposes only story/shots and narration and keeps both mounted',()=>{
+test('workspace loads tools on first visit and keeps visited tools mounted',()=>{
   const source=read('CreativeTools.tsx');
-  assert.equal((source.match(/aria-pressed=/g)||[]).length,2);
+  assert.equal((source.match(/aria-pressed=/g)||[]).length,6);
   assert.doesNotMatch(source,/CharacterSheet|manual-scene-tools|'character'/);
   assert.match(source,/hidden=\{tab !== 'scenes'\}/);
   assert.match(source,/hidden=\{tab !== 'audio'\}/);
+  assert.match(source,/dynamic\(\(\) => import\('\.\/StoryBuilder'\)/);
+  assert.match(source,/dynamic\(\(\) => import\('\.\/LocalNarration'\)/);
+  assert.match(source,/visited.scenes && <StoryBuilder/);
+  assert.match(source,/visited.audio && <LocalNarration/);
+  assert.match(source,/setVisited\(previous => \(\{ \.\.\.previous, \[next\]: true \}\)\)/);
 });
 test('story flow has readable stages, optional storage and no video editor',()=>{
   const source=read('StoryBuilder.tsx');

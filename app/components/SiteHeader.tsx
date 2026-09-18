@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import MemberLogin from './MemberLogin';
+import ThemeSwitch from './ThemeSwitch';
 import { localeOptions } from '../i18n';
 import { useSiteLocale, saveLocale } from '../useSiteLocale';
 
@@ -26,7 +27,7 @@ export default function SiteHeader() {
     <nav className="primary-navigation" aria-label={locale === 'ko' ? '주 메뉴' : 'Main navigation'}>
       {paths.map((path, i) => { const NavLink = path === '/tools' ? 'a' : WorkspaceLink; return <NavLink key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</NavLink>; })}
     </nav>
-    <div className="header-actions"><WorkspaceLink className="header-inquiry" href="/studio">{labels[locale][5]}</WorkspaceLink><MemberLogin compact locale={locale} />
+    <div className="header-actions"><WorkspaceLink className="header-inquiry" href="/studio">{labels[locale][5]}</WorkspaceLink><ThemeSwitch /><MemberLogin compact locale={locale} />
       <label className="locale-select"><span className="globe-icon" aria-hidden="true" /><span className="sr-only">언어 / Language</span><select value={locale} onChange={e => saveLocale(e.target.value as typeof locale)}>{localeOptions.map(x => <option key={x.code} value={x.code}>{x.label}</option>)}</select></label>
     </div>
   </header>;

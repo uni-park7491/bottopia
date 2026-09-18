@@ -7,7 +7,8 @@ const base = 'https://huggingface.co/ggml-org/Qwen3-TTS-12Hz-1.7B-Base-GGUF/reso
 const modelUrl = `${base}/Qwen3-TTS-12Hz-1.7B-Base-Q4_K_M.gguf`;
 const projectorUrl = `${base}/mmproj-Qwen3-TTS-12Hz-1.7B-Base-Q8_0.gguf`;
 const cacheName = 'bottopia-qwen-tts-v1';
-const progress = message => self.postMessage({ type: 'progress', message });
+const progress = (message, details = {}) => self.postMessage({ type: 'progress', phase: 'downloading', message, ...details });
+const fileProgress = (label, e) => progress(`${label} · ${Math.round((e.loaded || 0) / 1000000)}MB${e.total ? ` / ${Math.round(e.total / 1000000)}MB` : ''}`, { scope: 'file', percent: e.total > 0 ? e.loaded / e.total * 100 : undefined });
 let running = false;
 self.onmessage = async ({ data }) => {
   if (running) return;
@@ -32,7 +33,7 @@ self.onmessage = async ({ data }) => {
     if (self.caches) {
       try {
         for (const [url, label] of [[modelUrl, '언어 모델'], [projectorUrl, '음성 디코더']]) {
-          await bridge.prefetchModelToCache(url, { useCache: true, progressCallback: e => progress(`${label} 다운로드 · ${Math.round((e.loaded || 0) / 1000000)}MB${e.total ? ` / ${Math.round(e.total / 1000000)}MB` : ''}`) });
+          await bridge.prefetchModelToCache(url, { useCache: true, progressCallback: e => fileProgress(`${label} 파일 다운로드`, e) });
         }
         useCache = true;
         const cached = await (await self.caches.open(cacheName)).match(projectorUrl);
@@ -42,7 +43,7 @@ self.onmessage = async ({ data }) => {
     await bridge.loadModelFromUrl(modelUrl, {
       nCtx: 4096, nGpuLayers: 99, nThreads: 4, nBatch: 512, nUbatch: 256,
       useCache, forceRemoteFetchBackend: false,
-      progressCallback: e => progress(`Qwen 모델 준비 · ${Math.round((e.loaded || 0) / 1000000)}MB${e.total ? ` / ${Math.round(e.total / 1000000)}MB` : ''}`),
+      progressCallback: e => fileProgress('Qwen 모델 파일 준비', e),
     });
     progress('음성 디코더를 실행하고 있습니다.');
     await bridge.loadMultimodalProjector(projectorObjectUrl || projectorUrl);
@@ -52,15 +53,17 @@ self.onmessage = async ({ data }) => {
     const chunks = splitSpeech(text, 100), audio = [];
     let length = 0;
     for (let i = 0; i < chunks.length; i++) {
+      progress(`음성 생성 ${i + 1}/${chunks.length}`, { phase: 'generating', percent: i ? i / chunks.length * 100 : undefined });
       const result = await bridge.synthesizeSpeech({
         text: chunks[i], language, speakerAudio, maxFrames: 720,
-        onProgress: event => progress(`음성 생성 ${i + 1}/${chunks.length} · ${event.framesGenerated || 0} 프레임`),
+        onProgress: event => progress(`음성 생성 ${i + 1}/${chunks.length} · ${event.framesGenerated || 0} 프레임`, { phase: 'generating', percent: i ? i / chunks.length * 100 : undefined }),
       });
       if (result.truncated) throw new Error('문장을 끝까지 읽지 못했습니다. 대사를 짧게 나누어 다시 시도해주세요.');
       if (!(result.pcm instanceof Float32Array) || result.sampleRate !== 24000 || result.channels !== 1) throw new Error('음성 결과 형식이 올바르지 않습니다.');
       length += result.pcm.length;
       if (length > 24000 * 180) throw new Error('3분을 넘는 대사입니다. 나누어 생성해주세요.');
       audio.push(result.pcm);
+      progress(`음성 구간 완료 (${i + 1}/${chunks.length}) · 파일 구성 중`, { phase: 'generating', percent: Math.min(99, (i + 1) / chunks.length * 100) });
     }
     const pcm = new Float32Array(length); let offset = 0;
     for (const chunk of audio) { pcm.set(chunk, offset); offset += chunk.length; }

@@ -13,7 +13,11 @@ test('avatar, artwork and cover all use the shared file drop input', () => {
 });
 test('role badges are presentation only, not verified status or role grants', () => {
   const badge = read('app/components/CreatorBadge.tsx');
-  assert.ok(badge.includes('등급이나 본인 인증 표시는 아닙니다.'));
+  assert.ok(badge.includes('본인 인증 표시는 아닙니다.'));
+  assert.ok(badge.includes('aria-label="봇토피아 멤버 뱃지"'));
+  assert.ok(badge.includes('<svg width="18" height="18"'));
+  assert.ok(!badge.includes('초기 크리에이터'));
+  assert.ok(!badge.includes('{label}'));
   assert.ok(!badge.includes('fetch('));
   for (const file of ['app/profile/ProfileEditor.tsx', 'app/creators/CreatorsDirectory.tsx', 'app/creators/[handle]/CreatorProfile.tsx']) assert.ok(read(file).includes('<CreatorBadge role='));
 });

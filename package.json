@@ -13,22 +13,34 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
+    "@breezystack/lamejs": "1.2.7",
     "@mlc-ai/web-llm": "0.2.85",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
+    "kokoro-js": "1.2.1",
+    "libphonenumber-js": "^1.13.13",
     "next": "16.3.3",
     "onnxruntime-web": "1.22.0",
+    "qrcode": "1.5.4",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "sharp": "0.35.4"
   },
   "devDependencies": {
     "@types/node": "22.19.19",
+    "@types/qrcode": "1.5.6",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
+    "fake-indexeddb": "^6.2.5",
+    "jsqr": "1.4.0",
     "typescript": "5.9.3"
+  },
+  "overrides": {
+    "@huggingface/transformers": {
+      "sharp": "$sharp"
+    }
   },
   "type": "module"
 }

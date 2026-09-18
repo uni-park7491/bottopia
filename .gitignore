@@ -39,3 +39,6 @@ next-env.d.ts
 /work/
 /.character-venv/
 /.character-jobs/
+/artifacts/
+**/__pycache__/
+*.tsbuildinfo

@@ -1,0 +1,4 @@
+'use client';
+export default function RecruitmentLinks({value,onChange}:{value:string[];onChange:(v:string[])=>void}){
+ return <fieldset className="guild-intro-field guild-links"><legend>본인을 소개하는 링크</legend>{value.map((url,i)=><div className="guild-link-row" key={i}><input aria-label={`소개 링크 ${i+1}`} type="url" pattern="https://.*" required={i===0} maxLength={500} value={url} onChange={e=>onChange(value.map((v,n)=>n===i?e.target.value:v))} placeholder="https://…"/>{i===0?<button type="button" className="guild-link-icon" aria-label="소개 링크 추가" disabled={value.length>=5} onClick={()=>onChange([...value,''])}>+</button>:<button type="button" className="guild-link-icon" aria-label={`소개 링크 ${i+1} 삭제`} onClick={()=>onChange(value.filter((_,n)=>n!==i))}>×</button>}</div>)}<small className="guild-help">작품·프로필·포트폴리오 주소 · 최대 5개</small></fieldset>;
+}

@@ -4,17 +4,12 @@ import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useState } fro
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import CreatorArchive from './components/CreatorArchive';
+import RecruitmentBoard from './components/RecruitmentBoard';
 import { useSiteLocale } from './useSiteLocale';
 
 
 type SiteSection = 'feed' | 'community' | 'ecosystem' | 'about';
 
-const communityCopy = {
-  ko: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['보고.', '배우고.', '다시 만들기.'], body: '작품과 프롬프트는 누구에게나 공개됩니다. Google·네이버·카카오로 가입하면 좋아요와 커뮤니티 노트를 남기며 다른 창작자와 연결될 수 있어요.', steps: [['01 / WATCH', '영상과 제작 도구를 자유롭게 살펴봅니다.'], ['02 / COPY', '전체 프롬프트를 복사해 직접 실험합니다.'], ['03 / CONNECT', '좋아요와 노트로 결과와 발견을 나눕니다.']], cta: '감상과 프롬프트 복사는 자유롭게. 좋아요와 댓글을 남길 때만 로그인하세요.' },
-  en: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['WATCH.', 'LEARN.', 'REMIX.'], body: 'Works and prompts stay open to everyone. Join with Google, NAVER, or Kakao to like, leave community notes, and connect with other makers.', steps: [['01 / WATCH', 'Explore the film and the tools behind it.'], ['02 / COPY', 'Copy the full prompt and run your own experiment.'], ['03 / CONNECT', 'Share results and discoveries through likes and notes.']], cta: 'Watch and copy freely. Sign in only when you want to like or leave a note.' },
-  zh: { eyebrow: 'BOTTOPIA 社区 · 公开测试', title: ['观看。', '学习。', '再创造。'], body: '作品与提示词对所有人开放。使用 Google、NAVER 或 Kakao 加入后，可以点赞、留下社区笔记，并与其他创作者交流。', steps: [['01 / 观看', '自由探索影片与制作工具。'], ['02 / 复制', '复制完整提示词，开始自己的实验。'], ['03 / 连接', '通过点赞和笔记分享成果与发现。']], cta: '自由观看和复制提示词，仅在点赞或评论时登录。' },
-  ja: { eyebrow: 'BOTTOPIA COMMUNITY · OPEN BETA', title: ['見る。', '学ぶ。', '再創造する。'], body: '作品とプロンプトは誰でも見ることができます。Google・NAVER・Kakaoで参加すると、いいねやコミュニティノートを通して他のクリエイターとつながれます。', steps: [['01 / WATCH', '映像と制作ツールを自由に見ます。'], ['02 / COPY', 'プロンプトをコピーして自分で試します。'], ['03 / CONNECT', 'いいねとノートで成果や発見を共有します。']], cta: '視聴とコピーは自由に。いいねやコメントをするときだけログイン。' },
-} as const;
 
 const networkCopy = {
   ko: {
@@ -180,7 +175,6 @@ export default function Home() {
   const [activePlanet, setActivePlanet] = useState<string | null>(null);
   const locale = useSiteLocale();
   const t = copy[locale];
-  const community = communityCopy[locale];
   const network = networkCopy[locale];
   const planets = ecosystemPlanetCopy[locale];
   const selectedPlanet = planets.find((planet) => planet.key === activePlanet) ?? null;
@@ -264,17 +258,7 @@ export default function Home() {
         </section>
       </>}
 
-      {section === 'community' && <section className="community-manifesto section-page" id="community">
-        <div className="community-lead">
-          <p className="eyebrow">{community.eyebrow}</p>
-          <h2>{community.title[0]}<br />{community.title[1]}<br /><em>{community.title[2]}</em></h2>
-          <p>{community.body}</p>
-        </div>
-        <div className="community-path">
-          {community.steps.map(([label, description]) => <article key={label}><span>{label}</span><p>{description}</p></article>)}
-          <div className="community-join"><p>{community.cta}</p><Link className="community-browse" href="/">{t.promptArchive} ↗</Link></div>
-        </div>
-      </section>}
+      {section === 'community' && <RecruitmentBoard />}
 
       {section === 'about' && <section className="about section-page" id="about">
         <div className="about-label">

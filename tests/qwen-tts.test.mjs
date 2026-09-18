@@ -37,8 +37,8 @@ test('Qwen route requires login; isolation is not applied to the whole site', ()
 test('Model selection never navigates or discards text/audio, and resets download consent',()=>{
  const ui=read('app/tools/LocalNarration.tsx');
  assert.doesNotMatch(ui,/href="\/tools\/tts|window.location|router.push/);
- assert.match(ui,/selectEngine\('qwen'\)/);
- assert.match(ui,/setEngine\(next\); setAllowed\(false\)/);
+ assert.match(ui,/if \(model.engine\) selectEngine\(model.engine\)/);
+ assert.match(ui,/setEngine\(next\);.*setAllowed\(false\)/);
  const start=ui.indexOf('function selectEngine');
  const select=ui.slice(start,ui.indexOf('useEffect(',start));
  assert.match(select,/if \(busy \|\| next === engine\) return/);
@@ -47,12 +47,12 @@ test('Model selection never navigates or discards text/audio, and resets downloa
 });
 test('TTS retains consent, real playback, download and forced worker cancellation', () => {
  const ui=read('app/tools/LocalNarration.tsx');
- assert.match(ui,/Qwen3-TTS/); assert.match(ui,/1.48GB/);
+ assert.match(ui,/Qwen3-TTS/); assert.match(read('app/tools/tts-models.ts'),/1.48GB/);
  assert.match(ui,/!allowed/); assert.match(ui,/worker.current\?\.terminate\(\)/);
  assert.match(ui,/<audio.*controls/); assert.match(ui,/downloadFile\(result.blob/);
  assert.match(ui,/isQwen \? '\/vendor\/qwen-tts\/worker.mjs'/);
  assert.match(ui,/text: submitted, voice/);
- assert.match(ui,/result.voice === 'M1'/);
+ assert.match(ui,/result.voice}/); // Desktop speaker IDs are not necessarily gender labels.
  assert.doesNotMatch(ui,/!isQwen && <div className="scene-fields"/);
 });
 
@@ -91,6 +91,15 @@ test('Selected languages reach every Qwen chunk and invalid values stop before d
 test('Qwen worker success emits playable PCM16 WAV and disposes the engine',async()=>{
  const {messages,disposed}=await exercise();const result=messages.find(m=>m.type==='result');
  assert.equal(result.seconds,1);assert.equal(result.wav.byteLength,48044);assert.equal(disposed,1);
+});
+test('Qwen progress is based on completed chunks, not maximum frame limit',async()=>{
+ const {messages}=await exercise({text:'안녕하세요. '.repeat(30)});
+ const progress=messages.filter(m=>m.phase==='generating');
+ assert.ok(progress.length>=4);
+ assert.equal(progress[0].percent,undefined);
+ assert.ok(progress.some(m=>m.percent>0));
+ assert.ok(progress.every(m=>m.percent===undefined||m.percent<100));
+ assert.equal(messages.at(-1).type,'result');
 });
 test('Qwen rejects incomplete, silent and unsupported output rather than showing success',async()=>{
  for(const options of [{truncated:true},{silent:true},{supported:false},{supportsSpeakerReference:false}]){

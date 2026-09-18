@@ -1,0 +1,23 @@
+'use client';
+import {useEffect,useState,type FormEvent} from 'react';
+import RecruitmentPrivateFields,{emptyPrivate,type PrivateDraft,type PrivateFile} from './RecruitmentPrivateFields';
+import RecruitmentLinks from './RecruitmentLinks';
+import {readContacts,type Contacts} from '../../lib/recruitment-private';
+type RecordData={contacts?:Contacts|null;contact_type:string|null;contact_value:string|null;files:PrivateFile[]};
+type Application=RecordData&{id:string;display_name:string;message:string;intro_url:string;intro_urls?:string[]|null;status:string};
+type Result={mine:boolean;open:boolean;author:RecordData|null;applications:Application[]};
+function Resources({record}:{record:RecordData}){const c=readContacts(record);return <><div className="guild-contact-values">{c.email&&<p>이메일: {c.email}</p>}{c.phone&&<p>휴대폰: {c.phone}</p>}{c.kakao&&<p>카카오톡 ID: {c.kakao}</p>}{!c.email&&!c.phone&&!c.kakao&&<p className="guild-help">연락처는 모집 확정 후 공개됩니다.</p>}</div><ul className="guild-file-list">{record.files.map(f=><li key={f.id}><a href={`/api/community/files?id=${f.id}`} download>{f.name} ↓</a></li>)}</ul></>;}
+export default function RecruitmentApplications({postId}:{postId:string}){
+ const [data,setData]=useState<Result|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[uploading,setUploading]=useState(false),[draft,setDraft]=useState<PrivateDraft>(emptyPrivate),[show,setShow]=useState(false);
+ const [introLinks,setIntroLinks]=useState<string[]>(['']);
+ async function load(){const r=await fetch(`/api/community/applications?post=${postId}`,{cache:'no-store'});const j=await r.json();if(!r.ok)throw Error(j.error);setData(j);}
+ useEffect(()=>{let live=true;fetch(`/api/community/applications?post=${postId}`,{cache:'no-store'}).then(async r=>{const j=await r.json();if(!r.ok)throw Error(j.error);if(live)setData(j);}).catch(e=>{if(live)setError(e.message);});return()=>{live=false;};},[postId]);
+ async function change(body:Record<string,unknown>){setBusy(true);setError('');try{const r=await fetch('/api/community/applications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,post:postId})});const j=await r.json();if(!r.ok)throw Error(j.error);await load();setShow(false);}catch(e){setError(e instanceof Error?e.message:'저장 실패');}finally{setBusy(false);}}
+ function apply(e:FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);void change({action:'apply',message:f.get('message'),introUrl:introLinks[0],introLinks,contacts:draft.contacts,fileIds:draft.files.map(f=>f.id),consent:f.get('privacyConsent')==='on'});}
+ return <section className="guild-applications" aria-label="지원 및 비공개 자료"><h3>{data?.mine?'지원자 관리':'지원 및 비공개 자료'}</h3>{error&&<p role="alert">{error}</p>}{!data&&!error&&<p role="status">지원 정보 확인 중…</p>}
+ {data&&!data.mine&&data.author&&<div className="guild-private-card"><h4>모집자 자료 · 지원자 전용</h4><Resources record={data.author}/></div>}
+ {data?.applications.map(a=><div className="guild-private-card" key={a.id}><h4>{data.mine?a.display_name:'내 지원'} · {a.status==='accepted'?'확정':'검토 중'}</h4><p className="guild-detail-body">{a.message}</p><div className="guild-public-links">{(a.intro_urls?.length?a.intro_urls:[a.intro_url]).map((url,i)=><a key={url} href={url} target="_blank" rel="noopener noreferrer nofollow">소개 링크 {i+1} ↗</a>)}</div><Resources record={a}/>{data.mine&&a.status==='pending'&&data.open&&<button type="button" className="guild-outline" disabled={busy} onClick={()=>{if(window.confirm('이 지원자를 확정할까요? 서로의 연락처가 공개됩니다.'))void change({action:'accept',id:a.id});}}>함께할 사람으로 확정</button>}{!data.mine&&<button type="button" className="guild-text-button" disabled={busy} onClick={()=>{if(window.confirm('지원을 철회할까요? 자료 열람 권한도 종료됩니다. 이미 내려받은 자료는 회수할 수 없습니다.'))void change({action:'withdraw',id:a.id});}}>지원 철회</button>}</div>)}
+ {data?.mine&&!data.applications.length&&<p className="guild-help">본인이 작성한 글에는 지원할 수 없습니다. 다른 회원에게는 ‘지원하기’가 표시됩니다. 아직 지원자가 없습니다.</p>}
+ {data&&!data.mine&&!data.applications.length&&data.open&&<><p className="guild-help">지원 전에는 모집자의 비공개 자료를 볼 수 없습니다. 지원하면 모집자와 서로 첨부자료를 볼 수 있으며, 연락처는 확정 후 공개됩니다.</p><button type="button" className="guild-outline" onClick={()=>setShow(!show)}>{show?'지원서 접기':'지원하기'}</button>{show&&<form onSubmit={apply} className="guild-application-form"><label>지원 내용<textarea name="message" required minLength={10} maxLength={2000} rows={3}/></label><RecruitmentLinks value={introLinks} onChange={setIntroLinks}/><RecruitmentPrivateFields value={draft} onChange={setDraft} onBusy={setUploading} applicant/><button className="guild-primary" disabled={busy||uploading}>{busy?'저장 중…':'지원서 제출'}</button></form>}</>}
+ </section>;
+}
