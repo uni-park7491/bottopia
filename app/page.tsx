@@ -11,68 +11,6 @@ import { useSiteLocale } from './useSiteLocale';
 type SiteSection = 'feed' | 'community' | 'ecosystem' | 'about';
 
 
-const networkCopy = {
-  ko: {
-    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
-    title: '작품이 사람을 만나고,\n사람이 다음 세계를 만듭니다.',
-    body: '작품을 공개하는 데서 끝나지 않습니다. 제작 과정을 나누고, 서로의 기술을 발견하고, 함께할 크리에이터와 실제 프로젝트를 만나는 네트워크를 만듭니다.',
-    paths: [
-      ['01 / SHOW', '작품과 제작 과정을 한곳에 기록합니다.'],
-      ['02 / CONNECT', '필요한 역할과 크리에이터를 발견합니다.'],
-      ['03 / COLLAB', '협업 제안과 프로젝트 의뢰로 연결됩니다.'],
-    ],
-    badge: 'FOUNDING CREATOR',
-    foundingTitle: 'BOTTOPIA의 첫 크리에이터가 되어주세요.',
-    foundingBody: '금전 보상 대신, 초기 활동을 함께 만든 기록과 발견될 기회를 제공합니다. 배지는 판매하지 않으며 첫 모집 기간에 승인된 활동 멤버에게만 남습니다.',
-    perks: ['영구 파운딩 배지', '런칭 큐레이션 우선 소개', '협업 모집 우선 참여'],
-    cta: '크리에이터 프로필 만들기 ↗',
-  },
-  en: {
-    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
-    title: 'WORK MEETS PEOPLE.\nPEOPLE BUILD NEW WORLDS.',
-    body: 'It goes beyond publishing a finished piece. Share the process, discover complementary skills, and meet creators and projects worth building with.',
-    paths: [
-      ['01 / SHOW', 'Keep your work and process together.'],
-      ['02 / CONNECT', 'Discover the right roles and creators.'],
-      ['03 / COLLAB', 'Turn a connection into a collaboration or brief.'],
-    ],
-    badge: 'FOUNDING CREATOR',
-    foundingTitle: 'BECOME ONE OF BOTTOPIA’S FIRST CREATORS.',
-    foundingBody: 'Instead of a cash reward, early members receive a lasting record of helping shape the network and more chances to be discovered. The badge is never sold.',
-    perks: ['PERMANENT FOUNDING BADGE', 'LAUNCH SPOTLIGHT', 'EARLY COLLAB ACCESS'],
-    cta: 'CREATE YOUR PROFILE ↗',
-  },
-  zh: {
-    eyebrow: 'BOTTOPIA / AI 创作者网络',
-    title: '作品连接创作者，\n创作者构建新世界。',
-    body: '这里不只展示完成作品。分享制作过程，发现互补的技能，并遇见值得共同完成的创作者与项目。',
-    paths: [
-      ['01 / 展示', '集中记录作品与制作过程。'],
-      ['02 / 连接', '发现合适的角色与创作者。'],
-      ['03 / 协作', '把联系转化为合作或项目委托。'],
-    ],
-    badge: 'FOUNDING CREATOR',
-    foundingTitle: '成为 BOTTOPIA 的首批创作者。',
-    foundingBody: '初期不提供现金奖励，而是保留共同建立社区的身份记录，并优先获得展示机会。该徽章不会出售。',
-    perks: ['永久创始成员徽章', '上线精选优先展示', '优先参与合作招募'],
-    cta: '创建创作者资料 ↗',
-  },
-  ja: {
-    eyebrow: 'BOTTOPIA / AI CREATOR NETWORK',
-    title: '作品が人と出会い、\n人が次の世界をつくる。',
-    body: '完成作品を公開するだけではありません。制作過程を共有し、互いのスキルを見つけ、一緒につくるクリエイターやプロジェクトと出会うネットワークです。',
-    paths: [
-      ['01 / SHOW', '作品と制作過程を一か所に記録します。'],
-      ['02 / CONNECT', '必要な役割とクリエイターを見つけます。'],
-      ['03 / COLLAB', '出会いをコラボや依頼につなげます。'],
-    ],
-    badge: 'FOUNDING CREATOR',
-    foundingTitle: 'BOTTOPIA最初のクリエイターになりませんか。',
-    foundingBody: '金銭報酬ではなく、初期のネットワークを一緒につくった記録と、発見される機会を提供します。バッジを販売することはありません。',
-    perks: ['永久ファウンディングバッジ', 'ローンチ特集への優先掲載', 'コラボ募集への先行参加'],
-    cta: 'クリエイタープロフィールを作る ↗',
-  },
-} as const;
 
 
 const ecosystemPlanetCopy = {
@@ -175,7 +113,6 @@ export default function Home() {
   const [activePlanet, setActivePlanet] = useState<string | null>(null);
   const locale = useSiteLocale();
   const t = copy[locale];
-  const network = networkCopy[locale];
   const planets = ecosystemPlanetCopy[locale];
   const selectedPlanet = planets.find((planet) => planet.key === activePlanet) ?? null;
 
@@ -237,25 +174,6 @@ export default function Home() {
           </div>
         </section>
         <section className="worlds-hub section-page" id="work"><CreatorArchive locale={locale} /></section>
-        <section className="home-process">
-          <header><p className="eyebrow">OPEN PROCESS / BOTTOPIA METHOD</p><h2>{({ ko: '결과만 보여주지 않고,\n만드는 방법까지 엽니다.', en: 'NOT JUST THE RESULT.\nTHE MAKING STAYS OPEN.', zh: '不只展示结果，\n也公开创作方法。', ja: '完成形だけでなく、\nつくり方まで開く。' })[locale]}</h2></header>
-          <div className="home-process-grid">
-            <article><span>01</span><h3>DIRECT</h3><p>{({ ko: '아이디어와 감정을 한 장면의 방향으로 설계합니다.', en: 'Shape an idea and emotion into one clear visual direction.', zh: '把想法与情感设计成清晰的视觉方向。', ja: 'アイデアと感情を一つの映像方向へ設計します。' })[locale]}</p></article>
-            <article><span>02</span><h3>BUILD</h3><p>{({ ko: '도구와 모델을 조합해 움직이는 세계를 제작합니다.', en: 'Combine tools and models to build a world in motion.', zh: '组合工具与模型，构建动态世界。', ja: 'ツールとモデルを組み合わせ、動く世界を制作します。' })[locale]}</p></article>
-            <article><span>03</span><h3>OPEN</h3><p>{({ ko: '프롬프트와 제작 정보를 공개해 다음 창작으로 연결합니다.', en: 'Open the prompt and production notes for the next maker.', zh: '公开提示词与制作信息，连接下一次创作。', ja: 'プロンプトと制作情報を公開し、次の創作へつなぎます。' })[locale]}</p></article>
-          </div>
-          <div className="home-network" id="network">
-            <header className="home-network-head">
-              <div><p className="eyebrow">{network.eyebrow}</p><h2>{network.title}</h2></div>
-              <p>{network.body}</p>
-            </header>
-            <div className="home-network-paths">
-              {network.paths.map(([label, description]) => <article key={label}><span>{label}</span><p>{description}</p></article>)}
-            </div>
-            <Link className="network-join" href="/profile">{network.cta}</Link>
-          </div>
-          <div className="home-contact-band"><p>{({ ko: '완성한 장면이 있나요? 만드는 과정까지 함께 나눠주세요.', en: 'Made something? Share the scene and how you made it.', zh: '完成了新作品？分享场景与制作过程。', ja: '新しいシーンができたら、つくり方も共有しましょう。' })[locale]}</p><Link href="/studio">{({ ko: '내 작품 공유하기', en: 'Share your work', zh: '分享作品', ja: '作品を共有' })[locale]}</Link></div>
-        </section>
       </>}
 
       {section === 'community' && <RecruitmentBoard />}
