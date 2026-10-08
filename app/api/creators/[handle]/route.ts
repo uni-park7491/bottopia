@@ -3,6 +3,7 @@ import { createAdminClient } from '../../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../../lib/supabase/config';
 import { normalizeHandle } from '../../../../lib/profile-policy';
 import { profileColumns, serializeProfile, toPublicCreator, type ProfileRow } from '../../../../lib/profiles';
+import { optimizedMediaKeys } from '../../../../lib/work-media';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ handle: st
     prompt: row.prompt,
     negativePrompt: row.negative_prompt,
     videoUrl: `/api/works/${row.id}/media?kind=video`,
+    previewUrl: optimizedMediaKeys(row.id, row.poster_key) ? `/api/works/${row.id}/media?kind=preview` : null,
     posterUrl: row.poster_key ? `/api/works/${row.id}/media?kind=poster` : null,
     durationSeconds: row.duration_seconds,
     copies: row.copies,

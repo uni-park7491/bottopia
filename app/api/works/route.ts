@@ -7,6 +7,7 @@ import { getCurrentUser, getOwnerUser } from '../../../lib/auth';
 import { getCreatorAccess } from '../../../lib/creator-access';
 import { workMediaId, memberMediaId, uploadError } from '../../../lib/upload-policy';
 import { ensureProfile, profilesById, toPublicCreator, type PublicProfile } from '../../../lib/profiles';
+import { optimizedMediaKeys } from '../../../lib/work-media';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +24,7 @@ function serialize(row: WorkRow, creator: PublicProfile | null = null) {
   return {
     id: row.id, slug: row.slug, title: row.title, summary: row.summary, category: row.category,
     tool: row.tool, model: row.model, prompt: row.prompt, negativePrompt: row.negative_prompt,
-    videoUrl: url('video', row.video_key), posterUrl: url('poster', row.poster_key), filename: row.original_filename,
+    videoUrl: url('video', row.video_key), previewUrl: optimizedMediaKeys(row.id, row.poster_key) ? `/api/works/${row.id}/media?kind=preview` : null, posterUrl: url('poster', row.poster_key), filename: row.original_filename,
     contentType: row.content_type, fileSize: row.file_size, durationSeconds: row.duration_seconds,
     published: row.published, views: row.views, copies: row.copies, createdAt: row.created_at,
     creator: creator ? toPublicCreator(creator) : null, workType: row.work_type ?? 'ORIGINAL', remixOf: row.remix_of ?? null,
@@ -46,7 +47,25 @@ export async function GET(request: NextRequest) {
   if (error) return NextResponse.json({ error: '작품을 불러오지 못했습니다.' }, { status: 503 });
   const rows = (data ?? []) as WorkRow[];
   const profiles = await profilesById(admin, rows.map((row) => row.creator_id ?? ''));
-  return NextResponse.json({ works: rows.map((row) => serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null)), configured: true }, {
+  const works = rows.map((row) => serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null));
+  // Batch-sign only published media; private studio responses keep their guarded routes.
+  if (!studioScope && !mine) {
+    const keys = rows.flatMap(row => {
+      const optimized = optimizedMediaKeys(row.id, row.poster_key);
+      return [row.poster_key, optimized?.preview, optimized?.playback ?? row.video_key].filter((key): key is string => Boolean(key));
+    });
+    if (keys.length) {
+      const { data: signed } = await admin.storage.from('works').createSignedUrls(keys, 300);
+      const urls = new Map((signed ?? []).filter(item => !item.error && item.signedUrl).map(item => [item.path, item.signedUrl]));
+      rows.forEach((row, index) => {
+        const optimized = optimizedMediaKeys(row.id, row.poster_key);
+        works[index].posterUrl = urls.get(row.poster_key ?? '') ?? works[index].posterUrl;
+        works[index].previewUrl = urls.get(optimized?.preview ?? '') ?? works[index].previewUrl;
+        works[index].videoUrl = urls.get(optimized?.playback ?? row.video_key) ?? works[index].videoUrl;
+      });
+    }
+  }
+  return NextResponse.json({ works, configured: true }, {
     headers: { 'Cache-Control': studioScope || mine ? 'private, no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' },
   });
 }

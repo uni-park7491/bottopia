@@ -4,6 +4,7 @@ import { getCurrentUser } from '../../../../../lib/auth';
 import { isSiteOwner } from '../../../../../lib/auth-policy';
 import { canManageWork } from '../../../../../lib/upload-policy';
 import { isSupabaseConfigured } from '../../../../../lib/supabase/config';
+import { optimizedMediaKeys } from '../../../../../lib/work-media';
 
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   const { id } = await context.params;
   const kind = request.nextUrl.searchParams.get('kind');
   if (!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(id)
-    || (kind !== 'video' && kind !== 'poster')
+    || (kind !== 'video' && kind !== 'poster' && kind !== 'preview')
     || !isSupabaseConfigured || !process.env.SUPABASE_SERVICE_ROLE_KEY) return notFound();
 
   const admin = createAdminClient();
@@ -25,7 +26,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     const user = await getCurrentUser();
     if (!user || !canManageWork(user.id, work.creator_id, isSiteOwner(user, process.env.SITE_OWNER_USER_ID, process.env.SITE_OWNER_EMAIL))) return notFound();
   }
-  const key = kind === 'video' ? work.video_key : work.poster_key;
+  const optimized = optimizedMediaKeys(id, work.poster_key);
+  const key = kind === 'video' ? optimized?.playback ?? work.video_key : kind === 'preview' ? optimized?.preview ?? work.video_key : work.poster_key;
   if (!key) return notFound();
 
   // Private drafts are visible only to their creator and the site operator.

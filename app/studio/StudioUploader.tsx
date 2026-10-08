@@ -1,4 +1,5 @@
 'use client';
+import { videoCover } from '../../lib/video-cover';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -69,9 +70,10 @@ export default function StudioUploader({ isOwner = false, initialRemix = '' }: {
       if (videoUpload.error) throw videoUpload.error;
 
       let posterKey: string | null = null;
-      if (poster instanceof File && poster.size) {
-        const posterTicket = await ticket(poster, 'poster', videoTicket.workId);
-        const posterUpload = await supabase.storage.from('works').uploadToSignedUrl(posterTicket.path, posterTicket.token, poster, { contentType: poster.type });
+      const cover = poster instanceof File && poster.size ? poster : await videoCover(video);
+      if (cover) {
+        const posterTicket = await ticket(cover, 'poster', videoTicket.workId);
+        const posterUpload = await supabase.storage.from('works').uploadToSignedUrl(posterTicket.path, posterTicket.token, cover, { contentType: cover.type });
         if (posterUpload.error) throw posterUpload.error;
         posterKey = posterTicket.path;
       }
