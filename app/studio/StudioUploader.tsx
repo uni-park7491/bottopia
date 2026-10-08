@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createBrowserSupabaseClient } from '../../lib/supabase/client';
 import { uploadError } from '../../lib/upload-policy';
 import FileDropInput from '../components/FileDropInput';
+import {workGenres} from '../../lib/work-genres';
 
 type StudioWork = { id: string; title: string; category: string; filename: string; fileSize: number; published: boolean; createdAt: string };
 type UploadTicket = { workId: string; path: string; token: string; error?: string };
@@ -134,7 +135,7 @@ export default function StudioUploader({ isOwner = false, initialRemix = '' }: {
         <FileDropInput label="작품 영상" required name="video" accept="video/mp4,video/webm,video/quicktime" disabled={status === 'uploading'} validate={file => uploadError('video', file.type, file.size)} hint="MP4 · WEBM · MOV / 최대 50MB" />
         <div className="form-grid">
           <label>TITLE<input required name="title" placeholder="작품 제목" maxLength={100} /></label>
-          <label>CATEGORY<select name="category" defaultValue="STORY"><option>STORY</option><option>CHARACTER</option><option>KNOWLEDGE</option><option>EXPERIMENT</option><option>BRAND FILM</option></select></label>
+          <label>장르<select name="category" defaultValue="DRAMA">{workGenres.map(item=><option key={item[0]} value={item[0]}>{item[1]}</option>)}</select></label>
           <label>작품 유형<select name="workType" defaultValue={remixSource ? 'REMIX' : isOwner ? 'ORIGINAL' : 'COMMUNITY'} key={remixSource}>{isOwner && <option value="ORIGINAL">BOTTOPIA 공식 작품</option>}<option value="COMMUNITY">크리에이터 작품</option><option value="REMIX">원작을 재해석한 작품</option></select></label>
           <label>연결할 원작<select name="remixOf" value={remixSource} onChange={(event) => setRemixSource(event.target.value)}><option value="">원작 연결 없음</option>{sources.map((work) => <option key={work.id} value={work.id}>{work.title}</option>)}</select></label>
           <label>AI TOOL<input name="tool" placeholder="예: Hailuo AI" maxLength={80} /></label>

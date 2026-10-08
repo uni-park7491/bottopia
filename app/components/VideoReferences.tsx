@@ -1,0 +1,33 @@
+'use client';
+import {useMemo,useState} from 'react';
+import {videoReferences,latestReferences} from '../../lib/video-references';
+import {genreLabel,workGenres,matchesVideoFilters} from '../../lib/work-genres';
+import {copyText} from '../../lib/clipboard';
+import type {Locale} from '../i18n';
+
+export default function VideoReferences({locale}:{locale:Locale}) {
+  const [genre,setGenre]=useState('ALL');
+  const [model,setModel]=useState('ALL');
+  const [duration,setDuration]=useState<'ALL'|'15'|'30'>('ALL');
+  const [region,setRegion]=useState('ALL');
+  const [copied,setCopied]=useState('');
+  const [error,setError]=useState('');
+  const ko=locale==='ko';
+  const models=[...new Set(videoReferences.map(item=>item.model))];
+  const visible=useMemo(()=>latestReferences(videoReferences).filter(item=>(genre==='ALL'||item.category===genre)&&(region==='ALL'||item.region===region)&&matchesVideoFilters(item,{model,duration})),[genre,model,duration,region]);
+  return <div className="reference-archive">
+    <div className="reference-intro"><p>{ko?'국내외 제작자의 원본 영상으로 연결합니다. 프롬프트는 봇토피아가 재구성한 예시이며 원작자의 실제 입력문이 아닙니다.':'Source-linked creator videos. Prompts are BOTTOPIA adaptations, not the original generation prompts.'}</p><span>{ko?'게시일 최신순 · 날짜 미확인은 마지막':'Newest published first · unknown dates last'}</span></div>
+    <div className="feed-filters" aria-label={ko?'레퍼런스 장르':'Reference genres'}><button aria-pressed={genre==='ALL'} onClick={()=>setGenre('ALL')}>{ko?'전체':'All'}</button>{workGenres.slice(0,13).map(item=><button key={item[0]} aria-pressed={genre===item[0]} onClick={()=>setGenre(item[0])}>{genreLabel(item[0],locale)}</button>)}</div>
+    <div className="video-filter-row">
+      <label>{ko?'모델':'Model'}<select value={model} onChange={e=>setModel(e.target.value)}><option value="ALL">{ko?'전체 모델':'All models'}</option>{models.map(value=><option key={value}>{value}</option>)}</select></label>
+      <label>{ko?'길이':'Duration'}<select value={duration} onChange={e=>setDuration(e.target.value as typeof duration)}><option value="ALL">{ko?'전체 길이':'All lengths'}</option><option value="15">15 {ko?'초':'sec'}</option><option value="30">30 {ko?'초':'sec'}</option></select></label>
+      <label>{ko?'지역':'Region'}<select value={region} onChange={e=>setRegion(e.target.value)}><option value="ALL">{ko?'국내·해외':'All regions'}</option><option value="국내">{ko?'국내':'Korea'}</option><option value="해외">{ko?'해외':'International'}</option></select></label><span>{visible.length} {ko?'개':'references'}</span>
+    </div>
+    {visible.length ? <div className="reference-grid">{visible.map(item=><article className="reference-card" key={item.id}>
+      <a className="reference-source-cover" href={item.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`${item.title} · ${ko?'원본 영상 보기':'View source video'}`}><span>{genreLabel(item.category,locale)}</span><strong>{item.durationSeconds}<small> SEC</small></strong><span>{ko?'원본 영상 보기 ↗':'Watch at source ↗'}</span></a>
+      <div className="reference-card-copy"><div className="reference-tags"><span>{item.model}</span><span>{ko?item.region:item.region==='국내'?'Korea':'International'}</span></div><h3>{item.title}</h3><p>{item.summary}</p><a className="reference-credit" href={item.sourceUrl} target="_blank" rel="noopener noreferrer">{ko?'출처':'Source'} · {item.author} ↗</a><small className="reference-date">{item.publishedAt??(ko?'게시일 미확인':'Publication date unverified')}</small>
+      <details><summary>{ko?'재구성 프롬프트':'Adapted prompt'} <span>+</span></summary><p>{item.prompt}</p><button onClick={async()=>{setError(''); if(await copyText(item.prompt))setCopied(item.id);else setError(item.id);}}>{copied===item.id?(ko?'복사 완료':'Copied'):(ko?'프롬프트 복사':'Copy prompt')}</button>{error===item.id&&<p role="alert">{ko?'복사하지 못했습니다. 텍스트를 선택해 복사해주세요.':'Select the text to copy manually.'}</p>}</details>
+      <details className="reference-evidence"><summary>{ko?'확인 정보':'Verification notes'}</summary><p>{item.evidence}</p></details></div>
+    </article>)}</div>:<div className="archive-empty"><h3>{ko?'이 조건으로 확인된 자료가 없습니다.':'No verified references for these filters.'}</h3><button onClick={()=>{setGenre('ALL');setModel('ALL');setDuration('ALL');setRegion('ALL');}}>{ko?'필터 초기화':'Reset filters'}</button></div>}
+  </div>;
+}
