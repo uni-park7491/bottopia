@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './refinement.css';
 import './site-theme.css';
+import './brand-theme.css';
 import SiteHeader from './components/SiteHeader';
 import Link from 'next/link';
 

@@ -1,0 +1,129 @@
+/* BOTTOPIA editorial palette: neutral surfaces, one functional accent.
+   High specificity keeps route-level styles from reintroducing old palettes. */
+:root, html[data-theme="light"] {
+  --site-bg: #f5f4f0;
+  --site-panel: #fffefd;
+  --site-soft: #eceee8;
+  --site-text: #242a27;
+  --site-muted: #626a64;
+  --site-line: #d7ddd6;
+  --site-accent: #246959;
+  --site-primary: #215e54;
+  --site-primary-hover: #174b42;
+  --site-selected: #e7eee8;
+  --site-media: #111715;
+}
+html[data-theme="dark"] {
+  --site-bg: #141918;
+  --site-panel: #1d2421;
+  --site-soft: #26302b;
+  --site-text: #edf0ea;
+  --site-muted: #afb9b1;
+  --site-line: #3c4941;
+  --site-accent: #9dcdbb;
+  --site-primary: #326e5c;
+  --site-primary-hover: #3b7d68;
+  --site-selected: #293e34;
+  --site-media: #0c110f;
+}
+html[data-theme] {
+  --paper: var(--site-bg); --surface: var(--site-panel);
+  --ink: var(--site-text); --line: var(--site-line);
+  --orange: var(--site-accent); --acid: var(--site-soft);
+  --lilac: var(--site-soft); --sky: var(--site-accent); --coral: var(--site-accent);
+}
+html[data-theme] body {
+  background: var(--site-bg); color: var(--site-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+html[data-theme] body :is(button,input,textarea,select) { font-family: inherit; }
+html[data-theme] body :is(a,button,input,textarea,select,summary):focus-visible {
+  outline: 2px solid var(--site-accent); outline-offset: 3px;
+}
+html[data-theme] body ::selection { background: var(--site-selected); color: var(--site-text); }
+html[data-theme] body :is(input,textarea)::placeholder { color: var(--site-muted); opacity: .85; }
+html[data-theme] body .unified-header.site-header {
+  background: color-mix(in srgb,var(--site-panel) 96%,transparent);
+  color: var(--site-text); border-color: var(--site-line); box-shadow: none;
+}
+html[data-theme] body .brand span { color: var(--site-accent); }
+html[data-theme] body .primary-navigation { font-weight: 550; }
+html[data-theme] body .primary-navigation a[aria-current] { color: var(--site-accent); box-shadow: 0 2px var(--site-accent); }
+html[data-theme] body .header-actions .member-auth { background: var(--site-text); color: var(--site-bg); border-color: var(--site-text); }
+html[data-theme] body .unified-header .locale-select select { background: transparent; color: var(--site-text); }
+html[data-theme] body .theme-switch { background: var(--site-soft); color: var(--site-muted); border-color: var(--site-line); }
+html[data-theme] body .theme-switch svg { color: var(--site-muted); }
+html[data-theme="light"] body .theme-switch svg:first-of-type,
+html[data-theme="dark"] body .theme-switch svg:last-of-type { color: var(--site-accent); }
+html[data-theme] body :is(.portfolio-hero.hero,.creators-hero,.profile-editor-intro,.creator-profile-hero,.case-hero,.login-shell,.contact) {
+  background: var(--site-bg); color: var(--site-text);
+}
+html[data-theme] body .portfolio-hero.hero { border-bottom: 1px solid var(--site-line); }
+html[data-theme] body :is(.portfolio-hero h1 em,.creators-hero h1 em,.creator-profile-bio dt,.case-hero h1,.about h2 em) { color: var(--site-accent); }
+html[data-theme] body :is(.portfolio-hero-top,.portfolio-hero-top>*,.portfolio-hero-bottom p,.portfolio-archive-head>p,.feed-status,.transmission-meta p,.transmission-prompt>div>span,.transmission-prompt>div>p,.creator-profile-bio>p,.creator-directory-copy>p,.login-description,.login-intro>p:not(.eyebrow),.login-privacy,.login-footer) { color: var(--site-muted); }
+html[data-theme] body :is(.worlds-hub.section-page,.creator-directory,.creator-work-index,.about,.work-detail-shell,.studio-shell,.inquiry-inbox) { background: var(--site-bg); color: var(--site-text); }
+html[data-theme] body :is(.archive-grid .transmission-card,.creator-directory-card,.creator-work-grid article,.creator-profile-card,.case-creator-profile,.login-card,.archive-modal,.archive-empty,.profile-social-fields,.case-remix-action) {
+  background: var(--site-panel); color: var(--site-text); border-color: var(--site-line); box-shadow: none;
+}
+html[data-theme] body :is(.archive-grid .transmission-card,.creator-directory-card,.login-card) { border-radius: 12px; }
+html[data-theme] body :is(.archive-grid .transmission-card .video-frame,.archive-modal-video,.creator-work-media) { background: var(--site-media); }
+html[data-theme] body :is(.tool-badge,.media-badge) {
+  background: #f0f2ed; color: #303a34; border: 1px solid #ffffff40;
+  font-family: inherit; font-weight: 600; letter-spacing: .01em; border-radius: 5px;
+}
+html[data-theme] body .open-transmission { background: var(--site-primary); color: #fff; }
+html[data-theme] body :is(.transmission-creator,.creator-social-links a,.creator-directory-copy>a,.creator-profile-card>a,.about-lab-link) { color: var(--site-accent); }
+html[data-theme] body :is(.transmission-prompt,.creator-profile-bio dl,.creator-profile-bio dl>div,.profile-contact-fields,.case-footer) { border-color: var(--site-line); }
+html[data-theme] body :is(.feed-search input,.feed-sort select,.feed-filters button,.profile-form input,.profile-form textarea,.upload-form input,.upload-form textarea,.upload-form select,.inquiry-form input,.inquiry-form textarea,.inquiry-form select,.community-note-form textarea,.file-drop-input) {
+  background: var(--site-panel); color: var(--site-text); border-color: var(--site-line);
+}
+html[data-theme] body :is(.feed-filters button[aria-pressed=true],.feed-filters .original-filter[aria-pressed=true]) { background: var(--site-text); color: var(--site-bg); border-color: var(--site-text); }
+html[data-theme] body .feed-filters .original-filter { color: var(--site-accent); border-color: var(--site-line); }
+html[data-theme] body :is(.transmission-prompt>button,.case-prompt-heading button) {
+  background: var(--site-soft); color: var(--site-accent); border-color: var(--site-line); box-shadow: none;
+}
+html[data-theme] body :is(.discovery-hero .portfolio-hero-bottom>div>a.feed-upload,.profile-save,.upload-submit,.case-remix-action button,.creators-hero>div:last-child a) {
+  background: var(--site-primary); color: #fff; border-color: var(--site-primary); border-radius: 8px; box-shadow: none;
+}
+html[data-theme] body .discovery-hero .portfolio-hero-bottom>div>a.feed-upload:hover { background: var(--site-primary-hover); }
+html[data-theme] body :is(.archive-skeleton,.case-footer) { background: var(--site-soft); color: var(--site-text); border-color: var(--site-line); }
+html[data-theme] body :is(.creator-avatar,.creator-profile-avatar) { background: var(--site-soft); color: var(--site-text); border-color: var(--site-line); }
+html[data-theme] body .creator-avatar-badged>.creator-badge { background: var(--site-panel); }
+html[data-theme] body .language-menu { background: var(--site-panel); border-color: var(--site-line); box-shadow: 0 8px 28px #00000012; }
+html[data-theme] body .inquiry-panel { background: var(--site-panel); box-shadow: -12px 0 36px #00000012; }
+html[data-theme] body .social-auth-button { background: var(--site-panel); color: var(--site-text); border-color: var(--site-line); }
+html[data-theme] body .social-auth-button:hover:not(:disabled) { background: var(--site-soft); border-color: var(--site-accent); }
+/* Keep the photographic guild identity; make its controls match the rest of the site. */
+html[data-theme] body .guild {
+  --guild-card: var(--site-panel); --guild-bg: var(--site-bg); --guild-ink: var(--site-text);
+  --guild-muted: var(--site-muted); --guild-line: var(--site-line); --guild-accent: var(--site-accent);
+}
+html[data-theme] body .guild :is(.guild-primary,.guild-count) { background: var(--site-primary); color: #fff; }
+html[data-theme] body .guild .guild-hero .guild-primary { background: #e8d4b4; color: #252225; }
+html[data-theme] body .guild .guild-card { background: var(--site-panel); box-shadow: none; }
+/* Workspace tokens inherit the global palette rather than maintaining another theme. */
+html[data-theme] body .creative-tools {
+  --ws-bg: var(--site-bg); --ws-panel: var(--site-panel); --ws-soft: var(--site-soft);
+  --ws-text: var(--site-text); --ws-muted: var(--site-muted); --ws-line: var(--site-line);
+  --ws-accent: var(--site-accent); --ws-selected: var(--site-selected);
+  background: var(--site-bg); color: var(--site-text);
+}
+html[data-theme] body:has(.creative-tools) { background: var(--site-bg); color: var(--site-text); }
+html[data-theme] body:has(.creative-tools) .unified-header.site-header { background: color-mix(in srgb,var(--site-panel) 96%,transparent); color: var(--site-text); border-color: var(--site-line); }
+html[data-theme] body:has(.creative-tools) .primary-navigation a[aria-current=page] { color: var(--site-accent); }
+html[data-theme] body .creative-tools :is(.story-inputs,.story-setup,.engine-setup,.scene-editor,.story-shots article,.tts-library,.tts-selected,.tts-composer,.utility-panel,.tts-expression-guide,.tool-drop,.tool-preview,.tts-job-progress) { box-shadow: none; background-image: none; }
+html[data-theme] body .creative-tools .engine-setup { background: var(--site-soft); }
+html[data-theme] body .creative-tools .tool-primary { background: var(--site-primary); border-color: var(--site-primary); color: #fff; box-shadow: none; }
+html[data-theme] body .creative-tools .tool-primary:not(:disabled):hover { background: var(--site-primary-hover); border-color: var(--site-primary-hover); }
+html[data-theme] body .creative-tools :is(input,textarea)::placeholder { color: var(--site-muted); }
+html[data-theme] body .creative-tools :is(input[type=range],input[type=checkbox],progress) { accent-color: var(--site-accent); }
+html[data-theme] body .creative-tools .voice-wave i { background: var(--site-accent); }
+html[data-theme] body .creative-tools :is(.tool-tabs button,.tts-model-list button,.voice-chips button)[aria-pressed=true] {
+  background: var(--site-selected); color: var(--site-text); border-color: var(--site-accent); box-shadow: inset 0 0 0 1px var(--site-accent);
+}
+html[data-theme] body .creative-tools .tool-tabs button strong { color: inherit; }
+html[data-theme] body .creative-tools .tool-tabs button>span { color: var(--site-muted); opacity: 1; }
+html[data-theme] body :is(.creator-directory-card dt,.creator-profile-card dt,.creator-profile-card>small,.creator-profile-card>p:last-of-type,.field-help,.form-grid label) { color: var(--site-muted); }
+html[data-theme] body :is(.creators-hero>div:last-child p,.creator-card-index) { color: var(--site-muted); }
+html[data-theme] body :is(.creator-profile-card dl,.creator-profile-card dl>div) { border-color: var(--site-line); }
+html[data-theme] body:has(.creative-tools) .site-header .header-actions .member-auth { background: var(--site-text); color: var(--site-bg); border-color: var(--site-text); }
