@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import CreatorArchive from './components/CreatorArchive';
 import RecruitmentBoard from './components/RecruitmentBoard';
 import { useSiteLocale } from './useSiteLocale';
+import { operatorEmail, operatorMailto } from '../lib/contact';
 
 
 type SiteSection = 'feed' | 'community' | 'ecosystem' | 'about';
@@ -239,6 +240,7 @@ export default function Home() {
         <button onClick={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.makeReal[0]}<br />{t.makeReal[1]}</button>
         <footer>
           <span>© 2026 BOTTOPIA</span>
+          <a href={operatorMailto}>{operatorEmail}</a>
           <a href="https://www.instagram.com/bot.topia/" target="_blank" rel="noreferrer">INSTAGRAM @BOT.TOPIA ↗</a>
           <Link href="/studio">{t.creatorStudio}</Link>
           <Link href="/about">{t.backTop}</Link>
@@ -253,6 +255,7 @@ export default function Home() {
               <p className="eyebrow">{t.inquiryEyebrow}</p>
               <h2 id="inquiry-title">{t.inquiryTitle[0]}<br />{t.inquiryTitle[1]}</h2>
               <p className="inquiry-intro">{t.inquiryIntro}</p>
+              <p><a href={operatorMailto}>{operatorEmail}</a></p>
             </div>
             {!copied ? (
               <form onSubmit={handleInquiry}>

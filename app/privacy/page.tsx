@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './privacy.module.css';
+import { operatorEmail, operatorMailto } from '../../lib/contact';
 
 // Reference draft, not legal advice. Review operator disclosures, retention and
 // international transfers with counsel before publication. Never insert the
@@ -18,14 +19,14 @@ export default function PrivacyPage() {
         <p className={styles.eyebrow}>BOTTOPIA STUDIO · PRIVACY</p>
         <h1>개인정보처리방침</h1>
         <p>작품을 공유하는 공간에서, 내 정보가 어떻게 사용되는지 안내합니다.</p>
-        <p className={styles.notice}>시행일: 2026년 9월 13일 · 문의: bottopia030@gmail.com</p>
+        <p className={styles.notice}>시행일: 2026년 9월 13일 · 문의: {operatorEmail}</p>
         <nav aria-label="문서 언어"><a href="#korean">한국어</a><a href="#english">English summary</a></nav>
       </header>
       <article id="korean" lang="ko">
         <section>
           <h2>1. 서비스와 문의 창구</h2>
           <p>BOTTOPIA STUDIO는 한국에서 개인이 운영하는 AI 영상 포트폴리오·크리에이터 커뮤니티입니다. 작품 감상은 로그인 없이 가능하며, 회원 기능을 이용할 때 소셜 로그인을 사용합니다.</p>
-          <p>계정, 개인정보 열람·정정·삭제 및 게시물 관련 문의는 운영자 이메일 <a href="mailto:bottopia030@gmail.com">bottopia030@gmail.com</a>으로 보내실 수 있습니다.</p>
+          <p>계정, 개인정보 열람·정정·삭제 및 게시물 관련 문의는 운영자 이메일 <a href={operatorMailto}>{operatorEmail}</a>으로 보내실 수 있습니다.</p>
         </section>
         <section>
           <h2>2. 수집하는 정보와 이용 목적</h2>
@@ -56,7 +57,7 @@ export default function PrivacyPage() {
           <ul>
             <li><strong>Supabase:</strong> 회원 인증, 데이터베이스 및 업로드 파일 저장. 현재 프로젝트의 주 저장 리전은 호주 시드니입니다. 인증·지원 및 하위 처리업체의 처리 위치는 Supabase 계약과 하위 처리업체 안내에 따릅니다. <a href="https://supabase.com/legal/dpa">데이터 처리 계약</a> · <a href="https://supabase.com/privacy">개인정보 안내</a></li>
             <li><strong>Vercel:</strong> 웹페이지 제공, 서버 요청 처리 및 운영 로그. 글로벌 인프라에서 접속 정보와 서버 요청 데이터가 처리될 수 있습니다. <a href="https://vercel.com/legal/dpa">데이터 처리 계약</a> · <a href="https://vercel.com/legal/privacy-notice">개인정보 안내</a></li>
-            <li><strong>Cloudflare:</strong> 도메인과 DNS 관리. 사이트 접속에 필요한 도메인 조회 처리가 이루어집니다. <a href="https://www.cloudflare.com/privacypolicy/">개인정보 안내</a></li>
+            <li><strong>Cloudflare:</strong> 도메인과 DNS 관리 및 대표 이메일의 수신 전달. 사이트 접속에 필요한 도메인 조회와 문의 이메일 전달 처리가 이루어집니다. <a href="https://www.cloudflare.com/privacypolicy/">개인정보 안내</a></li>
             <li><strong>Google 및 Kakao:</strong> 이용자가 선택한 소셜 로그인 인증. <a href="https://policies.google.com/privacy">Google 개인정보처리방침</a> · <a href="https://www.kakao.com/policy/privacy">Kakao 개인정보처리방침</a></li>
             <li><strong>Gmail:</strong> 운영자에게 이메일로 문의할 때 회신 이메일과 문의 내용이 Google 메일 서비스에서 처리됩니다.</li>
           </ul>
@@ -71,7 +72,7 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2>7. 열람·정정·삭제와 동의 철회</h2>
-          <p>로그인 후 내 프로필에서 제공되는 항목을 수정할 수 있습니다. 개인정보 열람, 정정, 삭제, 처리 정지, 동의 철회 또는 계정 탈퇴는 <a href="mailto:bottopia030@gmail.com">bottopia030@gmail.com</a>으로 요청해주세요. 계정의 회신 가능한 이메일과 요청 범위를 알려주시면 필요한 최소한의 방법으로 본인을 확인합니다. 비밀번호나 신분증 전체 사본을 보내지 마세요.</p>
+          <p>로그인 후 내 프로필에서 제공되는 항목을 수정할 수 있습니다. 개인정보 열람, 정정, 삭제, 처리 정지, 동의 철회 또는 계정 탈퇴는 <a href={operatorMailto}>{operatorEmail}</a>으로 요청해주세요. 계정의 회신 가능한 이메일과 요청 범위를 알려주시면 필요한 최소한의 방법으로 본인을 확인합니다. 비밀번호나 신분증 전체 사본을 보내지 마세요.</p>
           <p>적용 법령에 따른 기간과 절차에 맞춰 요청을 처리하고, 요청을 처리할 수 없는 경우 이유를 안내합니다. 법정대리인이나 위임받은 대리인은 권한을 확인할 수 있는 방법으로 요청할 수 있습니다. 지역에 따라 적용되는 개인정보 이동권이나 감독기관에 대한 이의 제기 권리도 보장됩니다.</p>
         </section>
         <section>
@@ -90,7 +91,7 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2>11. 문의·분쟁과 변경 안내</h2>
-          <p>운영자 문의: <a href="mailto:bottopia030@gmail.com">bottopia030@gmail.com</a>. 개인정보 관련 상담이나 분쟁 조정은 <a href="https://privacy.kisa.or.kr/">개인정보침해 신고센터</a> 또는 <a href="https://www.kopico.go.kr/">개인정보분쟁조정위원회</a>에서도 안내받을 수 있습니다.</p>
+          <p>운영자 문의: <a href={operatorMailto}>{operatorEmail}</a>. 개인정보 관련 상담이나 분쟁 조정은 <a href="https://privacy.kisa.or.kr/">개인정보침해 신고센터</a> 또는 <a href="https://www.kopico.go.kr/">개인정보분쟁조정위원회</a>에서도 안내받을 수 있습니다.</p>
           <p>방침을 변경할 때에는 변경 내용과 시행일을 이 페이지에 안내합니다. 별도 동의가 필요한 변경은 해당 절차를 거칩니다.</p>
         </section>
       </article>
@@ -99,10 +100,10 @@ export default function PrivacyPage() {
         <p>BOTTOPIA STUDIO is an individually operated AI video portfolio and creator community based in Korea. Effective date: September 13, 2026.</p>
         <p>We use your social account identifier, email and available profile information for sign-in, account management and profile setup. Google access is limited to openid, userinfo.email and userinfo.profile. We do not access your Google password, Gmail messages, contacts or Drive files. Google user data is not sold for advertising or used to train AI models.</p>
         <p>Published profiles, works, prompts and comments can be viewed by visitors. Review your display name before publishing. Your login email is not automatically published as a contact email. Others may retain copies of public content.</p>
-        <p>Supabase handles authentication, database records and files; the project’s primary storage region is Sydney, Australia. Vercel serves the website and server requests using global infrastructure. Cloudflare manages the domain and DNS. Data may be processed outside your country. Google or Kakao handles the sign-in method you select, and Gmail processes messages sent to our support address.</p>
+        <p>Supabase handles authentication, database records and files; the project’s primary storage region is Sydney, Australia. Vercel serves the website and server requests using global infrastructure. Cloudflare manages the domain, DNS and incoming support email forwarding. Data may be processed outside your country. Google or Kakao handles the sign-in method you select, and Gmail processes messages sent to our support address.</p>
         <p>Account information is retained to provide your membership, and published content to provide the corresponding features. Contact us for access, correction, deletion, withdrawal or account closure. Deletion is handled manually after verifying the request; revoking Google access or signing out does not automatically delete existing data. Provider logs and backups follow their respective retention schedules.</p>
         <p>Authentication cookies maintain your session and local storage remembers your language. We have not installed advertising pixels or Google Analytics in the site code. Membership is for people aged 14 or older, subject to any higher consent age and guardian-consent requirements in your jurisdiction.</p>
-        <p>Privacy and account requests: <a href="mailto:bottopia030@gmail.com">bottopia030@gmail.com</a>. Where applicable, you may also exercise data portability rights or complain to your local privacy regulator.</p>
+        <p>Privacy and account requests: <a href={operatorMailto}>{operatorEmail}</a>. Where applicable, you may also exercise data portability rights or complain to your local privacy regulator.</p>
       </section>
       <Link href="/" className={styles.back}>홈 피드로 돌아가기 →</Link>
     </main>
