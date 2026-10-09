@@ -43,8 +43,8 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [retry, setRetry] = useState(0);
   const t = { ...archiveCopy[locale], ...{
-    ko: { eyebrow: 'COMMUNITY WORKS', title: '지금, 크리에이터들의 장면', intro: '영상에서 영감을 얻고, 프롬프트와 제작 과정을 나누세요.', emptyBody: '첫 장면을 함께 채워주세요. 승인된 크리에이터는 작품과 프롬프트를 공유할 수 있습니다.', ownerLink: '내 작품 공유 준비하기' },
-    en: { eyebrow: 'COMMUNITY WORKS', title: 'Scenes from our creators', intro: 'Discover films, prompts, and the process behind them.', emptyBody: 'Help make the first scene. Approved creators can share work and prompts.', ownerLink: 'Prepare to share your work' },
+    ko: { eyebrow: 'COMMUNITY WORKS', title: '크리에이터 작품', intro: '영상에서 영감을 얻고, 프롬프트와 제작 과정을 나누세요.', emptyBody: '첫 장면을 함께 채워주세요. 승인된 크리에이터는 작품과 프롬프트를 공유할 수 있습니다.', ownerLink: '내 작품 공유 준비하기' },
+    en: { eyebrow: 'COMMUNITY WORKS', title: 'Creator works', intro: 'Discover films, prompts, and the process behind them.', emptyBody: 'Help make the first scene. Approved creators can share work and prompts.', ownerLink: 'Prepare to share your work' },
     zh: { eyebrow: '社区作品', title: '创作者们的精彩片段', intro: '发现影片，分享提示词与制作过程。', emptyBody: '一起创造第一个场景。审核通过的创作者可以分享作品与提示词。', ownerLink: '准备分享作品' },
     ja: { eyebrow: 'COMMUNITY WORKS', title: 'クリエイターたちのシーン', intro: '映像を見つけ、プロンプトと制作過程を共有しましょう。', emptyBody: '最初のシーンを一緒に。承認されたクリエイターは作品とプロンプトを共有できます。', ownerLink: '作品を共有する準備' },
   }[locale] };

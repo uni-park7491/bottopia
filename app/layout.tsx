@@ -3,6 +3,7 @@ import './globals.css';
 import './refinement.css';
 import './site-theme.css';
 import './brand-theme.css';
+import './home-design.css';
 import SiteHeader from './components/SiteHeader';
 import Link from 'next/link';
 

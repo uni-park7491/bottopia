@@ -4,6 +4,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import MemberLogin from './MemberLogin';
 import ThemeSwitch from './ThemeSwitch';
@@ -23,7 +24,7 @@ export default function SiteHeader() {
   const locale = useSiteLocale();
   useEffect(() => { document.documentElement.lang = localeOptions.find(x => x.code === locale)?.htmlLang || locale; }, [locale]);
   return <header className="site-header unified-header">
-    <WorkspaceLink className="brand" href="/" aria-label="BOTTOPIA">BOT<span>•</span>TOPIA</WorkspaceLink>
+    <WorkspaceLink className="brand" href="/" aria-label="BOTTOPIA"><Image src="/bottopia-mascot.webp" alt="" width={40} height={40} />BOTTOPIA</WorkspaceLink>
     <nav className="primary-navigation" aria-label={locale === 'ko' ? '주 메뉴' : 'Main navigation'}>
       {paths.map((path, i) => { const NavLink = path === '/tools' ? 'a' : WorkspaceLink; return <NavLink key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</NavLink>; })}
     </nav>

@@ -2,6 +2,7 @@
 
 import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
+import HomeHero from './components/HomeHero';
 import { usePathname } from 'next/navigation';
 import CreatorArchive from './components/CreatorArchive';
 import RecruitmentBoard from './components/RecruitmentBoard';
@@ -166,14 +167,7 @@ export default function Home() {
 
       {section === 'feed' && <>
         <link rel="preload" href="/api/works" as="fetch" crossOrigin="anonymous" />
-        <section className="hero portfolio-hero discovery-hero" id="top">
-          <div className="portfolio-hero-top"><p className="eyebrow feed-eyebrow">BOTTOPIA / AI FILM &amp; CREATOR NETWORK</p><span>FOUNDED IN SEOUL · 2026</span></div>
-          <h1>{({ ko: <>창작을 발견하고,<br /><em>다음 장면을 함께.</em></>, en: <>Discover a world.<br /><em>Make the next scene.</em></>, zh: <>发现创作，<br /><em>一起创造下一幕。</em></>, ja: <>創作を見つけ、<br /><em>次のシーンを一緒に。</em></> })[locale]}</h1>
-          <div className="hero-bottom portfolio-hero-bottom">
-            <p>{({ ko: 'AI 영상과 제작 과정을 나누는 크리에이터 공간. 작품을 발견하고, 프롬프트를 배우고, 함께할 사람을 만나세요.', en: 'A space for AI films and their makers. Explore the work, learn the prompts, and find your next collaborator.', zh: '分享 AI 影像与创作过程。发现作品，学习提示词，认识未来的合作伙伴。', ja: 'AI映像と制作プロセスを共有する場所。作品とプロンプトを見つけ、次の仲間に出会おう。' })[locale]}</p>
-            <div><Link className="feed-upload" href="/studio">{({ ko: '내 작품 공유하기', en: 'Share your work', zh: '分享作品', ja: '作品を共有' })[locale]}</Link><Link href="/creators">{({ ko: '크리에이터 만나기', en: 'Meet creators', zh: '认识创作者', ja: 'クリエイターに出会う' })[locale]}</Link></div>
-          </div>
-        </section>
+        <HomeHero locale={locale} />
         <section className="worlds-hub section-page" id="work"><CreatorArchive locale={locale} /></section>
       </>}
 
