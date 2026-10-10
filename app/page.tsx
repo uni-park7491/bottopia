@@ -1,7 +1,7 @@
 'use client';
 
-import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useState } from 'react';
-import Link from 'next/link';
+import { FormEvent, useEffect, useState } from 'react';
+import AboutPage from './components/AboutPage';
 import HomeHero from './components/HomeHero';
 import { usePathname } from 'next/navigation';
 import CreatorArchive from './components/CreatorArchive';
@@ -14,37 +14,6 @@ type SiteSection = 'feed' | 'community' | 'ecosystem' | 'about';
 
 
 
-
-const ecosystemPlanetCopy = {
-  ko: [
-    { key: 'idea', name: 'IDEA', code: 'SEED 01', title: '아이디어 씨앗', description: '한 문장의 질문과 감정을 이미지가 될 수 있는 핵심 콘셉트로 압축합니다.' },
-    { key: 'character', name: 'CHARACTER', code: 'FORM 02', title: '캐릭터 설계', description: '실루엣, 재질, 성격과 움직임의 규칙을 정해 세계의 주인공을 만듭니다.' },
-    { key: 'story', name: 'STORY', code: 'WORLD 03', title: '이야기와 세계', description: '캐릭터가 존재할 시간, 장소, 갈등을 설계해 하나의 장면을 세계로 확장합니다.' },
-    { key: 'motion', name: 'MOTION', code: 'MOVE 04', title: '움직임 제작', description: '카메라, 타이밍, 빛과 사운드를 조율해 정지된 상상을 영화적인 순간으로 만듭니다.' },
-    { key: 'remix', name: 'REMIX', code: 'SHARE 05', title: '공개와 재창작', description: '작품과 프롬프트를 함께 공개해 다른 창작자의 새로운 실험으로 이어지게 합니다.' },
-  ],
-  en: [
-    { key: 'idea', name: 'IDEA', code: 'SEED 01', title: 'Idea seed', description: 'Condense one question and emotion into a visual concept with a clear point of view.' },
-    { key: 'character', name: 'CHARACTER', code: 'FORM 02', title: 'Character design', description: 'Define silhouette, material, personality, and movement rules to create the world’s protagonist.' },
-    { key: 'story', name: 'STORY', code: 'WORLD 03', title: 'Story and world', description: 'Design time, place, and conflict so a single scene can expand into a coherent world.' },
-    { key: 'motion', name: 'MOTION', code: 'MOVE 04', title: 'Motion craft', description: 'Direct camera, timing, light, and sound to turn a still idea into a cinematic moment.' },
-    { key: 'remix', name: 'REMIX', code: 'SHARE 05', title: 'Open and remix', description: 'Publish the work with its prompt so another maker can begin a new experiment.' },
-  ],
-  zh: [
-    { key: 'idea', name: 'IDEA', code: 'SEED 01', title: '创意种子', description: '把一个问题与一种情感，提炼成具有明确方向的视觉概念。' },
-    { key: 'character', name: 'CHARACTER', code: 'FORM 02', title: '角色设计', description: '定义轮廓、材质、性格与动作规则，创造世界的主角。' },
-    { key: 'story', name: 'STORY', code: 'WORLD 03', title: '故事与世界', description: '设计时间、地点与冲突，让一个场景发展成完整的世界。' },
-    { key: 'motion', name: 'MOTION', code: 'MOVE 04', title: '动态制作', description: '协调镜头、节奏、光线与声音，把静止想象变成电影瞬间。' },
-    { key: 'remix', name: 'REMIX', code: 'SHARE 05', title: '公开与再创作', description: '同时公开作品与提示词，让其他创作者继续新的实验。' },
-  ],
-  ja: [
-    { key: 'idea', name: 'IDEA', code: 'SEED 01', title: 'アイデアの種', description: '一つの問いと感情を、明確な方向を持つビジュアルコンセプトへ凝縮します。' },
-    { key: 'character', name: 'CHARACTER', code: 'FORM 02', title: 'キャラクター設計', description: 'シルエット、質感、性格、動きのルールを決め、世界の主人公をつくります。' },
-    { key: 'story', name: 'STORY', code: 'WORLD 03', title: '物語と世界', description: '時間、場所、葛藤を設計し、一つのシーンを一貫した世界へ広げます。' },
-    { key: 'motion', name: 'MOTION', code: 'MOVE 04', title: '動きの制作', description: 'カメラ、タイミング、光、音を演出し、静かな想像を映画的な瞬間にします。' },
-    { key: 'remix', name: 'REMIX', code: 'SHARE 05', title: '公開と再創作', description: '作品とプロンプトを公開し、次のクリエイターの新しい実験へつなぎます。' },
-  ],
-} as const;
 
 const copy = {
   ko: {
@@ -112,11 +81,8 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
   const [inquirySending, setInquirySending] = useState(false);
-  const [activePlanet, setActivePlanet] = useState<string | null>(null);
   const locale = useSiteLocale();
   const t = copy[locale];
-  const planets = ecosystemPlanetCopy[locale];
-  const selectedPlanet = planets.find((planet) => planet.key === activePlanet) ?? null;
 
 
   useEffect(() => {
@@ -147,20 +113,6 @@ export default function Home() {
     finally { setInquirySending(false); }
   }
 
-  function trackBotEyes(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === 'touch') return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2)));
-    const y = Math.max(-1, Math.min(1, (event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2)));
-    event.currentTarget.style.setProperty('--eye-x', `${(x * 9).toFixed(2)}px`);
-    event.currentTarget.style.setProperty('--eye-y', `${(y * 6).toFixed(2)}px`);
-  }
-
-  function resetBotEyes(event: ReactPointerEvent<HTMLDivElement>) {
-    event.currentTarget.style.setProperty('--eye-x', '0px');
-    event.currentTarget.style.setProperty('--eye-y', '0px');
-  }
-
   return (
     <main>
 
@@ -173,73 +125,7 @@ export default function Home() {
 
       {section === 'community' && <RecruitmentBoard />}
 
-      {section === 'about' && <section className="about section-page" id="about">
-        <div className="about-label">
-          <p>( {t.aboutLabel} )</p>
-          <div className="tiny-bot" aria-hidden="true"><span /></div>
-          <a className="about-lab-link" href="#lab">{({ ko: '창작 랩 살펴보기 ↓', en: 'Explore the creative lab ↓', zh: '探索创作实验室 ↓', ja: '創作ラボを見る ↓' })[locale]}</a>
-        </div>
-        <div className="about-copy">
-          <h2>{t.aboutTitle[0]}<br />{t.aboutTitle[1]}<br /><em>{t.aboutTitle[2]}</em></h2>
-          <p>{t.aboutBody}</p>
-          <dl className="about-credentials"><div><dt>ROLE</dt><dd>AI FILM DIRECTOR</dd></div><div><dt>FOCUS</dt><dd>VISUAL WORLDBUILDING</dd></div><div><dt>BASE</dt><dd>SEOUL / KOREA</dd></div></dl>
-        </div>
-      </section>}
-
-      {section === 'about' && <section className="ecosystem section-page about-lab" id="lab">
-        <div className="ecosystem-intro">
-          <p className="eyebrow">{({ ko: 'BOTTOPIA 소개 / 창작 랩', en: 'ABOUT BOTTOPIA / CREATIVE LAB', zh: '关于 BOTTOPIA / 创作实验室', ja: 'BOTTOPIAについて / 創作ラボ' })[locale]}</p>
-          <h2>{t.ecosystemTitle[0]}<br />{t.ecosystemTitle[1]}<br /><em>{t.ecosystemTitle[2]}</em></h2>
-          <p>{t.ecosystemBody}</p>
-        </div>
-        <div className="orbit-system" aria-label={t.ecosystemAria} onPointerMove={trackBotEyes} onPointerLeave={resetBotEyes}>
-          <span className="space-grid" /><span className="orbit-ring ring-one" /><span className="orbit-ring ring-two" /><span className="orbit-ring ring-three" />
-          <div className="orbit-bot" aria-hidden="true"><i className="bot-eye bot-eye-left" /><i className="bot-eye bot-eye-right" /><b className="bot-antenna" /></div>
-          {planets.map((planet) => <button
-            key={planet.key}
-            type="button"
-            className={`planet planet-${planet.key}${activePlanet === planet.key ? ' active' : ''}`}
-            aria-describedby={`planet-${planet.key}-detail`}
-            aria-pressed={activePlanet === planet.key}
-            onClick={() => setActivePlanet((current) => current === planet.key ? null : planet.key)}
-          >
-            <i aria-hidden="true" /><span>{planet.name}<small>{planet.code}</small></span>
-            <span className="planet-tooltip" id={`planet-${planet.key}-detail`} role="tooltip"><b>{planet.title}</b><span>{planet.description}</span></span>
-          </button>)}
-          <p className="orbit-caption">BOT.TOPIA / CREATIVE LOOP / ALWAYS IN MOTION</p>
-        </div>
-        <div className={`ecosystem-planet-note${selectedPlanet ? ' visible' : ''}`} aria-live="polite">
-          {selectedPlanet ? <><span>{selectedPlanet.name} / {selectedPlanet.code}</span><h3>{selectedPlanet.title}</h3><p>{selectedPlanet.description}</p></> : <p>{({ ko: '행성을 탭하면 제작 단계의 설명이 열립니다.', en: 'Tap a planet to open its production note.', zh: '点击行星即可查看制作阶段说明。', ja: '惑星をタップすると制作段階の説明が開きます。' })[locale]}</p>}
-        </div>
-      </section>}
-
-      {section === 'about' && <>
-
-      <section className="services" aria-labelledby="services-title">
-        <p className="eyebrow" id="services-title">{t.whatWeMake}</p>
-        <div className="service-list">
-          <article><span>01</span><h3>AI FILM</h3><p>{t.services[0]}</p></article>
-          <article><span>02</span><h3>CHARACTER</h3><p>{t.services[1]}</p></article>
-          <article><span>03</span><h3>CAMPAIGN</h3><p>{t.services[2]}</p></article>
-          <article><span>04</span><h3>R&amp;D</h3><p>{t.services[3]}</p></article>
-        </div>
-        <div className="process-note">
-          <span>BRIEF</span><i>→</i><span>WORLD</span><i>→</i><span>MAKE</span><i>→</i><span>DELIVER</span>
-        </div>
-      </section>
-
-      <section className="contact" id="contact">
-        <div className="availability"><i /> {t.booking}</div>
-        <p>{t.worldInMind}</p>
-        <button onClick={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }}>{t.makeReal[0]}<br />{t.makeReal[1]}</button>
-        <footer>
-          <span>© 2026 BOTTOPIA</span>
-          <a href={operatorMailto}>{operatorEmail}</a>
-          <a href="https://www.instagram.com/bot.topia/" target="_blank" rel="noreferrer">INSTAGRAM @BOT.TOPIA ↗</a>
-          <Link href="/studio">{t.creatorStudio}</Link>
-          <Link href="/about">{t.backTop}</Link>
-        </footer>
-      </section></>}
+      {section === 'about' && <AboutPage locale={locale} onInquiry={() => { setCopied(false); setCopyFailed(false); setInquiryOpen(true); }} />}
 
       {inquiryOpen && (
         <div className="modal-backdrop inquiry-backdrop" role="presentation" onMouseDown={() => setInquiryOpen(false)}>
