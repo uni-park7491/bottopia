@@ -27,9 +27,12 @@ export default function FileDropInput({ label, accept, name, required, disabled,
       setFilename('');
       return;
     }
-    const transfer = new DataTransfer();
-    transfer.items.add(file);
-    if (input.current) input.current.files = transfer.files;
+    // Native phone pickers already populated the input; only dropped files need assignment.
+    if (input.current && input.current.files !== files) {
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.current.files = transfer.files;
+    }
     setFilename(file.name);
     onFile?.(file);
   }

@@ -38,5 +38,5 @@ export async function POST(request: Request) {
   }
   const { data, error } = await admin.storage.from('works').createSignedUploadUrl(path);
   if (error) return NextResponse.json({ error: '업로드를 준비하지 못했습니다.' }, { status: 503 });
-  return NextResponse.json({ workId, path, token: data.token }, { headers: { 'Cache-Control': 'private, no-store' } });
+  return NextResponse.json({ workId, path, token: data.token, signedUrl: data.signedUrl }, { headers: { 'Cache-Control': 'private, no-store' } });
 }

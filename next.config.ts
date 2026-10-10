@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
       { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
+    ] }, { source:'/sw.js', headers:[
+      { key:'Cache-Control', value:'no-cache, no-store, must-revalidate' },
+      { key:'Content-Type', value:'application/javascript; charset=utf-8' },
+      { key:'Service-Worker-Allowed', value:'/' },
     ] }, ...[
       { source: '/tools/:path*' },
       // Dedicated workers need the same embedder policy as their document.

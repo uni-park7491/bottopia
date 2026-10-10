@@ -1,9 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './refinement.css';
 import './site-theme.css';
 import './brand-theme.css';
 import './home-design.css';
+import './mobile-app.css';
+import MobileApp from './components/MobileApp';
 import SiteHeader from './components/SiteHeader';
 import Link from 'next/link';
 
@@ -13,7 +15,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'BOTTOPIA — AI Film & Creator Network',
   description: 'AI 필름 작품과 제작 과정을 공개하고, 크리에이터와 협업 및 프로젝트로 연결되는 BOTTOPIA 네트워크입니다.',
-  icons: { icon: '/favicon.svg' },
+  icons: { icon: '/favicon.svg', apple: '/apple-touch-icon.png' },
+  appleWebApp: { capable:true, title:'BOTTOPIA', statusBarStyle:'default' },
   openGraph: {
     title: 'BOTTOPIA — Worlds in Motion',
     description: 'An open AI film portfolio and creator network for sharing process, finding collaborators, and starting projects.',
@@ -28,11 +31,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width:'device-width', initialScale:1, viewportFit:'cover',
+  themeColor: [{ media:'(prefers-color-scheme: light)', color:'#f7f8fa' }, { media:'(prefers-color-scheme: dark)', color:'#111318' }],
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: `(()=>{let t;try{t=localStorage.getItem('bottopia-theme')}catch{}document.documentElement.dataset.theme=t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'})()` }} /></head>
-      <body><SiteHeader />{children}<div style={{ padding: '24px', textAlign: 'center', fontSize: '14px', lineHeight: 1.8 }}><Link href="/privacy">개인정보처리방침 · Privacy Policy</Link></div></body>
+      <body><SiteHeader /><MobileApp />{children}<div style={{ padding: '24px', textAlign: 'center', fontSize: '14px', lineHeight: 1.8 }}><Link href="/privacy">개인정보처리방침 · Privacy Policy</Link></div></body>
     </html>
   );
 }

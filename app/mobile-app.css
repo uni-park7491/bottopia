@@ -1,0 +1,37 @@
+.mobile-app-nav,.mobile-app-install { display:none; }
+.app-network-notice { position:sticky; top:74px; z-index:29; margin:0; padding:12px 20px; background:var(--site-soft); color:var(--site-text); font-size:14px; text-align:center; border-bottom:1px solid var(--site-line); }
+.upload-transfer { margin:16px 0; padding:14px 16px; border:1px solid var(--site-line); border-radius:10px; background:var(--site-panel); color:var(--site-text); }
+.upload-transfer>div { display:flex; justify-content:space-between; gap:16px; font-size:14px; }
+.upload-transfer progress { display:block; width:100%; height:8px; margin-top:12px; accent-color:var(--site-accent); }
+.upload-draft { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; color:var(--site-muted); font-size:12px; margin:16px 0; }
+.upload-draft button { font:inherit; padding:8px 10px; border:1px solid var(--site-line); border-radius:8px; color:var(--site-text); background:var(--site-panel); cursor:pointer; }
+@media(max-width:760px) {
+  body { padding-bottom:calc(74px + env(safe-area-inset-bottom,0px)); }
+  html { scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px)); }
+  html[data-theme] body .unified-header .primary-navigation { display:none; }
+  html[data-theme] body .unified-header { gap:12px; padding:12px 16px; }
+  .mobile-app-nav { position:fixed; bottom:0; inset-inline:0; z-index:35; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px)); background:var(--site-panel); border-top:1px solid var(--site-line); box-shadow:0 -4px 20px #00000008; }
+  .mobile-app-nav a { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-height:48px; color:var(--site-muted); font-size:10px; font-weight:600; line-height:1.3; border-radius:10px; text-align:center; }
+  .mobile-app-nav a[aria-current] { color:var(--site-text); background:var(--site-selected); }
+  .mobile-app-nav svg { width:22px; height:22px; }
+  .mobile-app-nav a:focus-visible,.mobile-app-install button:focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; }
+  .mobile-app-install { display:flex; position:relative; align-items:center; gap:16px; margin:10px 16px; }
+  .mobile-extra-links { display:flex; gap:16px; margin-left:auto; color:var(--site-muted); font-size:12px; }
+  .mobile-extra-links a { display:flex; align-items:center; min-height:36px; }
+  .mobile-app-install>button { display:flex; align-items:center; gap:8px; width:max-content; padding:8px 12px; border:1px solid var(--site-line); border-radius:8px; background:var(--site-panel); color:var(--site-muted); font:600 12px/1.4 Arial,sans-serif; cursor:pointer; }
+  .mobile-app-install:empty { margin:0; }
+  .mobile-install-help { position:absolute; z-index:40; top:44px; left:0; width:min(340px,calc(100vw - 32px)); padding:18px; background:var(--site-panel); color:var(--site-text); border:1px solid var(--site-line); border-radius:12px; box-shadow:0 8px 24px #0002; }
+  .mobile-install-help strong { font-size:15px; }
+  .mobile-install-help p { color:var(--site-muted); font-size:13px; line-height:1.7; }
+  .mobile-install-help button { min-height:40px; padding:8px 14px; border:1px solid var(--site-line); border-radius:8px; color:var(--site-text); background:var(--site-soft); }
+  html[data-theme] body .studio-shell { padding-inline:16px; }
+  html[data-theme] body .studio-shell .studio-grid { grid-template-columns:minmax(0,1fr); }
+  html[data-theme] body .studio-shell .upload-form { min-width:0; padding:20px 16px; }
+  html[data-theme] body .studio-shell .form-grid { grid-template-columns:minmax(0,1fr); gap:20px; }
+  html[data-theme] body .studio-shell :is(input:not([type=checkbox]),textarea,select) { font-size:16px; max-width:100%; }
+  html[data-theme] body .studio-shell :is(.form-grid label,.file-drop-input) { min-width:0; }
+  html[data-theme] body .studio-shell .file-drop-input input { overflow:hidden; }
+  html[data-theme] body .studio-shell .studio-profile-callout { flex-wrap:wrap; }
+  html[data-theme] body .studio-shell .studio-library article { flex-wrap:wrap; gap:10px; }
+  .app-network-notice { top:0; }
+}
