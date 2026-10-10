@@ -7,6 +7,7 @@ import CommunityPanel from '../../components/CommunityPanel';
 import { copyText } from '../../../lib/clipboard';
 import { creatorInitials } from '../../../lib/profile-policy';
 import type { PublicCreator } from '../../../lib/profiles';
+import { loadMemberPrompt, memberPromptNotice } from '../../../lib/member-prompt';
 
 type Work = {
   id: string; title: string; summary: string; category: string; tool: string; model: string;
@@ -21,6 +22,7 @@ export default function WorkDetail({ id }: { id: string }) {
   const [work, setWork] = useState<Work | null>(null);
   const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -33,12 +35,18 @@ export default function WorkDetail({ id }: { id: string }) {
 
   async function copyPrompt() {
     if (!work) return;
-    const prompt = [work.prompt, work.negativePrompt && `\nNEGATIVE PROMPT\n${work.negativePrompt}`].filter(Boolean).join('\n');
+    setCopyError(false);
+    let content;
+    try { content = await loadMemberPrompt(`/api/works/${encodeURIComponent(work.id)}/prompt`, 'ko'); }
+    catch { setCopyError(true); return; }
+    if (!content) return;
+    setWork({ ...work, ...content });
+    const prompt = [content.prompt, content.negativePrompt && `\nNEGATIVE PROMPT\n${content.negativePrompt}`].filter(Boolean).join('\n');
     if (await copyText(prompt)) {
       setCopied(true);
       fetch(`/api/works/${work.id}/copy`, { method: 'POST' }).catch(() => undefined);
       window.setTimeout(() => setCopied(false), 1800);
-    }
+    } else setCopyError(true);
   }
 
   if (failed) return <main className="work-detail-state"><p>404 / LOST TRANSMISSION</p><h1>PROJECT<br />NOT FOUND.</h1><Link href="/">RETURN TO WORK ↗</Link></main>;
@@ -72,7 +80,8 @@ export default function WorkDetail({ id }: { id: string }) {
       </aside>
       <article>
         <div className="case-prompt-heading"><div><span>OPEN PROCESS</span><h2>FULL PROMPT</h2></div><button onClick={copyPrompt}>{copied ? 'COPIED ✓' : 'COPY PROMPT ↗'}</button></div>
-        <pre>{work.prompt}</pre>
+        <pre>{work.prompt || memberPromptNotice.ko}</pre>
+        {copyError && <p role="alert">프롬프트를 복사하지 못했습니다. 다시 시도하거나 표시된 원문을 선택해 복사해주세요.</p>}
         {work.negativePrompt && <div className="case-negative"><span>NEGATIVE PROMPT</span><pre>{work.negativePrompt}</pre></div>}
         {work.processNotes && <div className="case-process-notes"><span>PROCESS NOTES</span><p>{work.processNotes}</p></div>}
         {work.remixOf && <div className="case-remix-source"><span>원작 출처</span>{work.source ? <div><Link href={`/works/${work.source.id}`}>{work.source.title} ↗</Link>{work.source.creator && <p><Link href={`/creators/${work.source.creator.handle}`}>{work.source.creator.displayName} · @{work.source.creator.handle}</Link></p>}</div> : <p>원작이 비공개로 전환되었거나 더 이상 제공되지 않습니다.</p>}</div>}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { Locale } from '../i18n';
 import { safeReturnPath } from '../../lib/auth-policy';
+import { memberPromptNotice } from '../../lib/member-prompt';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: '로그인 · BOTTOPIA', robots: { index: false, follow: false } };
@@ -26,13 +27,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="login-intro"><p className="eyebrow">BOTTOPIA COMMUNITY</p><h1>{t.title}</h1><p>{t.body}</p><span className="login-orbit" aria-hidden="true"><i /></span></div>
         <div className="login-card">
           <p className="eyebrow">WELCOME TO BOTTOPIA</p><h2>{t.subtitle}</h2><p className="login-description">{t.account}</p>
-          {next.startsWith('/studio') && <p className="login-description">{({ ko: '로그인 후 크리에이터 승인 상태를 확인하고 작품을 공유할 수 있습니다. 홈 피드와 프롬프트는 로그인 없이 열려 있어요.', en: 'Sign in to check your creator approval and share work. Browsing works and prompts needs no sign-in.', zh: '登录后可查看创作者审核状态并分享作品。浏览作品与提示词无需登录。', ja: 'ログイン後、クリエイターの承認状況を確認して作品を共有できます。作品とプロンプトの閲覧はログイン不要です。' })[locale]}</p>}
+          {params.reason === 'prompt' && <p className="login-notice">{memberPromptNotice[locale]}</p>}
+          {next.startsWith('/studio') && <p className="login-description">{({ ko: '로그인 후 크리에이터 승인 상태를 확인하고 작품을 공유할 수 있습니다. 작품 감상은 로그인 없이, 프롬프트 열람·복사는 로그인 후 가능합니다.', en: 'Sign in to check your creator approval and share work. Works are public; viewing and copying prompts requires sign-in.', zh: '登录后可查看创作者审核状态并分享作品。作品可公开浏览，查看和复制提示词需要登录。', ja: 'ログイン後、承認状況を確認して作品を共有できます。作品は公開、プロンプトの閲覧・コピーはログイン後に利用できます。' })[locale]}</p>}
           {params.error && <p className="login-notice" role="alert">{params.error === 'setup' ? t.setup : t.error}</p>}
           <MemberLogin locale={locale} returnTo={next} />
           <Link className="login-skip" href="/">{({ ko: '로그인 없이 홈 피드 보기 →', en: 'Browse the home feed without signing in →', zh: '无需登录，浏览首页 →', ja: 'ログインせずにホームフィードを見る →' })[locale]}</Link>
           <p className="login-privacy">{t.privacy}</p>
           <p className="login-privacy"><Link href="/privacy">{({ ko: '개인정보처리방침', en: 'Privacy Policy', zh: '隐私政策', ja: 'プライバシーポリシー' })[locale]}</Link></p>
-          <nav className="login-languages" aria-label="Language">{(['ko', 'en', 'zh', 'ja'] as const).map((lang, i) => <Link key={lang} lang={lang} aria-current={lang === locale ? 'page' : undefined} href={`/login?${new URLSearchParams({ lang, next, ...(typeof params.error === 'string' ? { error: params.error } : {}) })}`}>{['한국어', 'English', '中文', '日本語'][i]}</Link>)}</nav>
+          <nav className="login-languages" aria-label="Language">{(['ko', 'en', 'zh', 'ja'] as const).map((lang, i) => <Link key={lang} lang={lang} aria-current={lang === locale ? 'page' : undefined} href={`/login?${new URLSearchParams({ lang, next, ...(params.reason === 'prompt' ? { reason: 'prompt' } : {}), ...(typeof params.error === 'string' ? { error: params.error } : {}) })}`}>{['한국어', 'English', '中文', '日本語'][i]}</Link>)}</nav>
         </div>
       </section>
       <footer className="login-footer">WATCH. LEARN. REMIX.</footer>

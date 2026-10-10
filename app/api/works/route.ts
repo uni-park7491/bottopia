@@ -47,7 +47,12 @@ export async function GET(request: NextRequest) {
   if (error) return NextResponse.json({ error: '작품을 불러오지 못했습니다.' }, { status: 503 });
   const rows = (data ?? []) as WorkRow[];
   const profiles = await profilesById(admin, rows.map((row) => row.creator_id ?? ''));
-  const works = rows.map((row) => serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null));
+  const works = rows.map((row) => {
+    const work = serialize(row, row.creator_id ? profiles.get(row.creator_id) ?? null : null);
+    // Public feed stays cacheable: member-only text is fetched through /prompt.
+    if (!studioScope && !mine) { work.prompt = ''; work.negativePrompt = ''; }
+    return work;
+  });
   // Batch-sign only published media; private studio responses keep their guarded routes.
   if (!studioScope && !mine) {
     const keys = rows.flatMap(row => {

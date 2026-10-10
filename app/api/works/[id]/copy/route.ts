@@ -2,13 +2,16 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '../../../../../lib/supabase/admin';
 import { isSupabaseConfigured } from '../../../../../lib/supabase/config';
 import { guardMutation } from '../../../../../lib/request-guard';
+import { getCurrentUser } from '../../../../../lib/auth';
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Sign in to copy prompts' }, { status: 401, headers: { 'Cache-Control': 'private, no-store' } });
   if (!isSupabaseConfigured || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ error: 'Archive not configured' }, { status: 503 });
   const { id } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return NextResponse.json({ error: 'Invalid work id' }, { status: 400 });
   const admin = createAdminClient();
-  const blocked = await guardMutation(request, 'copy', 120);
+  const blocked = await guardMutation(request, 'copy', 120, user.id);
   if (blocked) return blocked;
   for (let attempt = 0; attempt < 3; attempt++) {
     const { data, error } = await admin.from('works').select('copies').eq('id', id).eq('published', true).maybeSingle();

@@ -11,6 +11,7 @@ import { copyText, clipboardError } from '../../lib/clipboard';
 import type { PublicCreator } from '../../lib/profiles';
 import {genreLabel,workGenres} from '../../lib/work-genres';
 import VideoReferences from './VideoReferences';
+import { loadMemberPrompt, memberPromptNotice } from '../../lib/member-prompt';
 
 export type ArchiveWork = {
   id: string; slug: string; title: string; summary: string; category: string; tool: string; model: string; prompt: string;
@@ -77,8 +78,14 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
   const models=[...new Set(works.map(work=>work.model||work.tool).filter(Boolean))].sort();
 
   async function copyPrompt(work: ArchiveWork) {
-    const text = [work.prompt, work.negativePrompt && `\nNEGATIVE PROMPT\n${work.negativePrompt}`].filter(Boolean).join('\n');
     setCopyFailedId(null);
+    let content;
+    try { content = await loadMemberPrompt(`/api/works/${encodeURIComponent(work.id)}/prompt`, locale); }
+    catch { setCopyFailedId(work.id); return; }
+    if (!content) return;
+    setWorks(current => current.map(item => item.id === work.id ? { ...item, ...content } : item));
+    setActive(current => current?.id === work.id ? { ...current, ...content } : current);
+    const text = [content.prompt, content.negativePrompt && `\nNEGATIVE PROMPT\n${content.negativePrompt}`].filter(Boolean).join('\n');
     if (!(await copyText(text))) { setCopiedId(null); setCopyFailedId(work.id); return; }
     setCopiedId(work.id);
     window.setTimeout(() => setCopiedId((current) => current === work.id ? null : current), 1800);
@@ -125,7 +132,7 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
           {work.videoUrl ? <PreviewVideo src={work.previewUrl ?? work.videoUrl} refreshSrc={`/api/works/${work.id}/media?kind=${work.previewUrl ? "preview" : "video"}`} poster={work.posterUrl ?? undefined} /> : <span className="media-placeholder" />}<span className="tool-badge">{work.model || work.tool || 'AI TOOL'}</span><span className="media-badge">{work.durationSeconds ? `${Math.round(work.durationSeconds)} SEC` : genreLabel(work.category,locale)}</span><span className="open-transmission">{t.open}</span>
         </button>
         <div className="transmission-meta"><div>{work.creator && <Link prefetch={false} className="transmission-creator" href={`/creators/${work.creator.handle}`}>@{work.creator.handle} ↗</Link>}<h3><Link prefetch={false} href={`/works/${work.id}`}>{work.title}</Link></h3><p>{work.summary}</p></div><span>{work.workType || 'ORIGINAL'}<br />{work.category}<br />{new Date(work.createdAt).getFullYear()}</span></div>
-        <div className="transmission-prompt"><div><span>{t.prompt}</span><p>{work.prompt}</p></div><button className={copiedId === work.id ? 'copied' : ''} onClick={() => copyPrompt(work)}>{copiedId === work.id ? t.copied : t.copy}</button></div>
+        <div className="transmission-prompt"><div><span>{t.prompt}</span><p>{work.prompt || memberPromptNotice[locale]}</p></div><button className={copiedId === work.id ? 'copied' : ''} onClick={() => copyPrompt(work)}>{copiedId === work.id ? t.copied : t.copy}</button></div>
       {copyFailedId === work.id && <p className="prompt-copy-error" role="alert">{clipboardError[locale]}</p>}
       </article>)}</div>}
       {visible.length > limit && <button className="feed-load-more" onClick={() => setLimit(n => n + 24)}>{ko ? '작품 더 보기' : 'Load more'}</button>}
@@ -138,7 +145,7 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
         <div className="archive-modal-video">{active.videoUrl ? <video key={active.id} src={active.videoUrl} poster={active.posterUrl ?? undefined} controls autoPlay playsInline onError={event => { const video = event.currentTarget; if (!video.dataset.refreshed) { video.dataset.refreshed = "true"; video.src = `/api/works/${active.id}/media?kind=video`; video.load(); void video.play().catch(() => undefined); } }} /> : <span className="media-placeholder" />}</div>
         <div className="archive-modal-copy"><p className="eyebrow">{active.workType || 'ORIGINAL'} · {active.category} · {new Date(active.createdAt).getFullYear()}</p>{active.creator && <Link className="work-creator-link" href={`/creators/${active.creator.handle}`}><span>{active.creator.displayName}</span><small>@{active.creator.handle} · VIEW CREATOR ↗</small></Link>}<h2 id="archive-title">{active.title}</h2><p>{active.summary}</p>
           <dl className="modal-project-data"><div><dt>TOOL</dt><dd>{active.tool || '—'}</dd></div><div><dt>MODEL</dt><dd>{active.model || '—'}</dd></div><div><dt>DURATION</dt><dd>{active.durationSeconds ? `${active.durationSeconds} SEC` : '—'}</dd></div></dl>
-          <div className="prompt-block"><span>{t.prompt}</span><pre>{active.prompt}</pre></div>{active.negativePrompt && <div className="prompt-block negative"><span>{t.negative}</span><pre>{active.negativePrompt}</pre></div>}
+          <div className="prompt-block"><span>{t.prompt}</span><pre>{active.prompt || memberPromptNotice[locale]}</pre></div>{active.negativePrompt && <div className="prompt-block negative"><span>{t.negative}</span><pre>{active.negativePrompt}</pre></div>}
           <div className="modal-actions"><button className="copy-prompt" onClick={() => copyPrompt(active)}>{copiedId === active.id ? t.copied : t.copy}</button><Link href={`/works/${active.id}`}>{t.viewCase}</Link></div>
           {copyFailedId === active.id && <p className="auth-error" role="alert">{clipboardError[locale]}</p>}
           <CommunityPanel key={active.id} workId={active.id} locale={locale} isDemo={false} />

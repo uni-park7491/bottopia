@@ -42,7 +42,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   }
   return NextResponse.json({ work: {
     id: data.id, slug: data.slug, title: data.title, summary: data.summary, category: data.category,
-    tool: data.tool, model: data.model, prompt: data.prompt, negativePrompt: data.negative_prompt,
+    tool: data.tool, model: data.model, prompt: '', negativePrompt: '',
     videoUrl: `/api/works/${data.id}/media?kind=video`,
     posterUrl: data.poster_key ? `/api/works/${data.id}/media?kind=poster` : null,
     filename: data.original_filename, contentType: data.content_type, fileSize: data.file_size,
