@@ -73,7 +73,7 @@ export default function MemberLogin({ compact = false, locale = 'ko', returnTo }
     </span>
   );
   if (compact) return <Link className="member-auth compact" href={`/login?${new URLSearchParams({ next, lang: locale })}`}>{t.login}</Link>;
-  const pending = !isSupabaseConfigured || authProviders.some((provider) => !provider.enabled);
+  const pending = !isSupabaseConfigured || !authProviders.some((provider) => provider.enabled);
   return (
     <div className="social-auth" aria-busy={Boolean(busy)}>
       <div className="social-auth-options">

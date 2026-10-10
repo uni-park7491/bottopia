@@ -1,6 +1,7 @@
 /* BOTTOPIA palette drawn from the live favicon: ink, white, lime and orange.
    High specificity keeps route-level styles from reintroducing old palettes. */
 :root, html[data-theme="light"] {
+  color-scheme: only light;
   --site-bg: #f7f8fa;
   --site-panel: #ffffff;
   --site-soft: #eef0f3;
@@ -16,6 +17,7 @@
   --brand-orange: #ff4d16;
 }
 html[data-theme="dark"] {
+  color-scheme: only dark;
   --site-bg: #111318;
   --site-panel: #1a1d24;
   --site-soft: #242932;
