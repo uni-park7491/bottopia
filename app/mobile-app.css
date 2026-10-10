@@ -1,4 +1,5 @@
 .mobile-app-nav,.mobile-app-install { display:none; }
+.upload-form fieldset.form-grid { border:0; padding:0; margin-inline:0; min-width:0; }
 .app-network-notice { position:sticky; top:74px; z-index:29; margin:0; padding:12px 20px; background:var(--site-soft); color:var(--site-text); font-size:14px; text-align:center; border-bottom:1px solid var(--site-line); }
 .upload-transfer { margin:16px 0; padding:14px 16px; border:1px solid var(--site-line); border-radius:10px; background:var(--site-panel); color:var(--site-text); }
 .upload-transfer>div { display:flex; justify-content:space-between; gap:16px; font-size:14px; }

@@ -174,8 +174,8 @@ export default function StudioUploader({ isOwner = false, initialRemix = '', use
         <div className="studio-profile-callout"><div><span>내 크리에이터 프로필</span><p>작품에 표시될 이름과 소셜 링크를 먼저 설정할 수 있습니다.</p></div><Link href="/profile">프로필 수정</Link></div>
         <div className="upload-draft"><span>{restored ? '입력 내용을 복원했습니다. 영상·커버 파일은 다시 선택해주세요.' : '입력 내용은 이 탭에 임시 보관됩니다. 파일은 보관하지 않습니다.'}</span><button type="button" disabled={status === 'uploading'} onClick={() => { if (!window.confirm('작성 중인 내용을 지울까요?')) return; formRef.current?.reset(); setRemixSource(initialRemix); uploaded.current = null; setRestored(false); try { sessionStorage.removeItem(draftKey); } catch { /* Storage may be blocked. */ } }}>작성 내용 지우기</button></div>
         {!isOwner && <p className="field-help">초기 운영 보호 기준: 영상 최대 50MB, 새 영상 업로드 준비 요청은 시간당 3회까지 가능합니다. 실패한 전송도 횟수에 포함될 수 있습니다.</p>}
-        <FileDropInput label="작품 영상" required name="video" accept="video/mp4,video/webm,video/quicktime" disabled={status === 'uploading'} validate={file => uploadError('video', file.type, file.size)} hint="MP4 · WEBM · MOV / 최대 50MB" />
-        <div className="form-grid">
+        <FileDropInput label="작품 영상" required name="video" accept="video/mp4,video/webm,video/quicktime" disabled={status === 'uploading'} onFile={() => { uploaded.current = null; }} validate={file => uploadError('video', file.type, file.size)} hint="MP4 · WEBM · MOV / 최대 50MB" />
+        <fieldset className="form-grid" disabled={status === 'uploading'}>
           <label>TITLE<input required name="title" placeholder="작품 제목" maxLength={100} /></label>
           <label>장르<select name="category" defaultValue="DRAMA">{workGenres.map(item=><option key={item[0]} value={item[0]}>{item[1]}</option>)}</select></label>
           <label>작품 유형<select name="workType" defaultValue={remixSource ? 'REMIX' : isOwner ? 'ORIGINAL' : 'COMMUNITY'} key={remixSource}>{isOwner && <option value="ORIGINAL">BOTTOPIA 공식 작품</option>}<option value="COMMUNITY">크리에이터 작품</option><option value="REMIX">원작을 재해석한 작품</option></select></label>
@@ -189,10 +189,10 @@ export default function StudioUploader({ isOwner = false, initialRemix = '', use
           <label className="wide">NEGATIVE PROMPT · OPTIONAL<textarea name="negativePrompt" rows={4} placeholder="네거티브 프롬프트가 있다면 입력하세요." maxLength={8000} /></label>
           <label className="wide">PROCESS NOTES · OPTIONAL<textarea name="processNotes" rows={6} placeholder="아이디어, 레퍼런스, 제작 순서, 모델별 수정 사항처럼 다른 창작자가 재현하는 데 필요한 과정을 적어주세요." maxLength={6000} /></label>
           <label>VIDEO LENGTH · SEC<input name="durationSeconds" inputMode="numeric" placeholder="15" /></label>
-          <FileDropInput label="커버 이미지 · 선택" name="poster" accept="image/jpeg,image/png,image/webp,image/avif" disabled={status === 'uploading'} validate={file => uploadError('poster', file.type, file.size)} hint="JPG · PNG · WebP · AVIF / 최대 10MB" />
+          <FileDropInput label="커버 이미지 · 선택" name="poster" accept="image/jpeg,image/png,image/webp,image/avif" disabled={status === 'uploading'} onFile={() => { uploaded.current = null; }} validate={file => uploadError('poster', file.type, file.size)} hint="JPG · PNG · WebP · AVIF / 최대 10MB" />
           <label className="publish-check"><input type="checkbox" name="published" value="true" /> 영상과 프롬프트를 함께 공개하기 · 선택하지 않으면 비공개 저장</label>
           <p className="field-help wide">직접 만들었거나 공유 권한이 있는 자료만 올려주세요. 원작 연결은 이용 허락을 대신하지 않습니다. 비공개 초안은 본인과 운영자만 볼 수 있습니다.</p>
-        </div>
+        </fieldset>
         <button className="upload-submit" type="submit" disabled={status === 'uploading'}>{status === 'uploading' ? '작품을 올리고 있습니다…' : status === 'error' ? '다시 시도하기' : '작품 저장하기'}</button>
         {(status === 'uploading' || status === 'done' && progress === 100) && <div className="upload-transfer"><div><span>{status === 'done' ? '저장 완료' : progress >= 95 ? '작품 정보 저장 중' : '파일 전송 중'}</span><strong>{progress}%</strong></div><progress max={100} value={progress} aria-label="작품 업로드 진행률" /><small>전송·저장 단계 기준 진행률입니다. 완료될 때까지 화면을 열어두세요.</small></div>}
         {message && <p className={`upload-message ${status}`} role="status">{message}</p>}

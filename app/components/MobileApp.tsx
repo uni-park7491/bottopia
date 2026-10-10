@@ -18,6 +18,7 @@ export default function MobileApp() {
   const pathname = usePathname();
   const locale = useSiteLocale();
   const t = text[locale];
+  const ExtraLink = pathname.startsWith('/tools') ? 'a' : Link;
   const [install, setInstall] = useState<InstallEvent | null>(null);
   const [standalone, setStandalone] = useState(true);
   const [help, setHelp] = useState(false);
@@ -52,7 +53,7 @@ export default function MobileApp() {
     {offline && <p className="app-network-notice" role="status">{t.offline}</p>}
     <div className="mobile-app-install">
       {!standalone && <button type="button" aria-expanded={help} onClick={requestInstall}><span aria-hidden="true">↓</span> {t.install}</button>}
-      <div className="mobile-extra-links"><Link href="/creators">{({ko:'크리에이터',en:'Creators',zh:'创作者',ja:'クリエイター'})[locale]}</Link><Link href="/about">{({ko:'소개',en:'About',zh:'关于',ja:'紹介'})[locale]}</Link></div>
+      <div className="mobile-extra-links"><ExtraLink href="/creators">{({ko:'크리에이터',en:'Creators',zh:'创作者',ja:'クリエイター'})[locale]}</ExtraLink><ExtraLink href="/about">{({ko:'소개',en:'About',zh:'关于',ja:'紹介'})[locale]}</ExtraLink></div>
       {help && <section className="mobile-install-help" aria-label={t.title}><strong>{t.title}</strong><p>{t.ios}</p><p>{t.other}</p><button type="button" onClick={() => setHelp(false)}>{t.done}</button></section>}
     </div>
     <nav className="mobile-app-nav" aria-label={t.menu}>
