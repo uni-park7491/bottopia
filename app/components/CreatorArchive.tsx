@@ -10,7 +10,6 @@ import { filterWorks } from '../../lib/feed-policy';
 import { copyText, clipboardError } from '../../lib/clipboard';
 import type { PublicCreator } from '../../lib/profiles';
 import {genreLabel,workGenres} from '../../lib/work-genres';
-import VideoReferences from './VideoReferences';
 import { loadMemberPrompt, memberPromptNotice } from '../../lib/member-prompt';
 
 export type ArchiveWork = {
@@ -35,7 +34,6 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
   const [originalsOnly, setOriginalsOnly] = useState(false);
   const [limit, setLimit] = useState(24);
   const [sort, setSort] = useState<'LATEST' | 'POPULAR'>('LATEST');
-  const [collection,setCollection]=useState<'works'|'references'>('works');
   const [model,setModel]=useState('ALL');
   const [duration,setDuration]=useState<'ALL'|'15'|'30'>('ALL');
   const [loading, setLoading] = useState(true);
@@ -115,8 +113,6 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
     </header>
 
 
-    <div className="archive-collection-tabs" aria-label={ko?'영상 컬렉션':'Video collections'}><button aria-pressed={collection==='works'} onClick={()=>setCollection('works')}>{ko?'크리에이터 작품':'Creator works'}</button><button aria-pressed={collection==='references'} onClick={()=>setCollection('references')}>{ko?'국내외 레퍼런스':'Global references'}<span>15 / 30 SEC</span></button></div>
-    {collection==='references' ? <VideoReferences locale={locale}/> : <>
     <div className="feed-controls">
       <div className="feed-search-row">
         <label className="feed-search"><span className="sr-only">{ko ? '작품 검색' : 'Search works'}</span><input type="search" value={query} placeholder={ko ? '작품, 크리에이터, AI 도구 검색' : 'Search works, creators and tools'} onChange={e => { setQuery(e.target.value); setLimit(24); }} /></label>
@@ -137,8 +133,6 @@ export default function CreatorArchive({ locale }: { locale: Locale }) {
       </article>)}</div>}
       {visible.length > limit && <button className="feed-load-more" onClick={() => setLimit(n => n + 24)}>{ko ? '작품 더 보기' : 'Load more'}</button>}
     </>}
-    </>}
-
     {active && <div className="modal-backdrop archive-modal-backdrop" role="presentation" onMouseDown={() => setActive(null)}>
       <article className="archive-modal" role="dialog" aria-modal="true" aria-labelledby="archive-title" onMouseDown={(event) => event.stopPropagation()}>
         <button className="modal-close" onClick={() => setActive(null)} aria-label={t.close}>×</button>

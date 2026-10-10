@@ -3,14 +3,16 @@ import assert from 'node:assert/strict';
 import {workGenres,matchesVideoFilters,genreLabel} from '../lib/work-genres.ts';
 import {videoReferences,latestReferences} from '../lib/video-references.ts';
 import {filterWorks} from '../lib/feed-policy.ts';
-test('reference records retain source attribution, version and evidence',()=>{
-  assert.equal(new Set(videoReferences.map(v=>v.id)).size,videoReferences.length);
-  for(const v of videoReferences){assert.equal(new URL(v.sourceUrl).protocol,'https:');assert.ok(v.author&&v.model&&v.evidence&&v.prompt);assert.ok([15,30].includes(v.durationSeconds));assert.ok(workGenres.some(g=>g[0]===v.category));}
-  assert.ok(videoReferences.some(v=>v.region==='국내'));assert.ok(videoReferences.some(v=>v.region==='해외'));
+import {readFileSync} from 'node:fs';
+test('withdrawn reference examples are absent from both public data and homepage',()=>{
+  assert.deepEqual(videoReferences,[]);
+  const source=readFileSync(new URL('../app/components/CreatorArchive.tsx',import.meta.url),'utf8');
+  assert.doesNotMatch(source,/VideoReferences|국내외 레퍼런스|Global references/);
 });
 test('reference dates are newest first; unknown dates last, without mutating inputs',()=>{
-  const before=[...videoReferences];const sorted=latestReferences(videoReferences);
-  assert.equal(sorted[0].publishedAt,'2026-10-08');assert.equal(sorted.at(-1).publishedAt,null);assert.deepEqual(videoReferences,before);
+  const fixtures=[{publishedAt:null},{publishedAt:'2026-10-08'},{publishedAt:'2026-10-01'}];
+  const before=[...fixtures];const sorted=latestReferences(fixtures);
+  assert.equal(sorted[0].publishedAt,'2026-10-08');assert.equal(sorted.at(-1).publishedAt,null);assert.deepEqual(fixtures,before);
 });
 test('version-specific models and measured duration are filtered independently',()=>{
   const v={model:'Seedance 2.5',tool:'Seedance',durationSeconds:29.708};
