@@ -172,3 +172,20 @@ html[data-theme] body .feed-filters button { white-space:nowrap; flex-shrink:0; 
 @media(max-width:1000px) { .reference-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .reference-intro { display:grid; gap:8px; } }
 @media(max-width:620px) { .reference-grid { grid-template-columns:1fr; gap:16px; } .video-filter-row { gap:8px 12px; } .video-filter-row select { max-width:200px; } .archive-collection-tabs button { font-size:13px; padding:9px 12px; gap:8px; } .reference-source-cover { padding:18px; } }
 @media(prefers-reduced-motion:reduce) { html[data-theme] body .archive-grid .transmission-card { transition:none; } }
+
+/* Studio previously retained light-on-dark colors after its background became light. */
+html[data-theme] body .studio-shell .studio-title h1 { color:var(--site-text); }
+html[data-theme] body .studio-shell .studio-title h1::first-line { color:var(--site-accent); }
+html[data-theme] body .studio-shell :is(.studio-title>p:not(.eyebrow),.studio-profile-callout p,.field-help,.studio-empty,.studio-library article span,.studio-library article i,.studio-library article button) { color:var(--site-muted); }
+html[data-theme] body .studio-shell :is(.studio-title,.upload-form,.studio-library-head,.studio-library article,.upload-message) { border-color:var(--site-line); }
+html[data-theme] body .studio-shell .studio-profile-callout { background:var(--site-panel); border-color:var(--site-line); border-radius:12px; }
+html[data-theme] body .studio-shell .studio-profile-callout :is(span,a) { color:var(--site-accent); }
+html[data-theme] body .studio-shell .studio-profile-callout a { border-color:var(--site-line); border-radius:6px; }
+html[data-theme] body .studio-shell .publish-check { color:var(--site-text) !important; }
+html[data-theme] body .studio-shell .studio-library article i.published { color:var(--site-accent); }
+html[data-theme] body .studio-shell .studio-library article button:hover { color:var(--site-accent); }
+html[data-theme] body .studio-shell .file-drop-input :is(label,p) { color:var(--site-muted); }
+html[data-theme] body .studio-shell .file-drop-input input::file-selector-button { background:var(--site-soft); color:var(--site-text); border-color:var(--site-line); }
+html[data-theme] body .studio-shell .upload-message.done { color:var(--site-accent); border-color:var(--site-accent); }
+html[data-theme] body .studio-shell :is(.upload-message.error,.file-drop-input [role="alert"]) { color:#b42e25; }
+html[data-theme="dark"] body .studio-shell :is(.upload-message.error,.file-drop-input [role="alert"]) { color:#ffaaa1; }
