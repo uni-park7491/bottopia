@@ -12,12 +12,12 @@ import { localeOptions } from '../i18n';
 import { useSiteLocale, saveLocale } from '../useSiteLocale';
 
 const labels = {
-  ko: ['탐색', '창작 도구', '크리에이터', '커뮤니티', '소개', '작품 올리기'],
-  en: ['Explore', 'Tools', 'Creators', 'Community', 'About', 'Upload work'],
-  zh: ['探索', '创作工具', '创作者', '社区', '关于', '上传作品'],
-  ja: ['探索', '創作ツール', 'クリエイター', 'コミュニティ', '紹介', '作品を投稿'],
+  ko: ['탐색', '창작 도구', '크리에이터', '커뮤니티', '자료', '재미', '소개', '작품 올리기'],
+  en: ['Explore', 'Tools', 'Creators', 'Community', 'Resources', 'Fun', 'About', 'Upload work'],
+  zh: ['探索', '创作工具', '创作者', '社区', '资料', '趣味', '关于', '上传作品'],
+  ja: ['探索', '創作ツール', 'クリエイター', 'コミュニティ', '資料', '楽しみ', '紹介', '作品を投稿'],
 };
-const paths = ['/', '/tools', '/creators', '/community', '/about'];
+const paths = ['/', '/tools', '/creators', '/community', '/resources', '/fun', '/about'];
 export default function SiteHeader() {
   const pathname = usePathname();
   const WorkspaceLink = pathname.startsWith('/tools') ? 'a' : Link;
@@ -28,7 +28,7 @@ export default function SiteHeader() {
     <nav className="primary-navigation" aria-label={locale === 'ko' ? '주 메뉴' : 'Main navigation'}>
       {paths.map((path, i) => { const NavLink = path === '/tools' ? 'a' : WorkspaceLink; return <NavLink key={path} href={path} aria-current={(path === '/' ? pathname === '/' || pathname.startsWith('/works/') : pathname === path || pathname.startsWith(path + '/')) ? 'page' : undefined}>{labels[locale][i]}</NavLink>; })}
     </nav>
-    <div className="header-actions"><WorkspaceLink className="header-inquiry" href="/studio">{labels[locale][5]}</WorkspaceLink><ThemeSwitch /><MemberLogin compact locale={locale} />
+    <div className="header-actions"><WorkspaceLink className="header-inquiry" href="/studio">{labels[locale][7]}</WorkspaceLink><ThemeSwitch /><MemberLogin compact locale={locale} />
       <label className="locale-select"><span className="globe-icon" aria-hidden="true" /><span className="sr-only">언어 / Language</span><select value={locale} onChange={e => saveLocale(e.target.value as typeof locale)}>{localeOptions.map(x => <option key={x.code} value={x.code}>{x.label}</option>)}</select></label>
     </div>
   </header>;

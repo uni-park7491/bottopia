@@ -6,6 +6,13 @@
 .upload-transfer progress { display:block; width:100%; height:8px; margin-top:12px; accent-color:var(--site-accent); }
 .upload-draft { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; color:var(--site-muted); font-size:12px; margin:16px 0; }
 .upload-draft button { font:inherit; padding:8px 10px; border:1px solid var(--site-line); border-radius:8px; color:var(--site-text); background:var(--site-panel); cursor:pointer; }
+/* Seven section links need their own row before translated labels can overlap. */
+@media(min-width:761px) and (max-width:1279px) {
+  html[data-theme] body .unified-header.site-header { grid-template-columns:auto minmax(0,1fr); gap:8px 16px; }
+  .unified-header .brand { grid-column:1; grid-row:1; }
+  .unified-header .header-actions { grid-column:2; grid-row:1; justify-self:end; }
+  .unified-header .primary-navigation { grid-column:1/-1; grid-row:2; justify-content:flex-start; gap:24px; overflow-x:auto; }
+}
 @media(max-width:760px) {
   body { padding-bottom:calc(74px + env(safe-area-inset-bottom,0px)); }
   html { scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px)); }
@@ -16,8 +23,9 @@
   .mobile-app-nav a[aria-current] { color:var(--site-text); background:var(--site-selected); }
   .mobile-app-nav svg { width:22px; height:22px; }
   .mobile-app-nav a:focus-visible,.mobile-app-install button:focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; }
-  .mobile-app-install { display:flex; position:relative; align-items:center; gap:16px; margin:10px 16px; }
-  .mobile-extra-links { display:flex; gap:16px; margin-left:auto; color:var(--site-muted); font-size:12px; }
+  .mobile-app-install { display:flex; flex-wrap:wrap; position:relative; align-items:center; gap:8px 16px; margin:10px 16px; }
+  .mobile-extra-links { display:flex; flex-wrap:wrap; gap:4px 16px; min-width:0; margin-left:auto; color:var(--site-muted); font-size:12px; }
+  .mobile-extra-links a[aria-current] { color:var(--site-accent); font-weight:650; }
   .mobile-extra-links a { display:flex; align-items:center; min-height:36px; }
   .mobile-app-install>button { display:flex; align-items:center; gap:8px; width:max-content; padding:8px 12px; border:1px solid var(--site-line); border-radius:8px; background:var(--site-panel); color:var(--site-muted); font:600 12px/1.4 Arial,sans-serif; cursor:pointer; }
   .mobile-app-install:empty { margin:0; }

@@ -1,0 +1,1015 @@
+{
+  "source": "https://link-notes-nine.vercel.app/",
+  "updatedAt": "2026-10-20T11:55:42.844Z",
+  "importedAt": "2026-10-20T12:08:16.009Z",
+  "items": [
+    {
+      "id": "affb6b4d7a",
+      "title": "테슬라 로드스터 영상을 클로드 MCP + Opus 5.5로 '당근 차'로 바꾼 제작 사례",
+      "description": "프롬프트 예시와 입력 방법을 원문에서 확인하세요.",
+      "category": "prompts",
+      "topic": "이미지 프롬프트",
+      "formats": [
+        "skill",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112485702630080608",
+      "noteUrl": "https://link-notes-nine.vercel.app/#affb6b4d7a",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "d268865d73",
+      "title": "무료 오프라인 영어 문법 검사기 Harper 실측(12개 중 7개 검출) + 명령어·확장 설치처",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "개발 툴",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112429407600279645",
+      "noteUrl": "https://link-notes-nine.vercel.app/#d268865d73",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "029d6829b6",
+      "title": "대학생 구글 AI 프로 월 7,300원 할인 인증 방법·주의점",
+      "description": "신청 대상·지원 국가·기간과 현재 조건을 공식 페이지에서 확인하세요.",
+      "category": "offers",
+      "topic": "학생 할인",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112361856757051767",
+      "noteUrl": "https://link-notes-nine.vercel.app/#029d6829b6",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "3140305ab4",
+      "title": "AI 영상 팟캐스트 멀티모델 파이프라인 (Pluvio9yte)",
+      "description": "nakazakifam이 올린 124초짜리 AI 팟캐스트 영상을 인용해, 제작 파이프라인을 분해한 글입니다.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "@Pluvio9yte",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/Pluvio9yte/status/2112343037388964300",
+      "noteUrl": "https://link-notes-nine.vercel.app/#3140305ab4",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "ea6dbe7de9",
+      "title": "Claude Code Godot 3D 게임 5주 제작",
+      "description": "Claude Code+Codex+Godot+Tripo로 3D 액션 게임 『After the Wind』를 5주 만에 만든 사례(원 영상 @Stefan_3D_AI).",
+      "category": "agents",
+      "topic": "애니·MV",
+      "formats": [
+        "guide"
+      ],
+      "author": "@ClaudeCode_love",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/claudecode_love/status/2112326178006761858",
+      "noteUrl": "https://link-notes-nine.vercel.app/#ea6dbe7de9",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "a4d23d6221",
+      "title": "Higgsfield DeepSeek V4.1 Flash 모션 디자인",
+      "description": "DeepSeek V4.1 Flash(비전 달린 코딩 모델)가 애니메이션을 코드로 쓰고 → 렌더 → 프레임을 다시 보고 → 고치는 루프로 3D·UI 제품 런칭 영상을 만든다는 Higgsfield Supercomputer 홍보 글.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "Alber Adilov (LinkedIn)",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://lnkd.in/p/gwBqW9J7",
+      "noteUrl": "https://link-notes-nine.vercel.app/#a4d23d6221",
+      "repositories": [],
+      "relatedUrls": [
+        "http://higgsfield.ai/",
+        "https://higgsfield.ai/creator-hub/help-center/tools/how-do-i-use-supercomputer",
+        "https://adtestbench.com/guides/higgsfield-vibe-motion/"
+      ]
+    },
+    {
+      "id": "b76f9a690d",
+      "title": "노션 템플릿 판매 Easlo 사례 (서울창업일기)",
+      "description": "Gumroad가 공개한 Easlo의 성장 기록을 정리한 글이야.",
+      "category": "growth",
+      "topic": "디지털 상품",
+      "formats": [
+        "guide"
+      ],
+      "author": "@SeoulAlleyLog",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/SeoulAlleyLog/status/2112400923297284228",
+      "noteUrl": "https://link-notes-nine.vercel.app/#b76f9a690d",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "eeb4a25604",
+      "title": "스페이스노마드 rari Opus 스튜디오 인용",
+      "description": "rari의 아티클 \"Motion Engineering: Build a Video Studio Around Opus 5.5\"(북마크 5,517개)를 인용한 글입니다.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "@smbluespace",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/smbluespace/status/2112308494678610027",
+      "noteUrl": "https://link-notes-nine.vercel.app/#eeb4a25604",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "0e7dee13f0",
+      "title": "쿠팡파트너스 카드뉴스 자동화 (꼬마봇)",
+      "description": "꼬마봇이 자기 아티클 \"쿠팡파트너스 / 카카오톡 선물하기 큐레이터 카드뉴스 제작 자동화\"(북마크 78개)를 인용하면서 덧붙인 글입니다.",
+      "category": "growth",
+      "topic": "제휴·자동화",
+      "formats": [
+        "guide"
+      ],
+      "author": "@BBBang9900",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/BBBang9900/status/2112451382892716333",
+      "noteUrl": "https://link-notes-nine.vercel.app/#0e7dee13f0",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "92b01f2f2a",
+      "title": "틱톡 초반 계정 세팅 꿀팁",
+      "description": "틱톡 시작 전 '연락처 및 위치' 설정에서 연락처 추천·Facebook 친구 추천·연락처 동기화·Facebook 친구 동기화 4개를 끄라는 팁(@dudrms606 청춘).",
+      "category": "growth",
+      "topic": "SNS 운영",
+      "formats": [
+        "guide"
+      ],
+      "author": "@dudrms606",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/dudrms606/status/2112359395342594195",
+      "noteUrl": "https://link-notes-nine.vercel.app/#92b01f2f2a",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "aa8ccf6286",
+      "title": "2027년 2월부터 바뀌는 YPP 쇼츠 수익 기준(90일 1,000만 뷰) 계산",
+      "description": "채널 운영·수익화 사례를 정리한 참고 자료입니다.",
+      "category": "growth",
+      "topic": "세금·수익 기준",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-20",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112320023108948123",
+      "noteUrl": "https://link-notes-nine.vercel.app/#aa8ccf6286",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "533e7d9c11",
+      "title": "Claude Code로 만든 게임의 크레이지게임즈 실제 지표(재방문 0.70%)로 본 수익화 기준",
+      "description": "채널 운영·수익화 사례를 정리한 참고 자료입니다.",
+      "category": "growth",
+      "topic": "세금·수익 기준",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112106269473739062",
+      "noteUrl": "https://link-notes-nine.vercel.app/#533e7d9c11",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "0adc287c40",
+      "title": "쇼츠 수익 2,181만 원에 45% 세율? 과세표준 기준으로 다시 계산한 세금 정리",
+      "description": "채널 운영·수익화 사례를 정리한 참고 자료입니다.",
+      "category": "growth",
+      "topic": "세금·수익 기준",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2112000035147653435",
+      "noteUrl": "https://link-notes-nine.vercel.app/#0adc287c40",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "3b41993561",
+      "title": "agency-agents 등 무료 에이전트·스킬 모음",
+      "description": "무료 에이전트·스킬 GitHub 모음 5개(원글 @romandevz, 북마크 1.1만).",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "github",
+        "skill"
+      ],
+      "author": "@kemu_aii",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/kemu_aii/status/2111935196610318426",
+      "noteUrl": "https://link-notes-nine.vercel.app/#3b41993561",
+      "repositories": [
+        "https://github.com/msitarzewski/agency-agents",
+        "https://github.com/wshobson/agents",
+        "https://github.com/anthropics/knowledge-work-plugins",
+        "https://github.com/anthropics/claude-quickstarts",
+        "https://github.com/addyosmani/agent-skills"
+      ],
+      "relatedUrls": []
+    },
+    {
+      "id": "37b23de53a",
+      "title": "awesome-opus5-5-videos 코드 영상 프롬프트 모음",
+      "description": "Claude Opus 5.5가 HTML·Canvas·SVG·Three.js 코드로 만든 화제 영상들과 그 프롬프트 703개(418개는 재현 영상 포함)를 카테고리별로 모은 무료 깃허브 리포.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "github",
+        "video",
+        "prompt"
+      ],
+      "author": "@ClaudeCode_love",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/claudecode_love/status/2112029472623141110",
+      "noteUrl": "https://link-notes-nine.vercel.app/#37b23de53a",
+      "repositories": [
+        "https://github.com/yihui-dev/awesome-opus5-5-videos"
+      ],
+      "relatedUrls": [
+        "https://skillry.dev/ai-videos/opus-5-5"
+      ]
+    },
+    {
+      "id": "396938f91e",
+      "title": "Claude 프리비즈 Kling 액체 MV",
+      "description": "Claude에게 음악을 주고 전체 길이의 편집된 프리비즈(가편집 콘티 영상)를 만들게 한 뒤, 씬별로 나눠 Kling으로 본 생성하고 마지막 편집만 사람이 다듬은 액체(물) 모션 MV 제작 사례.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "@tapehead_Lab",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/tapehead_lab/status/2112136688902558123",
+      "noteUrl": "https://link-notes-nine.vercel.app/#396938f91e",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "9cb72a4ebc",
+      "title": "fire-your-seo-agency SEO 스킬",
+      "description": "월 수십~수백만 원 받는 SEO·GEO 대행 업무(사이트 점검·수정·측정)를 Claude Code 에이전트가 직접 하게 해주는 무료 오픈소스 스킬.",
+      "category": "growth",
+      "topic": "SEO",
+      "formats": [
+        "github",
+        "skill"
+      ],
+      "author": "@hmmmmmm1458",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/hmmmmmm1458/status/2112042427595051095",
+      "noteUrl": "https://link-notes-nine.vercel.app/#9cb72a4ebc",
+      "repositories": [
+        "https://github.com/leopard627/fire-your-seo-agency"
+      ],
+      "relatedUrls": [
+        "https://www.threads.com/@kindainvestor"
+      ]
+    },
+    {
+      "id": "cbeb7ef3ce",
+      "title": "Google AI Pro 학생 3년 $8.99 (btczizi)",
+      "description": "학생 할인으로 $8.99에 Gemini AI Pro + YouTube 프리미엄 3년(2029-10까지) 받는 5단계(중국어, 북마크 2,758).",
+      "category": "offers",
+      "topic": "학생 할인",
+      "formats": [
+        "guide"
+      ],
+      "author": "@BTCzizi",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/btczizi/status/2112013186803404945",
+      "noteUrl": "https://link-notes-nine.vercel.app/#cbeb7ef3ce",
+      "repositories": [],
+      "relatedUrls": [
+        "https://gemini.google/students/",
+        "https://one.google.com/ai-student",
+        "https://play.google.com/store/account/subscriptions"
+      ]
+    },
+    {
+      "id": "1be1fc9e26",
+      "title": "Google AI Pro 학생 Antigravity",
+      "description": "학생 인증한 Google AI Pro(8.99달러)를 결제하면 Gemini 4배 사용량·5TB·YouTube Premium에 더해, 구글 코딩 에이전트 Antigravity에서 Gemini 4 Argon·Claude Opus 5.5·Sonnet 5.5…",
+      "category": "offers",
+      "topic": "학생 할인",
+      "formats": [
+        "guide"
+      ],
+      "author": "@xmglab",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/xmglab/status/2112144479545094642",
+      "noteUrl": "https://link-notes-nine.vercel.app/#1be1fc9e26",
+      "repositories": [],
+      "relatedUrls": [
+        "https://one.google.com/ai-student",
+        "http://one.google.com/ai-student",
+        "http://play.google.com/store/account/subscriptions",
+        "https://play.google.com/store/account/subscriptions"
+      ]
+    },
+    {
+      "id": "1ca5b4e47c",
+      "title": "Harness² 자기개선 에이전트 (Google)",
+      "description": "모델은 그대로 두고, 에이전트의 프롬프트·스킬·메모리·도구 설명을 작업마다 자동으로 고쳐 성능을 올리는 구글 클라우드 AI 리서치·노스웨스턴대의 프레임워크.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "@_guillecasaus",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/_guillecasaus/status/2112141661719400918",
+      "noteUrl": "https://link-notes-nine.vercel.app/#1ca5b4e47c",
+      "repositories": [],
+      "relatedUrls": [
+        "https://harness2.github.io/"
+      ]
+    },
+    {
+      "id": "fb06d1441b",
+      "title": "OpenNana 프롬프트 갤러리",
+      "description": "OpenNana: Nano Banana Pro 이미지 프롬프트 19,888개 무료 복사 사이트.",
+      "category": "prompts",
+      "topic": "이미지 프롬프트",
+      "formats": [
+        "prompt"
+      ],
+      "author": "@wangxiaoxin88",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/wangxiaoxin88/status/2112100942133047432",
+      "noteUrl": "https://link-notes-nine.vercel.app/#fb06d1441b",
+      "repositories": [],
+      "relatedUrls": [
+        "https://opennana.com/awesome-prompt-gallery"
+      ]
+    },
+    {
+      "id": "646edaeeba",
+      "title": "Opus 5.5 모션 디자인 스튜디오 (rari)",
+      "description": "\"Opus 5.5가 애프터이펙트를 대체했다\"는 글.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "@0xwhrrari",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/0xwhrrari/status/2112166940081004693",
+      "noteUrl": "https://link-notes-nine.vercel.app/#646edaeeba",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "88dd9596fc",
+      "title": "X Video Kickstart Bonus 조건(30일 내 서로 다른 15일 세로 영상, 워터마크 금지)",
+      "description": "채널 운영·수익화 사례를 정리한 참고 자료입니다.",
+      "category": "growth",
+      "topic": "세금·수익 기준",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-19",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111955313234763985",
+      "noteUrl": "https://link-notes-nine.vercel.app/#88dd9596fc",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "909e2c75d4",
+      "title": "스파이더버스 제작에 쓰인 머신러닝 잉크선 툴의 실제 방식(자기 팀 그림으로 학습)",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "애니·MV",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-18",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111744280222105830",
+      "noteUrl": "https://link-notes-nine.vercel.app/#909e2c75d4",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "f991c04ee7",
+      "title": "XERJ 색인 검색으로 grep 대비 읽는 양 261KB→7.4KB 실측 + 명령어·비교 방법",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-18",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111704754623541568",
+      "noteUrl": "https://link-notes-nine.vercel.app/#f991c04ee7",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "1e1cad2492",
+      "title": "Claude 코드 애니 Gus & Spark",
+      "description": "영상 생성 AI 없이 Claude(Opus 5.5 MAX)가 15시간 넘게 코드 3만4천 줄로 직접 렌더링해 만든 25분짜리 애니 1화 사례 + 작성자의 무료 자료 배포 홍보 글.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "@ClaudeCode_love",
+      "publishedAt": "2026-10-18",
+      "sourceUrl": "https://x.com/claudecode_love/status/2111712886196474031",
+      "noteUrl": "https://link-notes-nine.vercel.app/#1e1cad2492",
+      "repositories": [],
+      "relatedUrls": [
+        "http://plai-ai.com/"
+      ]
+    },
+    {
+      "id": "bf75c31374",
+      "title": "클로드코드 꿀팁 12개",
+      "description": "Claude Code를 덜 헤매고 토큰 덜 쓰게 만드는 설정·습관 12개(effort 분리, autocompact, prompt-audit, claude-mem, /verify, /goal 등)를 복붙 명령어와 함께 정리한 한국어 가이드.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "github",
+        "skill"
+      ],
+      "author": "@lucian__03",
+      "publishedAt": "2026-10-18",
+      "sourceUrl": "https://x.com/lucian__03/status/2111802461149364647",
+      "noteUrl": "https://link-notes-nine.vercel.app/#bf75c31374",
+      "repositories": [
+        "https://github.com/thedotmack/claude-mem"
+      ],
+      "relatedUrls": [
+        "https://code.claude.com/docs/en/commands",
+        "https://code.claude.com/docs/en/hooks-guide",
+        "https://code.claude.com/docs/en/goal",
+        "https://code.claude.com/docs/en/worktrees",
+        "http://code.claude.com/docs"
+      ]
+    },
+    {
+      "id": "5cc2edd9cf",
+      "title": "영상 생성기 없이 Claude가 코드로 그린 25분 애니 Gus & Spark 제작 비용·시간",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "애니·MV",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-18",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111602919032127886",
+      "noteUrl": "https://link-notes-nine.vercel.app/#5cc2edd9cf",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "a39197dda8",
+      "title": "유튜브 Shorts 보너스(월 16개, 최대 270만원, 초대제) 조건 정리",
+      "description": "채널 운영·수익화 사례를 정리한 참고 자료입니다.",
+      "category": "growth",
+      "topic": "세금·수익 기준",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-17",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111437475365212293",
+      "noteUrl": "https://link-notes-nine.vercel.app/#a39197dda8",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "bf2a4abce5",
+      "title": "Claude 공식이 고른 작품 6개(손글씨 120쪽→폰트, 12.93달러 등) 정리",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "Claude Code",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-17",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2111274568627503140",
+      "noteUrl": "https://link-notes-nine.vercel.app/#bf2a4abce5",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "a025fd70fc",
+      "title": "헤이젠 HyperFrames: HTML 78줄로 9초 영상 렌더 실측 + init/lint/render 순서",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-16",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2110979766748868612",
+      "noteUrl": "https://link-notes-nine.vercel.app/#a025fd70fc",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "18f349bc26",
+      "title": "Felix Rieseberg의 'AI를 더 야심차게 쓰는 법' 4갈래(속도·높이·깊이·범위) + 깊이 프롬프트 방법",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-15",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2110657257616879657",
+      "noteUrl": "https://link-notes-nine.vercel.app/#18f349bc26",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "858e62e071",
+      "title": "context-mode MCP로 도구 출력 401KB→4.5KB 절감 실측 + 설치·실행 순서",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-14",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2110256047046975610",
+      "noteUrl": "https://link-notes-nine.vercel.app/#858e62e071",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "fda1444f87",
+      "title": "무료 오픈소스 코딩 에이전트 OpenCode 2.0 변경점 + 설치·업그레이드 방법",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-13",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2109783741791105407",
+      "noteUrl": "https://link-notes-nine.vercel.app/#fda1444f87",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "19ecf71faa",
+      "title": "코드 리뷰 무한 루프 막는 'done 기준' SKILL.md 초안 전문",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-12",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2109570710771483066",
+      "noteUrl": "https://link-notes-nine.vercel.app/#19ecf71faa",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "0e18edd51c",
+      "title": "ASD-STE100 스킬로 에이전트용 영어 지시문을 한 뜻으로 읽히게 고치기 + 설치·사용 문장",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-12",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2109530163482427766",
+      "noteUrl": "https://link-notes-nine.vercel.app/#0e18edd51c",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "bc23c3aa37",
+      "title": "REA(Reverse Engineer Anything) MCP로 앱 기능 구조 분석 + 설치 4단계",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-12",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2109420433623924814",
+      "noteUrl": "https://link-notes-nine.vercel.app/#bc23c3aa37",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "82f49f2388",
+      "title": "Higgsfield Genjutsu 오징어 게임 리캐스트 릴스",
+      "description": "웬즈데이 릴스와 같은 작성자가 Higgsfield Genjutsu 트렌드로 만든 '오징어 게임' 테마 리캐스트 릴스(캡션 기준).",
+      "category": "video",
+      "topic": "리캐스트·숏폼",
+      "formats": [
+        "video"
+      ],
+      "author": "@jake.visualss_",
+      "publishedAt": "2026-10-11",
+      "sourceUrl": "https://www.instagram.com/reel/DeWI0xfsE0c/",
+      "noteUrl": "https://link-notes-nine.vercel.app/#82f49f2388",
+      "repositories": [],
+      "relatedUrls": [
+        "https://higgsfield.ai/genjutsu",
+        "https://higgsfield.ai/blog/higgsfield-genjutsu"
+      ]
+    },
+    {
+      "id": "271b4b5303",
+      "title": "Higgsfield Genjutsu 웬즈데이 리캐스트 릴스",
+      "description": "Higgsfield Genjutsu(영상→영상 리얼리티 스왑)로 트와일라잇 장면을 '웬즈데이'로 다시 만든 트렌드 릴스 — 원본의 움직임·카메라·타이밍은 그대로 두고 인물·장소·스타일만 바꾸는 방식.",
+      "category": "video",
+      "topic": "리캐스트·숏폼",
+      "formats": [
+        "video"
+      ],
+      "author": "@jake.visualss_",
+      "publishedAt": "2026-10-11",
+      "sourceUrl": "https://www.instagram.com/reel/DeV1wVEsk87/",
+      "noteUrl": "https://link-notes-nine.vercel.app/#271b4b5303",
+      "repositories": [],
+      "relatedUrls": [
+        "https://higgsfield.ai/genjutsu",
+        "https://higgsfield.ai/blog/higgsfield-genjutsu",
+        "https://hermosso.com/blog/genjutsu-explained",
+        "https://docs.comfy.org/built-in-nodes/HiggsfieldMotionTransferNode"
+      ]
+    },
+    {
+      "id": "2529608804",
+      "title": "Synthesia Syren 영상 에이전트에서 실제로 되는 것/안 되는 것 + 무료 플랜 제한",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-10",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108844904726339739",
+      "noteUrl": "https://link-notes-nine.vercel.app/#2529608804",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "8fb9fc455b",
+      "title": "Opus 5.5 Fast 토글 비용 함정(2배 단가, 중간에 켜면 캐시 없이 재과금)과 켜/끌 때 정리",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-10",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108737563498561693",
+      "noteUrl": "https://link-notes-nine.vercel.app/#8fb9fc455b",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "f63f0ebb2e",
+      "title": "블렌더·다빈치·애펙을 에이전트가 직접 조작하는 Voyager 앱 소개 + 요금·주의점",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "모션·코드 영상",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-09",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108483421542740143",
+      "noteUrl": "https://link-notes-nine.vercel.app/#f63f0ebb2e",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "bd19e3dcee",
+      "title": "애디 오스마니 agent-skills의 constraint-driven-development: 에이전트가 테스트 건너뛰는 것 막기 + 설치법",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-09",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108444021274366040",
+      "noteUrl": "https://link-notes-nine.vercel.app/#bd19e3dcee",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "250253190d",
+      "title": "구글 Playground: 프롬프트로 게임 만들고 공유 (미국 18세+ 한정) 이용 조건",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "개발 툴",
+      "formats": [
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-09",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108393131544846616",
+      "noteUrl": "https://link-notes-nine.vercel.app/#250253190d",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "01eb18a90d",
+      "title": "Anthropic OSS Scanner: 오픈소스 유지보수자 무료 취약점 스캔 신청 방법",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "개발 툴",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-09",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2108349707018014924",
+      "noteUrl": "https://link-notes-nine.vercel.app/#01eb18a90d",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "f98a903a75",
+      "title": "매트 포콕 스킬(/grill-me, /tdd, /code-review, /retro) 소개 + 설치·사용 순서",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "스킬·플러그인",
+      "formats": [
+        "skill"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-07",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2107719452523692215",
+      "noteUrl": "https://link-notes-nine.vercel.app/#f98a903a75",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "3ac9ae0e20",
+      "title": "Opus 5.5를 감독으로 쓰는 영상 제작법: 프롬프트에 '배치도(좌우 위치)'를 적었더니 결과가 달라진 사례",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-05",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2107035630211621020",
+      "noteUrl": "https://link-notes-nine.vercel.app/#3ac9ae0e20",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "26c9428885",
+      "title": "로컬 음성 클론 오픈소스 VoiceStudio와 voicebox·GPT-SoVITS·Chatterbox 비교, 상업용 라이선스 주의",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "팟캐스트·음성",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-05",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2106941839148519916",
+      "noteUrl": "https://link-notes-nine.vercel.app/#26c9428885",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "eefb2432da",
+      "title": "호떡 3편: 같은 내용을 영어 문장형 vs JSON형 프롬프트로 비교, 멀티숏 20초 프롬프트 원문 공개",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-04",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2106671784527630711",
+      "noteUrl": "https://link-notes-nine.vercel.app/#eefb2432da",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "5a0950c598",
+      "title": "호떡 2편: 옴니 레퍼런스로 캐릭터 고정, 정면 립싱크 개선 프롬프트·설정 공개",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-04",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2106624306042245435",
+      "noteUrl": "https://link-notes-nine.vercel.app/#5a0950c598",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "3efc909954",
+      "title": "호떡 1편: 클링 4.0 Flash 텍스트→영상으로 대사·효과음·음악까지 한 번에, 프롬프트·설정·결과 평가 공개",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-03",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2106309361253622090",
+      "noteUrl": "https://link-notes-nine.vercel.app/#3efc909954",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "9aaa59f453",
+      "title": "클링 4.0 아랑 설화 EP01 누각 달빛 컷 제작 사례 (프롬프트 없음)",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-03",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2106202048782102797",
+      "noteUrl": "https://link-notes-nine.vercel.app/#9aaa59f453",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "6f98b6bb62",
+      "title": "클링 4.0으로 아랑 설화 숏 3컷을 하드컷으로 이어 붙인 제작 사례 (프롬프트 없음)",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "클링·생성 영상",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-02",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2105838422430769318",
+      "noteUrl": "https://link-notes-nine.vercel.app/#6f98b6bb62",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "9c5cd39e6a",
+      "title": "시댄스 15초 샷-포-샷 리메이크 영상 + 컷별 타임코드 프롬프트 공개",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "리캐스트·숏폼",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-10-01",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2105478845759668632",
+      "noteUrl": "https://link-notes-nine.vercel.app/#9c5cd39e6a",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "9af8f4a080",
+      "title": "Jev Playground에 고객 문의 티켓을 넣어 Choice/Noul/Score 판단 결과를 받은 실험",
+      "description": "에이전트와 개발 도구의 사용 방법·설정 자료를 살펴보세요.",
+      "category": "agents",
+      "topic": "개발 툴",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-09-19",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2101260428751888539",
+      "noteUrl": "https://link-notes-nine.vercel.app/#9af8f4a080",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "bee126b8cb",
+      "title": "봇 보이스 노트 기능을 에이전트 업무에 붙이는 3가지 방법",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "팟캐스트·음성",
+      "formats": [
+        "video"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-09-19",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2101118238163632613",
+      "noteUrl": "https://link-notes-nine.vercel.app/#bee126b8cb",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "554b2ea067",
+      "title": "Grok Bot 세션을 실제 업무에 쓰는 3가지 레인(마케팅·리서치·병렬 봇)",
+      "description": "Grok Bot 세션을 실제 업무에 쓰는 3가지 레인(마케팅·리서치·병렬 봇) (https://x.com/bottopia_studio/status/2100798338937311307 글의 후속 글)…",
+      "category": "agents",
+      "topic": "에이전트",
+      "formats": [
+        "guide"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-09-18",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2100805280103592406",
+      "noteUrl": "https://link-notes-nine.vercel.app/#554b2ea067",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "f0e4add26c",
+      "title": "같은 숏드라마 프롬프트로 해상도·품질 세팅만 바꿔 Before/After 비교 (GPT Image 2.0)",
+      "description": "영상 제작 사례와 도구·작업 과정을 원문에서 살펴보세요.",
+      "category": "video",
+      "topic": "리캐스트·숏폼",
+      "formats": [
+        "video",
+        "prompt"
+      ],
+      "author": "보토피아 (@bottopia_studio)",
+      "publishedAt": "2026-09-15",
+      "sourceUrl": "https://x.com/bottopia_studio/status/2099688783046463507",
+      "noteUrl": "https://link-notes-nine.vercel.app/#f0e4add26c",
+      "repositories": [],
+      "relatedUrls": []
+    },
+    {
+      "id": "83b3fefa4a",
+      "title": "OOXO AI 시트콤 제작 기록 (Seedance 2.5)",
+      "description": "'프렌즈' 같은 한국판 AI 시트콤 광고(100초)를 Seedance 2.5로 만든 제작 순서와 노하우.",
+      "category": "video",
+      "topic": "리캐스트·숏폼",
+      "formats": [
+        "video"
+      ],
+      "author": "@EEJ_OOXO",
+      "publishedAt": "2026-09-05",
+      "sourceUrl": "https://x.com/eej_ooxo/status/2096105636815925422",
+      "noteUrl": "https://link-notes-nine.vercel.app/#83b3fefa4a",
+      "repositories": [],
+      "relatedUrls": []
+    }
+  ]
+}
