@@ -2,9 +2,20 @@ import type { CanvasAsset, CanvasJob, CanvasProject } from '../../../lib/canvas/
 import { parseProject } from '../../../lib/canvas/graph.ts';
 
 const DATABASE = 'bottopia-canvas-local';
+const DATABASE_VERSION = 2;
+const LEGACY_REVISION = 'legacy-v1';
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
-type ProjectRow = { memberId: string; projectId: string; project: CanvasProject };
+type ProjectRow = { memberId: string; projectId: string; project: CanvasProject; revision?: string };
 type AssetRow = { memberId: string; projectId: string; assetId: string; asset: CanvasAsset };
+export type ProjectSnapshot = { project: CanvasProject; revision: string };
+
+export class CanvasSaveConflictError extends Error {
+  constructor() {
+    super('다른 탭에서 이 작업을 먼저 저장했습니다. 현재 작업을 파일로 내려받아 보관한 뒤 최신 저장본을 불러와주세요.');
+    this.name = 'CanvasSaveConflictError';
+  }
+}
+const revisionOf = (row: ProjectRow): string => row.revision ?? LEGACY_REVISION;
 
 function key(value: string): string {
   if (typeof value !== 'string' || !value.trim() || value.length > 200) throw new Error('계정 또는 프로젝트 ID를 확인해주세요.');
@@ -13,13 +24,14 @@ function key(value: string): string {
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') { reject(new Error('이 브라우저는 로컬 캔버스 저장을 지원하지 않습니다.')); return; }
-    const request = indexedDB.open(DATABASE, 1);
+    const request = indexedDB.open(DATABASE, DATABASE_VERSION);
     let blocked = false;
     request.onupgradeneeded = () => {
-      const projects = request.result.createObjectStore('projects', { keyPath: ['memberId', 'projectId'] });
-      projects.createIndex('member', 'memberId');
-      const assets = request.result.createObjectStore('assets', { keyPath: ['memberId', 'projectId', 'assetId'] });
-      assets.createIndex('project', ['memberId', 'projectId']);
+      const db = request.result;
+      const projects = db.objectStoreNames.contains('projects') ? request.transaction!.objectStore('projects') : db.createObjectStore('projects', { keyPath: ['memberId', 'projectId'] });
+      if (!projects.indexNames.contains('member')) projects.createIndex('member', 'memberId');
+      const assets = db.objectStoreNames.contains('assets') ? request.transaction!.objectStore('assets') : db.createObjectStore('assets', { keyPath: ['memberId', 'projectId', 'assetId'] });
+      if (!assets.indexNames.contains('project')) assets.createIndex('project', ['memberId', 'projectId']);
     };
     request.onsuccess = () => {
       const db = request.result;
@@ -32,7 +44,7 @@ function openDatabase(): Promise<IDBDatabase> {
 }
 
 /** Resolve only after commit; quota, cloning, request and abort errors reject. */
-async function transaction<T>(names: string[], mode: IDBTransactionMode, work: (tx: IDBTransaction) => () => T): Promise<T> {
+async function transaction<T>(names: string[], mode: IDBTransactionMode, work: (tx: IDBTransaction, abort: (reason: unknown) => void) => () => T): Promise<T> {
   const db = await openDatabase();
   return new Promise((resolve, reject) => {
     let tx: IDBTransaction;
@@ -43,10 +55,8 @@ async function transaction<T>(names: string[], mode: IDBTransactionMode, work: (
     tx.onabort = () => { db.close(); reject(failure ?? tx.error ?? new Error('저장하지 못했습니다. 내려받기로 현재 작업을 보관해주세요.')); };
     // Request errors abort the transaction by default. Handle the final abort only.
     tx.onerror = () => {};
-    try { result = work(tx); } catch (error) {
-      failure = error;
-      try { tx.abort(); } catch { db.close(); reject(error); }
-    }
+    const abort = (reason: unknown) => { failure = reason; try { tx.abort(); } catch { db.close(); reject(reason); } };
+    try { result = work(tx, abort); } catch (error) { abort(error); }
   });
 }
 
@@ -136,7 +146,7 @@ export async function listProjects(memberId: string): Promise<Array<{ id: string
   }).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-export async function loadProject(memberId: string, projectId: string): Promise<CanvasProject | null> {
+export async function loadProjectSnapshot(memberId: string, projectId: string): Promise<ProjectSnapshot | null> {
   key(memberId); key(projectId);
   const row = await transaction<ProjectRow | undefined>(['projects'], 'readonly', tx => {
     let row: ProjectRow | undefined;
@@ -144,19 +154,32 @@ export async function loadProject(memberId: string, projectId: string): Promise<
     request.onsuccess = () => { row = request.result as ProjectRow | undefined; };
     return () => row;
   });
-  return row ? localProject(row.project) : null;
+  return row ? { project: localProject(row.project), revision: revisionOf(row) } : null;
 }
 
-/** Pass new assets here to commit the graph and its blobs atomically. */
-export async function saveProject(memberId: string, project: CanvasProject, assets: CanvasAsset[] = []): Promise<void> {
+export async function loadProject(memberId: string, projectId: string): Promise<CanvasProject | null> {
+  return (await loadProjectSnapshot(memberId, projectId))?.project ?? null;
+}
+
+/** Compare and write in one transaction; null means this must be a new row. */
+export async function saveProject(memberId: string, project: CanvasProject, assets: CanvasAsset[] = [], expectedRevision: string | null = null): Promise<string> {
   key(memberId);
   const clean = localProject(project);
   if (assets.length > 500) throw new Error('한 번에 저장할 미디어가 너무 많습니다.');
   const cleanAssets = assets.map(normalizedAsset);
-  await transaction<void>(['projects', 'assets'], 'readwrite', tx => {
-    tx.objectStore('projects').put({ memberId, projectId: clean.id, project: clean } satisfies ProjectRow);
-    for (const asset of cleanAssets) tx.objectStore('assets').put({ memberId, projectId: clean.id, assetId: asset.id, asset } satisfies AssetRow);
-    return () => undefined;
+  const revision = crypto.randomUUID();
+  return transaction<string>(['projects', 'assets'], 'readwrite', (tx, abort) => {
+    const projects = tx.objectStore('projects');
+    const request = projects.get([memberId, clean.id]);
+    request.onsuccess = () => {
+      const existing = request.result as ProjectRow | undefined;
+      if ((existing ? revisionOf(existing) : null) !== expectedRevision) { abort(new CanvasSaveConflictError()); return; }
+      try {
+        projects.put({ memberId, projectId: clean.id, project: clean, revision } satisfies ProjectRow);
+        for (const asset of cleanAssets) tx.objectStore('assets').put({ memberId, projectId: clean.id, assetId: asset.id, asset } satisfies AssetRow);
+      } catch (error) { abort(error); }
+    };
+    return () => revision;
   });
 }
 
@@ -180,16 +203,23 @@ export async function loadAssets(memberId: string, projectId: string): Promise<C
   return rows.map(row => normalizedAsset(row.asset));
 }
 
-export async function deleteProject(memberId: string, projectId: string): Promise<void> {
+export async function deleteProject(memberId: string, projectId: string, expectedRevision: string | null = null): Promise<void> {
   key(memberId); key(projectId);
-  await transaction<void>(['projects', 'assets'], 'readwrite', tx => {
-    tx.objectStore('projects').delete([memberId, projectId]);
-    const request = tx.objectStore('assets').index('project').openKeyCursor(IDBKeyRange.only([memberId, projectId]));
+  await transaction<void>(['projects', 'assets'], 'readwrite', (tx, abort) => {
+    const projects = tx.objectStore('projects');
+    const request = projects.get([memberId, projectId]);
     request.onsuccess = () => {
-      const cursor = request.result;
-      if (!cursor) return;
-      tx.objectStore('assets').delete(cursor.primaryKey);
-      cursor.continue();
+      const existing = request.result as ProjectRow | undefined;
+      if ((existing ? revisionOf(existing) : null) !== expectedRevision) { abort(new CanvasSaveConflictError()); return; }
+      try {
+        projects.delete([memberId, projectId]);
+        const cursorRequest = tx.objectStore('assets').index('project').openKeyCursor(IDBKeyRange.only([memberId, projectId]));
+        cursorRequest.onsuccess = () => {
+          const cursor = cursorRequest.result;
+          if (!cursor) return;
+          tx.objectStore('assets').delete(cursor.primaryKey); cursor.continue();
+        };
+      } catch (error) { abort(error); }
     };
     return () => undefined;
   });

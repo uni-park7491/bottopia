@@ -5,12 +5,13 @@ import type { KeyboardEvent, PointerEvent } from 'react';
 import type { CanvasAsset, CanvasJob, CanvasKind, CanvasNode, CanvasProject, ModelAvailability } from '../../../lib/canvas/types';
 import { canConnect, collectInputs, connectNodes, createNode, createProject, duplicateNodes, fitViewport, groupNodes, MAX_NODES, NODE_HEIGHT, NODE_WIDTH, removeNodes, screenToWorld, ungroupNodes } from '../../../lib/canvas/graph';
 import { estimateGenerationCost, MODELS } from '../../../lib/canvas/models';
-import { deleteProject, listProjects, loadAssets, loadProject, saveProject } from './canvas-store';
+import { CanvasSaveConflictError, deleteProject, listProjects, loadAssets, loadProjectSnapshot, saveProject } from './canvas-store';
 import { makeArchive, readArchive } from './canvas-archive';
 import { CanvasClientError, deleteReferences, inspectAsset, pollGeneration, submitGeneration, uploadReferences } from './canvas-generation';
 import { downloadFile } from '../download';
 import CanvasMinimap from './CanvasMinimap';
 import CanvasIcon from './CanvasIcon';
+import { recoverRequestJob } from './canvas-job-recovery';
 import './canvas.css';
 
 const TOOLS: Array<{ kind: CanvasKind; label: string; icon: string }> = [
@@ -21,7 +22,7 @@ const JOB_LABELS = { queued: '접수됨', running: '생성 중', succeeded: '완
 const NODE_PORT_Y = NODE_HEIGHT / 2;
 type NodeMenu = { x: number; y: number; world: { x: number; y: number }; sourceId?: string; fit?: boolean };
 type Panel = 'history' | 'tools' | 'shortcuts' | 'guide' | 'view' | null;
-type SaveState = 'loading' | 'dirty' | 'saving' | 'saved' | 'error';
+type SaveState = 'loading' | 'dirty' | 'saving' | 'saved' | 'error' | 'conflict';
 type ProjectSummary = { id: string; title: string; updatedAt: string };
 type Drag = {
   kind: 'pan' | 'nodes' | 'connection'; pointerId: number; startX: number; startY: number;
@@ -88,6 +89,9 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
   const undoStack = useRef<CanvasProject[]>([]);
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
   const persistedAssets = useRef(new Map<string, Map<string, CanvasAsset>>());
+  const storageRevisions = useRef(new Map<string, string | null>());
+  const storageConflicts = useRef(new Set<string>());
+  const retiredProjects = useRef(new Set<string>());
   const firstSelectedId = selected[0];
   const composerVisible = !!firstSelectedId && !connectionPoint;
 
@@ -112,35 +116,51 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
     if (!current || ownerRef.current !== memberId || busyRef.current === 'project' || busyRef.current === 'import') return;
     const next = { ...edit(current), updatedAt: new Date().toISOString() };
     if (remember) { undoStack.current.push(current); if (undoStack.current.length > 30) undoStack.current.shift(); }
-    projectRef.current = next; setProject(next); setSaveState('dirty');
+    projectRef.current = next; setProject(next); setSaveState(storageConflicts.current.has(`${memberId}/${next.id}`) ? 'conflict' : 'dirty');
   }, [memberId]);
 
   const putAssets = useCallback((next: CanvasAsset[]) => {
-    assetsRef.current = next; setAssets(next); setSaveState('dirty');
+    assetsRef.current = next; setAssets(next); setSaveState(storageConflicts.current.has(`${ownerRef.current}/${projectRef.current?.id}`) ? 'conflict' : 'dirty');
   }, []);
 
   const persist = useCallback(async (snapshot: CanvasProject, media: CanvasAsset[]) => {
+    const cacheKey = `${memberId}/${snapshot.id}`;
+    if (storageConflicts.current.has(cacheKey)) { setSaveState('conflict'); throw new CanvasSaveConflictError(); }
+    if (retiredProjects.current.has(cacheKey)) throw new Error('삭제한 작업은 다시 저장하지 않습니다.');
     setSaveState('saving');
     const task = saveQueue.current.catch(() => {}).then(async () => {
-      const cacheKey = `${memberId}/${snapshot.id}`;
+      if (storageConflicts.current.has(cacheKey)) throw new CanvasSaveConflictError();
+      if (retiredProjects.current.has(cacheKey)) throw new Error('삭제한 작업은 다시 저장하지 않습니다.');
       const previous = persistedAssets.current.get(cacheKey);
       const changed = media.filter(asset => previous?.get(asset.id) !== asset);
-      await saveProject(memberId, snapshot, changed);
+      let revision: string;
+      try { revision = await saveProject(memberId, snapshot, changed, storageRevisions.current.get(cacheKey) ?? null); }
+      catch (error) { if (error instanceof CanvasSaveConflictError) storageConflicts.current.add(cacheKey); throw error; }
+      storageRevisions.current.set(cacheKey, revision);
       persistedAssets.current.set(cacheKey, new Map(media.map(asset => [asset.id, asset])));
     });
     saveQueue.current = task;
     try {
       await task;
-      if (ownerRef.current === memberId && projectRef.current === snapshot && assetsRef.current === media) setSaveState('saved');
+      if (ownerRef.current === memberId && projectRef.current === snapshot && assetsRef.current === media && !storageConflicts.current.has(cacheKey)) setSaveState('saved');
       if (ownerRef.current === memberId) setProjects(rows => [{ id: snapshot.id, title: snapshot.title, updatedAt: snapshot.updatedAt }, ...rows.filter(row => row.id !== snapshot.id)].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)));
-    } catch (error) { setSaveState('error'); setMessage(`기기 저장 실패: ${errorMessage(error)} 작업 파일로 내려받아 보관해주세요.`); throw error; }
+    } catch (error) {
+      if (error instanceof CanvasSaveConflictError) storageConflicts.current.add(cacheKey);
+      if (ownerRef.current === memberId && projectRef.current?.id === snapshot.id) {
+        setSaveState(error instanceof CanvasSaveConflictError ? 'conflict' : 'error');
+        setMessage(error instanceof CanvasSaveConflictError ? error.message : `기기 저장 실패: ${errorMessage(error)} 작업 파일로 내려받아 보관해주세요.`);
+      }
+      throw error;
+    }
   }, [memberId]);
 
-  const adopt = useCallback((next: CanvasProject, media: CanvasAsset[], saved: boolean) => {
+  const adopt = useCallback((next: CanvasProject, media: CanvasAsset[], revision: string | null) => {
     projectRef.current = next; assetsRef.current = media; ownerRef.current = memberId;
-    if (saved) persistedAssets.current.set(`${memberId}/${next.id}`, new Map(media.map(asset => [asset.id, asset])));
+    const cacheKey = `${memberId}/${next.id}`;
+    storageRevisions.current.set(cacheKey, revision); storageConflicts.current.delete(cacheKey);
+    if (revision !== null) persistedAssets.current.set(cacheKey, new Map(media.map(asset => [asset.id, asset])));
     setProject(next); setAssets(media); setOwner(memberId); setSelected([]); setSelectedEdge(null); setConnecting(null); setNodeMenu(null); setPanel(null);
-    undoStack.current = []; setSaveState(saved ? 'saved' : 'dirty');
+    undoStack.current = []; setSaveState(revision !== null ? 'saved' : 'dirty');
   }, [memberId]);
 
   useEffect(() => {
@@ -149,11 +169,13 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
     void listProjects(memberId).then(async rows => {
       if (cancelled) return;
       setProjects(rows);
+      // Fast Refresh reruns effects; preserve an already active draft for this member.
+      if (ownerRef.current === memberId && projectRef.current) return;
       const first = rows[0];
-      const [saved, media] = first ? await Promise.all([loadProject(memberId, first.id), loadAssets(memberId, first.id)]) : [null, [] as CanvasAsset[]];
-      if (!cancelled) adopt(saved ?? createProject(), media, !!saved);
+      const [saved, media] = first ? await Promise.all([loadProjectSnapshot(memberId, first.id), loadAssets(memberId, first.id)]) : [null, [] as CanvasAsset[]];
+      if (!cancelled && !(ownerRef.current === memberId && projectRef.current)) adopt(saved?.project ?? createProject(), media, saved?.revision ?? null);
     }).catch(error => {
-      if (!cancelled) { adopt(createProject(), [], false); setSaveState('error'); setMessage(`저장된 작업을 읽지 못했습니다. ${errorMessage(error)}`); }
+      if (!cancelled && !(ownerRef.current === memberId && projectRef.current)) { adopt(createProject(), [], null); setSaveState('error'); setMessage(`저장된 작업을 읽지 못했습니다. ${errorMessage(error)}`); }
     });
     void fetch('/api/canvas/models', { credentials: 'same-origin', cache: 'no-store', signal: abort.signal })
       .then(async response => { if (!response.ok) throw new Error('모델 연결 상태를 읽지 못했습니다.'); return response.json(); })
@@ -163,14 +185,14 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
   }, [memberId, adopt]);
 
   useEffect(() => {
-    if (!project || owner !== memberId || saveState === 'saved' || saveState === 'loading' || saveState === 'error') return;
+    if (!project || owner !== memberId || busy === 'project' || busy === 'import' || saveState === 'saved' || saveState === 'loading' || saveState === 'error' || saveState === 'conflict') return;
     const timer = window.setTimeout(() => { void persist(project, assets).catch(() => {}); }, 650);
     return () => window.clearTimeout(timer);
-  }, [project, assets, memberId, owner, persist, saveState]);
+  }, [project, assets, memberId, owner, busy, persist, saveState]);
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
-      if (saveState === 'dirty' || saveState === 'saving' || saveState === 'error' || busyRef.current) event.preventDefault();
+      if (saveState === 'dirty' || saveState === 'saving' || saveState === 'error' || saveState === 'conflict' || busyRef.current) event.preventDefault();
     };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
@@ -205,7 +227,8 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
           } : item) }), false);
           if (result.state === 'succeeded' || result.state === 'failed') {
             undoStack.current = [];
-            await persist(projectRef.current!, assetsRef.current);
+            try { await persist(projectRef.current!, assetsRef.current); }
+            catch { continue; } // Keep confirmed terminal state, outputs and receipt in memory.
             if (latest.job.assetKeys?.length) {
               try {
                 await deleteReferences(latest.job.assetKeys);
@@ -422,27 +445,44 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
   }
 
   async function switchProject(id: string) {
-    if (busyRef.current) return;
+    if (busyRef.current || projectRef.current?.id === id) return;
     busyRef.current = 'project'; setBusy('project');
     try {
       if (projectRef.current) await persist(projectRef.current, assetsRef.current);
-      const [next, media] = await Promise.all([loadProject(memberId, id), loadAssets(memberId, id)]);
-      if (next) { adopt(next, media, true); setMessage(''); }
+      const [next, media] = await Promise.all([loadProjectSnapshot(memberId, id), loadAssets(memberId, id)]);
+      if (next) { adopt(next.project, media, next.revision); setMessage(''); }
     } catch (error) { setMessage(errorMessage(error)); }
     finally { busyRef.current = null; setBusy(null); }
   }
   async function newProject() {
     if (busyRef.current) return;
     busyRef.current = 'project'; setBusy('project');
-    try { if (projectRef.current) await persist(projectRef.current, assetsRef.current); adopt(createProject(), [], false); setMessage(''); }
+    try { if (projectRef.current) await persist(projectRef.current, assetsRef.current); adopt(createProject(), [], null); setMessage(''); }
     catch (error) { setMessage(errorMessage(error)); }
     finally { busyRef.current = null; setBusy(null); }
   }
   async function removeProject() {
     if (!project || busyRef.current || project.nodes.some(activeJob)) { setMessage('진행 중인 생성 결과를 먼저 확인해주세요.'); return; }
     if (!window.confirm('이 기기에 저장된 캔버스와 미디어를 삭제할까요? 내려받은 작업 파일은 유지됩니다.')) return;
-    try { await saveQueue.current.catch(() => {}); await deleteProject(memberId, project.id); setProjects(rows => rows.filter(row => row.id !== project.id)); adopt(createProject(), [], false); }
-    catch (error) { setMessage(errorMessage(error)); }
+    busyRef.current = 'project'; setBusy('project');
+    const cacheKey = `${memberId}/${project.id}`;
+    try { await saveQueue.current.catch(() => {}); await deleteProject(memberId, project.id, storageRevisions.current.get(cacheKey) ?? null); retiredProjects.current.add(cacheKey); setProjects(rows => rows.filter(row => row.id !== project.id)); adopt(createProject(), [], null); }
+    catch (error) { if (error instanceof CanvasSaveConflictError) { storageConflicts.current.add(cacheKey); setSaveState('conflict'); } setMessage(errorMessage(error)); }
+    finally { busyRef.current = null; setBusy(null); }
+  }
+  async function loadLatestProject() {
+    const current = projectRef.current;
+    if (!current || busyRef.current) return;
+    if (current.nodes.some(activeJob)) { setMessage('진행 중인 생성 결과를 먼저 확인해주세요. 접수 기록을 보존하기 위해 최신 저장본은 생성 종료 후 불러올 수 있습니다.'); return; }
+    if (!window.confirm('현재 화면의 작업을 파일로 보관했나요? 최신 저장본을 불러오면 현재 화면의 변경사항은 사라집니다.')) return;
+    busyRef.current = 'project'; setBusy('project');
+    try {
+      await saveQueue.current.catch(() => {});
+      const [snapshot, media] = await Promise.all([loadProjectSnapshot(memberId, current.id), loadAssets(memberId, current.id)]);
+      if (!snapshot) throw new Error('다른 탭에서 저장본을 삭제했습니다. 현재 작업을 파일로 보관해주세요.');
+      adopt(snapshot.project, media, snapshot.revision); setMessage('최신 저장본을 불러왔습니다.');
+    } catch (error) { setMessage(errorMessage(error)); }
+    finally { busyRef.current = null; setBusy(null); }
   }
   async function importFile(file?: File) {
     if (!file || busyRef.current) return;
@@ -451,7 +491,7 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
       if (projectRef.current) await persist(projectRef.current, assetsRef.current);
       const archive = await readArchive(file);
       const next = { ...archive.project, id: crypto.randomUUID(), updatedAt: new Date().toISOString() };
-      await persist(next, archive.assets); adopt(next, archive.assets, true); setMessage('작업 파일을 새 캔버스로 가져왔습니다.');
+      await persist(next, archive.assets); adopt(next, archive.assets, storageRevisions.current.get(`${memberId}/${next.id}`) ?? null); setMessage('작업 파일을 새 캔버스로 가져왔습니다.');
     } catch (error) { setMessage(errorMessage(error)); }
     finally { busyRef.current = null; setBusy(null); }
   }
@@ -540,9 +580,11 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
     const snapshot = projectRef.current;
     const node = snapshot?.nodes.find(item => item.id === selected[0]);
     if (!snapshot || !node || busyRef.current || activeJob(node)) return;
+    if (storageConflicts.current.has(`${memberId}/${snapshot.id}`)) { setSaveState('conflict'); setMessage(new CanvasSaveConflictError().message); return; }
     const model = models.find(item => item.id === node.modelId);
     if (!model?.canGenerate) { setMessage(model?.configurationNote ?? '이 모델의 API 연결과 생성 권한을 확인해주세요.'); return; }
     let keys: string[] = [];
+    let acceptedReceipt: string | null = null;
     busyRef.current = node.id; setBusy(node.id); setMessage('');
     try {
       const input = collectInputs(snapshot, node.id);
@@ -555,8 +597,11 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
       if (incomingMedia.some(item => !item!.assetIds.length)) throw new Error('연결된 참조 노드에 미디어가 없습니다. 먼저 업로드하거나 생성해주세요.');
       estimateGenerationCost({ modelId: node.modelId, providerId: model.providerId, resolution: node.resolution, durationSeconds: node.durationSeconds, references: refs });
       await persist(snapshot, assetsRef.current);
+      if (storageConflicts.current.has(`${memberId}/${snapshot.id}`)) throw new CanvasSaveConflictError();
       const uploaded = await uploadReferences(refs); keys = uploaded.assetKeys;
+      if (storageConflicts.current.has(`${memberId}/${snapshot.id}`)) throw new CanvasSaveConflictError();
       const result = await submitGeneration({ operationId: crypto.randomUUID(), modelId: node.modelId, prompt: input.prompt, aspectRatio: node.aspectRatio, resolution: node.resolution, durationSeconds: node.durationSeconds, generateAudio: node.generateAudio, references: uploaded.references });
+      acceptedReceipt = result.receipt;
       const job: CanvasJob = { receipt: result.receipt, receipts: [result.receipt], expectedCount: 1, assetKeys: keys, state: result.state, startedAt: new Date().toISOString(), pollAfterSeconds: result.pollAfterSeconds };
       undoStack.current = [];
       commit(value => ({ ...value, nodes: value.nodes.map(item => item.id === node.id ? { ...item, job } : item) }), false);
@@ -566,10 +611,11 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
       const retained = error instanceof CanvasClientError && error.assetKeys.length ? error.assetKeys : keys;
       // An existing receipt must survive a subsequent local-save failure.
       const latest = projectRef.current?.nodes.find(item => item.id === node.id);
-      if (!latest?.job?.receipt || latest.job.state === 'failed' || latest.job.state === 'succeeded') {
+      const recovery = recoverRequestJob(latest?.job, acceptedReceipt, { receipt: '', state: uncertain ? 'unknown' : 'failed', startedAt: new Date().toISOString(), message: uncertain ? `접수 결과 확인 필요. 자동 재시도하지 않습니다. ${errorMessage(error)}` : errorMessage(error), assetKeys: retained });
+      if (!recovery.retained) {
         let remainingKeys = retained;
         if (!uncertain && retained.length) { try { await deleteReferences(retained); remainingKeys = []; } catch { /* Preserve keys for explicit cleanup. */ } }
-        commit(value => ({ ...value, nodes: value.nodes.map(item => item.id === node.id ? { ...item, job: { receipt: '', state: uncertain ? 'unknown' : 'failed', startedAt: new Date().toISOString(), message: uncertain ? `접수 결과 확인 필요. 자동 재시도하지 않습니다. ${errorMessage(error)}` : errorMessage(error), assetKeys: remainingKeys } } : item) }), false);
+        commit(value => ({ ...value, nodes: value.nodes.map(item => item.id === node.id ? { ...item, job: { ...recovery.job, assetKeys: remainingKeys } } : item) }), false);
       }
       setMessage(errorMessage(error));
     } finally { busyRef.current = null; setBusy(null); }
@@ -578,7 +624,7 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
   if (!project || owner !== memberId) return <section className="bottopia-canvas bc-loading" aria-busy="true"><p>캔버스를 불러오는 중…</p></section>;
   const selectedAsset = selectedNode ? assetMap.get(selectedNode.selectedAssetId ?? selectedNode.assetIds.at(-1) ?? '') : undefined;
   const nodeMap = new Map(project.nodes.map(node => [node.id, node]));
-  const saveLabel = { loading: '불러오는 중', dirty: '저장 대기', saving: '저장 중…', saved: '기기에 저장됨', error: '저장 실패' }[saveState];
+  const saveLabel = { loading: '불러오는 중', dirty: '저장 대기', saving: '저장 중…', saved: '기기에 저장됨', error: '저장 실패', conflict: '저장 충돌' }[saveState];
   const composerWidth = Math.max(240, Math.min(635, stageSize.width - 24));
   const composerLeft = selectedNode ? Math.max(8, Math.min(stageSize.width - composerWidth - 8, project.viewport.x + (selectedNode.x + NODE_WIDTH / 2) * project.viewport.zoom - composerWidth / 2)) : 8;
   const composerTop = selectedNode ? Math.max(8, Math.min(stageSize.height - composerHeight - (stageSize.width <= 850 ? 130 : 78), project.viewport.y + (selectedNode.y + NODE_HEIGHT) * project.viewport.zoom + 12)) : 8;
@@ -648,7 +694,7 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
             <label className="bc-inline-field"><span className="bc-sr-only">해상도</span><select aria-label="해상도" value={selectedNode.resolution} disabled={!!busy || activeJob(selectedNode)} onChange={event => updateNode(selectedNode.id, { resolution: event.target.value })}>{selectedModel?.resolutions.map(resolution => <option key={resolution}>{resolution}</option>)}</select></label>
             {selectedNode.kind === 'video' && <><label className="bc-inline-field bc-duration-field" title="영상 길이"><input aria-label="길이 (초)" type="number" min={selectedModel?.minDuration ?? 4} max={selectedModel?.maxDuration ?? 30} step="1" disabled={!!busy || activeJob(selectedNode)} value={selectedNode.durationSeconds} onChange={event => { const value = Number(event.target.value); if (Number.isFinite(value) && value >= 1 && value <= 120) updateNode(selectedNode.id, { durationSeconds: value }); }} /><span>초</span></label><label className="bc-audio-check" title="영상 오디오 생성"><input type="checkbox" aria-label="영상에 오디오 생성" checked={selectedNode.generateAudio} disabled={!!busy || activeJob(selectedNode)} onChange={event => updateNode(selectedNode.id, { generateAudio: event.target.checked })} /><CanvasIcon name="audio" width="14" height="14" /></label></>}
             <details className="bc-price-info"><summary title="예상 요금과 근거">{estimate?.amount != null ? `$${estimate.amount.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}` : '견적 —'}</summary><div><strong>1개 생성 예상 비용</strong><p>{estimate?.note ?? selectedModel?.priceNote}</p><p>{estimate?.approximate ? '잠정 예상입니다. ' : ''}실제 청구는 달라질 수 있습니다.</p>{selectedModel && <a href={selectedModel.pricingSource} target="_blank" rel="noreferrer">{selectedModel.providerLabel} 가격표 ↗</a>}<small>{selectedModel?.checkedAt} 확인</small></div></details>
-            <button className="bc-run" aria-label="1개 생성하기" title="버튼을 누를 때만 유료 생성 요청을 보냅니다" disabled={!!busy || activeJob(selectedNode) || !selectedModel?.canGenerate || !!estimateError || !inputs.prompt.trim()} onClick={() => void run()}>{busy === selectedNode.id || activeJob(selectedNode) ? <span className="bc-working-dot" /> : <CanvasIcon name="arrow" width="21" height="21" />}</button>
+            <button className="bc-run" aria-label="1개 생성하기" title="버튼을 누를 때만 유료 생성 요청을 보냅니다" disabled={saveState === 'conflict' || !!busy || activeJob(selectedNode) || !selectedModel?.canGenerate || !!estimateError || !inputs.prompt.trim()} onClick={() => void run()}>{busy === selectedNode.id || activeJob(selectedNode) ? <span className="bc-working-dot" /> : <CanvasIcon name="arrow" width="21" height="21" />}</button>
           </> : <><span className="bc-local-note">{selectedNode.kind === 'audio' ? '내 오디오 파일' : '직접 작성 · 생성 비용 없음'}</span>{selectedNode.kind === 'script' && <button className="bc-small-action" onClick={() => splitScript(selectedNode)}>장면 나누기</button>}{selectedNode.kind === 'audio' && <button className="bc-small-action" onClick={() => openUpload(selectedNode.id)}><CanvasIcon name="upload" width="13" height="13" />미디어 추가</button>}</>}
           <details className="bc-node-options"><summary aria-label="노드 상세 설정"><CanvasIcon name="more" width="17" height="17" /></summary><div><label className="bc-field">이름<input value={selectedNode.title} maxLength={160} onChange={event => updateNode(selectedNode.id, { title: event.target.value })} /></label>{selectedNode.kind !== 'text' && selectedNode.kind !== 'script' && <button onClick={() => openUpload(selectedNode.id)}>미디어 추가</button>}{selectedNode.assetIds.length > 0 && <><label className="bc-field">미디어 · 결과<select value={selectedAsset?.id ?? ''} onChange={event => updateNode(selectedNode.id, { selectedAssetId: event.target.value })}>{selectedNode.assetIds.map((id, index) => <option key={id} value={id}>{index + 1}. {assetMap.get(id)?.name ?? '파일을 찾을 수 없음'}</option>)}</select></label>{selectedAsset && <button onClick={() => void downloadAsset(selectedAsset)}><CanvasIcon name="download" width="14" height="14" />원본 내려받기</button>}{selectedAsset?.remoteUrl && !selectedAsset.blob && <small>결과 주소가 만료되기 전에 원본을 보관하세요.</small>}</>}{selectedNode.job?.assetKeys?.length && !activeJob(selectedNode) ? <button disabled={!!busy} onClick={() => void cleanupReferences(selectedNode)}>임시 참조 파일 정리</button> : null}<small>이 작업은 내 기기에 저장됩니다.<br />포트폴리오에 자동 게시되지 않습니다.</small></div></details>
         </div>
@@ -666,7 +712,7 @@ export default function CanvasWorkspace({ memberId, onOpenTools }: { memberId: s
       <nav className="bc-view-dock bc-floating-ui" aria-label="캔버스 보기 도구"><button className="bc-zoom-button" title="확대 · 축소" onClick={() => togglePanel('view')} aria-expanded={panel === 'view'}>{Math.round(project.viewport.zoom * 100)}%<span>⌄</span></button><button title="노드 정리" aria-label="노드 정리" onClick={arrangeNodes} disabled={!project.nodes.length}><CanvasIcon name="arrange" width="16" height="16" /></button><button title="미니맵" aria-label="미니맵" aria-pressed={showMinimap} onClick={() => setShowMinimap(value => !value)}><CanvasIcon name="map" width="16" height="16" /></button><button title={showEdges ? '연결선 숨기기' : '연결선 보기'} aria-label={showEdges ? '연결선 숨기기' : '연결선 보기'} aria-pressed={!showEdges} onClick={() => setShowEdges(value => !value)}><CanvasIcon name="edge" width="16" height="16" /></button><button title="격자에 맞추기" aria-label="격자에 맞추기" aria-pressed={snap} onClick={() => setSnap(value => !value)}><CanvasIcon name="snap" width="16" height="16" /></button></nav>
       <nav className="bc-tool-dock bc-floating-ui" aria-label="캔버스 도구 모음"><button className="bc-add-button" title="노드 추가" aria-label="노드 추가" aria-expanded={!!nodeMenu} onClick={() => nodeMenu ? setNodeMenu(null) : openNodeMenu()}><CanvasIcon name="add" width="21" height="21" /></button><span className="bc-dock-separator" /><button title="선택 도구" aria-label="선택 도구" aria-pressed={!hand} onClick={() => setHand(false)}><CanvasIcon name="select" /></button><button title="손 도구 · Space" aria-label="손 도구" aria-pressed={hand} onClick={() => setHand(value => !value)}><CanvasIcon name="hand" /></button><span className="bc-dock-separator" /><button title="미디어 기록" aria-label="미디어 기록" aria-expanded={panel === 'history'} onClick={() => togglePanel('history')}><CanvasIcon name="history" /></button><button title="도구" aria-label="캔버스 도구" aria-expanded={panel === 'tools'} onClick={() => togglePanel('tools')}><CanvasIcon name="tools" /></button><button title="단축키" aria-label="단축키" aria-expanded={panel === 'shortcuts'} onClick={() => togglePanel('shortcuts')}><CanvasIcon name="keyboard" /></button><button title="가이드" aria-label="캔버스 가이드" aria-expanded={panel === 'guide'} onClick={() => togglePanel('guide')}><CanvasIcon name="guide" /></button></nav>
       {connecting && !nodeMenu && <div className="bc-connection-hint">왼쪽 ＋에 연결하거나 빈 곳에 놓아주세요 <kbd>Esc</kbd></div>}
-      {message && <div className="bc-message bc-floating-ui" role="status"><span>{message}</span><button aria-label="알림 닫기" onClick={() => setMessage('')}><CanvasIcon name="close" width="14" height="14" /></button></div>}
+      {(message || saveState === 'conflict') && <div className="bc-message bc-floating-ui" role="status" style={saveState === 'conflict' ? { flexDirection: 'column' } : undefined}><span>{saveState === 'conflict' ? new CanvasSaveConflictError().message + (project.nodes.some(activeJob) ? ' 진행 중인 생성은 결과를 확인한 뒤 최신본을 불러올 수 있습니다.' : '') : message}</span>{saveState === 'conflict' ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}><button style={{ width: 'auto', minHeight: 28 }} onClick={() => void exportFile()}>현재 작업 내려받기</button><button style={{ width: 'auto', minHeight: 28 }} disabled={!!busy || project.nodes.some(activeJob)} onClick={() => void loadLatestProject()}>최신 저장본 불러오기</button></div> : <button aria-label="알림 닫기" onClick={() => setMessage('')}><CanvasIcon name="close" width="14" height="14" /></button>}</div>}
     </div>
   </section>;
 }
