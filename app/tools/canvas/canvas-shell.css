@@ -1,0 +1,18 @@
+.creative-tools.is-canvas-tool { max-width:1600px; padding:24px clamp(12px,2vw,28px) 28px; margin-block:12px; border-radius:16px; }
+.creative-tools.is-canvas-tool .tools-heading { align-items:center; }
+.creative-tools.is-canvas-tool .tools-heading h1 { font-size:clamp(22px,2.2vw,30px); }
+.creative-tools.is-canvas-tool .tools-heading p { margin-bottom:8px; }
+.creative-tools.is-canvas-tool > .tools-intro { margin:10px 0 18px; font-size:13px; }
+.creative-tools.is-canvas-tool > .tool-tabs { display:flex; flex-wrap:wrap; gap:6px; }
+.creative-tools.is-canvas-tool > .tool-tabs button { min-height:44px; padding:8px 14px; border-radius:9px; }
+.creative-tools.is-canvas-tool > .tool-tabs button > span { display:none; }
+.creative-tools.is-canvas-tool > .tool-tabs strong { font-size:13px; }
+.creative-tools.is-canvas-tool > .tool-upcoming { margin-block:8px; }
+.creative-tools.is-canvas-tool > .tools-notice { padding:4px 0; margin-bottom:0; }
+@media(max-width:600px) {
+  .creative-tools.is-canvas-tool { padding:16px 10px; margin-block:0; border-radius:0; }
+  .creative-tools.is-canvas-tool .tools-heading > span { display:none; }
+  .creative-tools.is-canvas-tool > .tools-intro { max-width:32em; font-size:12px; }
+  .creative-tools.is-canvas-tool > .tool-tabs { flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
+  .creative-tools.is-canvas-tool > .tool-tabs button { flex-shrink:0; }
+}
