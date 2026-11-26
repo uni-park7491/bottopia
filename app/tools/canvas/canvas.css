@@ -115,3 +115,6 @@
 @media (prefers-reduced-motion:reduce) { .bottopia-canvas * { transition:none!important; } }
 
 .bottopia-canvas.bc-project-loading { pointer-events:none; opacity:.7; }
+
+.bc-preview-failed { padding:14px; text-align:center; font-size:11px; color:var(--bc-muted); }
+.bc-preview-failed a { display:inline-block; padding:8px; color:var(--bc-accent); text-decoration:underline; }

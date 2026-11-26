@@ -26,6 +26,7 @@ const activeJob = (node: CanvasNode) => !!node.job && !['succeeded', 'failed'].i
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : '작업을 마치지 못했습니다. 다시 확인해주세요.';
 
 function MediaPreview({ asset }: { asset?: CanvasAsset }) {
+  const [failedId, setFailedId] = useState('');
   const element = useRef<HTMLImageElement | HTMLVideoElement | HTMLAudioElement | null>(null);
   const blob = asset?.blob, remoteUrl = asset?.remoteUrl;
   useEffect(() => {
@@ -40,9 +41,10 @@ function MediaPreview({ asset }: { asset?: CanvasAsset }) {
     };
   }, [blob, remoteUrl]);
   if (!asset) return <div className="bc-media-empty"><span aria-hidden="true">＋</span><p>미디어를 올리거나<br />노드를 연결해 생성하세요.</p></div>;
-  if (asset.kind === 'image') return <img className="bc-media" ref={value => { element.current = value; }} alt={asset.name} loading="lazy" draggable={false} />; // eslint-disable-line @next/next/no-img-element
-  if (asset.kind === 'video') return <video className="bc-media" ref={value => { element.current = value; }} controls playsInline preload="metadata" aria-label={asset.name} />;
-  return <div className="bc-audio-preview"><span aria-hidden="true">♫</span><audio ref={value => { element.current = value; }} controls preload="metadata" aria-label={asset.name} /></div>;
+  if (failedId === asset.id) return <div className="bc-preview-failed"><p>미리보기를 불러오지 못했습니다.</p>{asset.remoteUrl && <a href={asset.remoteUrl} target="_blank" rel="noopener noreferrer">원본 파일 열기 ↗</a>}</div>;
+  if (asset.kind === 'image') return <img className="bc-media" crossOrigin="anonymous" onError={() => setFailedId(asset.id)} ref={value => { element.current = value; }} alt={asset.name} loading="lazy" draggable={false} />; // eslint-disable-line @next/next/no-img-element
+  if (asset.kind === 'video') return <video className="bc-media" crossOrigin="anonymous" onError={() => setFailedId(asset.id)} ref={value => { element.current = value; }} controls playsInline preload="metadata" aria-label={asset.name} />;
+  return <div className="bc-audio-preview"><span aria-hidden="true">♫</span><audio crossOrigin="anonymous" onError={() => setFailedId(asset.id)} ref={value => { element.current = value; }} controls preload="metadata" aria-label={asset.name} /></div>;
 }
 
 export default function CanvasWorkspace({ memberId }: { memberId: string }) {
@@ -247,6 +249,7 @@ export default function CanvasWorkspace({ memberId }: { memberId: string }) {
     if (selected.some(id => { const node = projectRef.current!.nodes.find(item => item.id === id); return node && (activeJob(node) || busyRef.current === id); })) { setMessage('진행 중인 노드는 결과 확인 후 삭제할 수 있습니다.'); return; }
     if (selectedEdge) { commit(value => ({ ...value, edges: value.edges.filter(edge => edge.id !== selectedEdge) })); setSelectedEdge(null); }
     else { commit(value => removeNodes(value, selected)); setSelected([]); }
+    stage.current?.focus({ preventScroll: true });
   }
   function duplicateSelection() {
     try {
