@@ -44,6 +44,8 @@ npm run dev
 3. Deploy 후 `NEXT_PUBLIC_SITE_URL`을 실제 배포 URL로 바꿉니다.
 4. Supabase의 허용 URL 목록과 제공자 앱의 설정을 확인하고 실제 계정으로 3개 로그인 흐름을 검수합니다.
 
+Vercel의 의존성 설치는 `vercel.json`에 지정한 `ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm ci`를 사용합니다. 브라우저 TTS는 WASM으로 실행하므로 서버 CUDA 바이너리는 필요하지 않습니다. 간접 의존성인 `onnxruntime-node@1.21.0`은 Linux x64에서 CUDA 파일을 자동 다운로드하는데, 해당 릴리스 주소가 404를 반환하면 설치 전체가 실패합니다. 이 옵션은 CUDA 추가 다운로드만 생략하며 CPU 런타임과 다른 패키지의 설치 스크립트는 유지합니다.
+
 ## 보안 모델
 
 - 기본 접속 주소 `/`는 공개 홈 피드입니다. 홈페이지에 인증 리다이렉트나 자동 로그인 팝업을 적용하지 않습니다.
