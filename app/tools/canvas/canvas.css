@@ -1,0 +1,1340 @@
+.bottopia-canvas {
+  --bc-bg:#1a1a1a;
+  --bc-panel:#292929;
+  --bc-text:#f7f7f7;
+  --bc-muted:#959595;
+  --bc-line:#414141;
+  --ws-bg:#1a1a1a;
+  --ws-panel:#292929;
+  --ws-text:#f7f7f7;
+  --ws-muted:#959595;
+  --ws-line:#414141;
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  height:100%;
+  min-height:0;
+  min-width:0;
+  margin:0;
+  color:var(--bc-text);
+  background:var(--bc-bg);
+  font-size:12px;
+  line-height:1.5;
+  color-scheme:dark
+}
+.bottopia-canvas * {
+  box-sizing:border-box
+}
+.bottopia-canvas button,.bottopia-canvas input,.bottopia-canvas textarea,.bottopia-canvas select {
+  font:inherit;
+  color:var(--bc-text)
+}
+.bottopia-canvas button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:30px;
+  margin:0;
+  padding:5px 9px;
+  background:transparent;
+  border:1px solid transparent;
+  border-radius:7px;
+  color:var(--bc-text);
+  font-size:12px;
+  line-height:1.3;
+  cursor:pointer;
+  white-space:nowrap
+}
+.bottopia-canvas button:hover:not(:disabled) {
+  background:#383838;
+  border-color:transparent
+}
+.bottopia-canvas button:disabled {
+  opacity:.35;
+  cursor:not-allowed
+}
+.bottopia-canvas button svg {
+  flex-shrink:0
+}
+.bottopia-canvas :is(button,input,textarea,select,a,summary):focus-visible {
+  outline:2px solid #b9c7e0;
+  outline-offset:2px
+}
+.bottopia-canvas button[aria-pressed=true],.bottopia-canvas button[aria-expanded=true] {
+  background:#3e3e3e;
+  color:#fff
+}
+.bottopia-canvas input:not([type=checkbox]),.bottopia-canvas select,.bottopia-canvas textarea {
+  margin:0;
+  min-height:0;
+  width:auto;
+  max-width:100%;
+  border:1px solid var(--bc-line);
+  border-radius:6px;
+  background:#292929;
+  color:var(--bc-text);
+  padding:6px 8px;
+  font-size:12px;
+  box-shadow:none
+}
+.bottopia-canvas input[type=checkbox] {
+  appearance:auto;
+  width:13px;
+  height:13px;
+  min-height:0;
+  margin:0;
+  padding:0;
+  accent-color:#e6e6e6
+}
+.bottopia-canvas textarea {
+  resize:none
+}
+.bottopia-canvas a {
+  color:#d0dcf3;
+  text-decoration:underline
+}
+.bottopia-canvas .bc-danger {
+  color:#c9a1a1
+}
+.bottopia-canvas .bc-file-input {
+  display:none
+}
+.bottopia-canvas .bc-project-bar {
+  display:flex;
+  align-items:center;
+  flex:0 0 48px;
+  height:48px;
+  gap:8px;
+  padding:0 8px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  z-index:50
+}
+.bottopia-canvas .bc-tools-back {
+  gap:8px;
+  padding:3px 6px;
+  font-size:12px;
+  font-weight:550
+}
+.bc-brand-mark {
+  display:grid;
+  place-items:center;
+  width:23px;
+  height:23px;
+  border:1px solid #666;
+  border-radius:6px;
+  font-weight:800;
+  font-size:14px;
+  font-family:Arial,sans-serif
+}
+.bc-project-divider {
+  height:16px;
+  width:1px;
+  background:#414141;
+  margin:0 2px
+}
+.bc-title-field {
+  min-width:80px;
+  max-width:280px;
+  flex:1
+}
+.bottopia-canvas .bc-title-field input {
+  height:30px;
+  width:100%;
+  padding:4px 7px;
+  border-color:transparent;
+  background:transparent;
+  border-radius:5px;
+  font-size:12px;
+  font-weight:500
+}
+.bottopia-canvas .bc-title-field input:hover {
+  border-color:#414141
+}
+.bc-save-state {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  color:#929292;
+  font-size:10px;
+  white-space:nowrap
+}
+.bc-save-state::before {
+  content:'';
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:currentColor
+}
+.bc-save-state.error {
+  color:#e1aaa4
+}
+.bc-save-state.saving {
+  color:#c5c5c5
+}
+.bc-project-actions {
+  display:flex;
+  align-items:center;
+  margin-left:auto;
+  gap:6px
+}
+.bottopia-canvas .bc-project-actions select {
+  height:28px;
+  min-height:0;
+  border:0;
+  background:transparent;
+  color:#aaa;
+  font-size:11px;
+  max-width:150px;
+  padding:4px
+}
+.bc-project-menu {
+  position:relative
+}
+.bc-project-menu summary,.bc-node-options summary {
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  width:28px;
+  height:28px;
+  border-radius:5px
+}
+.bc-project-menu summary:hover,.bc-node-options summary:hover {
+  background:#373737
+}
+.bc-project-menu summary::-webkit-details-marker,.bc-node-options summary::-webkit-details-marker {
+  display:none
+}
+.bc-project-menu>div,.bc-node-options>div {
+  position:absolute;
+  width:220px;
+  right:0;
+  top:calc(100% + 7px);
+  padding:6px;
+  background:#292929;
+  border:1px solid #454545;
+  border-radius:10px;
+  box-shadow:0 10px 35px #0005;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  z-index:70
+}
+.bottopia-canvas .bc-project-menu button,.bottopia-canvas .bc-node-options button {
+  justify-content:flex-start;
+  text-align:left;
+  width:100%;
+  font-size:11px
+}
+.bc-stage {
+  flex:1;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  touch-action:none;
+  outline:none;
+  background-color:#1a1a1a;
+  background-image:radial-gradient(circle,#444 .65px,transparent .75px);
+  background-size:20px 20px
+}
+.bc-stage.is-hand {
+  cursor:grab
+}
+.bc-stage.is-hand:active {
+  cursor:grabbing
+}
+.bc-stage.is-connecting {
+  cursor:crosshair
+}
+.bc-world {
+  position:absolute;
+  width:1px;
+  height:1px;
+  transform-origin:0 0
+}
+.bc-edges {
+  position:absolute;
+  top:0;
+  left:0;
+  overflow:visible;
+  pointer-events:none;
+  z-index:1
+}
+.bc-edge-line {
+  fill:none;
+  stroke:#646464;
+  stroke-width:1.3;
+  pointer-events:none
+}
+.bc-edge-hit {
+  fill:none;
+  stroke:transparent;
+  stroke-width:16;
+  pointer-events:stroke;
+  cursor:pointer
+}
+.bc-edges .is-selected .bc-edge-line {
+  stroke:#b6c5e0;
+  stroke-width:2
+}
+.bc-edge-draft {
+  fill:none;
+  stroke:#aaa;
+  stroke-width:1.5;
+  pointer-events:none
+}
+.bc-group {
+  position:absolute;
+  border:1px solid #555;
+  border-radius:10px;
+  background:#ffffff04;
+  pointer-events:none;
+  z-index:0
+}
+.bottopia-canvas .bc-group>button {
+  position:absolute;
+  left:8px;
+  top:2px;
+  min-height:24px;
+  padding:2px 5px;
+  font-size:10px;
+  color:#aaa;
+  pointer-events:auto
+}
+.bc-group small {
+  font-size:9px;
+  color:#888
+}
+.bc-node {
+  position:absolute;
+  z-index:2;
+  background:transparent;
+  border:0
+}
+.bc-node.is-selected {
+  z-index:3
+}
+.bc-node-header {
+  height:24px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 3px;
+  color:#bcbcbc;
+  font-size:10px;
+  line-height:1;
+  cursor:grab;
+  user-select:none
+}
+.bc-node-header:active {
+  cursor:grabbing
+}
+.bc-node-header>svg {
+  color:#aaa
+}
+.bc-node-header strong {
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:10px;
+  font-weight:500
+}
+.bc-node-status {
+  color:#868686;
+  font-size:9px;
+  white-space:nowrap
+}
+.bc-node-status.failed,.bc-node-status.unknown {
+  color:#d0a99a
+}
+.bc-node-body {
+  width:100%;
+  height:calc(100% - 24px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  border:1px solid #3b3b3b;
+  border-radius:8px;
+  background:#232323
+}
+.bc-node.is-selected .bc-node-body,.bc-node.is-source .bc-node-body {
+  border-color:#acacac;
+  box-shadow:0 0 0 1px #acacac
+}
+.bottopia-canvas .bc-node-body textarea {
+  width:100%;
+  height:100%;
+  padding:17px 18px;
+  border:0;
+  border-radius:7px;
+  background:#252525;
+  color:#e0e0e0;
+  font-size:12px;
+  line-height:1.75;
+  touch-action:auto
+}
+.bottopia-canvas .bc-node-body textarea::placeholder {
+  color:#747474
+}
+.bottopia-canvas .bc-port {
+  position:absolute;
+  width:20px;
+  height:20px;
+  min-height:20px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  background:#292929;
+  color:#aaa;
+  border:1px solid #606060;
+  border-radius:50%;
+  z-index:5;
+  cursor:crosshair
+}
+.bottopia-canvas .bc-port:hover,.bottopia-canvas .bc-port[aria-pressed=true] {
+  border-color:#dedede;
+  background:#464646;
+  color:#fff
+}
+.bc-input {
+  left:-10px
+}
+.bc-output {
+  right:-10px
+}
+.bc-media {
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  display:block;
+  background:#1d1d1d;
+  border:0;
+  border-radius:7px
+}
+.bc-media-empty {
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  gap:8px;
+  width:100%;
+  height:100%;
+  color:#787878;
+  text-align:center
+}
+.bc-media-empty>span {
+  font-size:24px;
+  line-height:1;
+  color:#8b8b8b
+}
+.bc-media-empty p {
+  margin:0;
+  font-size:10px;
+  line-height:1.7
+}
+.bc-audio-preview {
+  display:grid;
+  justify-items:center;
+  gap:14px;
+  width:100%;
+  padding:20px
+}
+.bc-audio-preview>span {
+  color:#999;
+  font-size:30px
+}
+.bc-audio-preview audio {
+  width:100%;
+  height:32px
+}
+.bc-preview-failed {
+  padding:16px;
+  text-align:center;
+  font-size:11px;
+  color:#999
+}
+.bc-preview-failed p {
+  margin:0 0 8px
+}
+.bc-floating-ui {
+  cursor:default;
+  touch-action:auto
+}
+.bc-empty {
+  position:absolute;
+  inset:0;
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  padding:0 20px 65px;
+  pointer-events:none;
+  text-align:center;
+  color:#757575
+}
+.bc-empty-title {
+  color:#c5c5c5;
+  font-size:20px;
+  letter-spacing:-.04em;
+  font-weight:500
+}
+.bc-empty p {
+  font-size:12px;
+  margin:8px 0 20px
+}
+.bottopia-canvas .bc-empty button {
+  pointer-events:auto;
+  color:#bcbcbc;
+  font-size:11px;
+  border:1px solid #464646;
+  border-radius:8px;
+  padding:9px 13px;
+  background:#252525
+}
+.bc-contextbar {
+  position:absolute;
+  z-index:15;
+  display:flex;
+  align-items:center;
+  padding:3px 4px;
+  gap:2px;
+  border:1px solid #444;
+  border-radius:8px;
+  background:#262626;
+  box-shadow:0 4px 12px #0003;
+  max-width:calc(100% - 16px)
+}
+.bc-contextbar>span {
+  padding:0 7px;
+  font-size:10px;
+  color:#c6c6c6;
+  white-space:nowrap
+}
+.bottopia-canvas .bc-contextbar button {
+  min-height:27px;
+  height:27px;
+  padding:3px 6px;
+  border-radius:5px;
+  font-size:10px
+}
+.bc-composer {
+  position:absolute;
+  z-index:20;
+  padding:10px 12px 8px;
+  border:1px solid #484848;
+  border-radius:13px;
+  background:#292929;
+  box-shadow:0 12px 36px #0004;
+  max-height:calc(100% - 92px);
+  overflow:auto;
+  scrollbar-width:thin;
+  overscroll-behavior:contain
+}
+.bc-ref-strip {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-height:27px;
+  max-width:100%;
+  overflow-x:auto;
+  padding-bottom:6px;
+  scrollbar-width:thin
+}
+.bottopia-canvas .bc-add-reference {
+  min-height:25px;
+  height:25px;
+  padding:3px 7px;
+  font-size:10px;
+  color:#b0b0b0;
+  background:#353535;
+  border-radius:5px
+}
+.bc-ref-strip>small {
+  font-size:10px;
+  color:#777;
+  white-space:nowrap
+}
+.bc-ref-chip {
+  display:flex;
+  align-items:center;
+  height:25px;
+  min-width:0;
+  gap:5px;
+  padding:2px 4px 2px 6px;
+  border-radius:5px;
+  border:1px solid #4b4b4b;
+  color:#bbb;
+  flex-shrink:0;
+  font-size:10px
+}
+.bc-ref-chip>span:not(.bc-ref-thumb) {
+  max-width:100px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.bc-ref-chip.has-thumb {
+  padding-left:2px
+}
+.bc-ref-thumb {
+  width:22px;
+  height:21px;
+  display:block;
+  overflow:hidden;
+  border-radius:3px
+}
+.bc-ref-thumb .bc-media {
+  border-radius:2px;
+  object-fit:cover
+}
+.bottopia-canvas .bc-ref-chip button {
+  width:17px;
+  height:17px;
+  min-height:17px;
+  padding:0;
+  color:#909090;
+  border-radius:3px
+}
+.bc-prompt {
+  display:block;
+  margin:0;
+  padding:0
+}
+.bottopia-canvas .bc-prompt textarea {
+  width:100%;
+  height:76px;
+  min-height:66px;
+  margin:0;
+  padding:7px 2px 10px;
+  border:0;
+  border-radius:0;
+  color:#f0f0f0;
+  background:transparent;
+  font-size:12px;
+  line-height:1.7;
+  resize:vertical;
+  outline-offset:0
+}
+.bottopia-canvas .bc-prompt textarea::placeholder {
+  color:#858585
+}
+.bc-composer-footer {
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  min-height:32px
+}
+.bc-inline-field {
+  display:flex;
+  align-items:center;
+  margin:0;
+  min-width:0
+}
+.bottopia-canvas .bc-inline-field select {
+  min-height:27px;
+  height:27px;
+  border:0;
+  border-radius:5px;
+  padding:3px 17px 3px 5px;
+  font-size:10px;
+  line-height:1;
+  background-color:transparent;
+  max-width:135px
+}
+.bottopia-canvas .bc-inline-field select:hover {
+  background-color:#3c3c3c
+}
+.bottopia-canvas .bc-model-field select {
+  max-width:160px
+}
+.bottopia-canvas .bc-duration-field {
+  height:27px;
+  padding:0 5px 0 0;
+  background:transparent;
+  border-radius:5px;
+  font-size:10px
+}
+.bottopia-canvas .bc-duration-field input {
+  width:33px;
+  min-height:0;
+  height:27px;
+  padding:3px 0 3px 5px;
+  border:0;
+  background:transparent;
+  border-radius:0;
+  font-size:10px;
+  appearance:textfield
+}
+.bc-duration-field input::-webkit-inner-spin-button {
+  appearance:none
+}
+.bc-audio-check {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 4px;
+  margin:0;
+  color:#b4b4b4
+}
+.bc-price-info {
+  margin-left:auto;
+  font-size:10px;
+  color:#b3b3b3;
+  white-space:nowrap
+}
+.bc-price-info summary {
+  cursor:pointer;
+  list-style:none;
+  padding:6px 4px;
+  border-radius:4px;
+  font-variant-numeric:tabular-nums
+}
+.bc-price-info summary::-webkit-details-marker {
+  display:none
+}
+.bc-price-info summary:hover {
+  color:#fff;
+  background:#373737
+}
+.bc-price-info>div {
+  position:absolute;
+  z-index:3;
+  right:0;
+  bottom:calc(100% + 6px);
+  padding:13px;
+  width:min(320px,calc(100vw - 48px));
+  border:1px solid #555;
+  border-radius:8px;
+  background:#303030;
+  box-shadow:0 8px 24px #0004;
+  color:#bababa;
+  white-space:normal;
+  font-size:11px;
+  line-height:1.7
+}
+.bc-price-info p {
+  margin:6px 0
+}
+.bc-price-info strong {
+  font-size:11px;
+  color:#eee
+}
+.bc-price-info small {
+  display:block;
+  margin-top:6px;
+  color:#929292;
+  font-size:9px
+}
+.bottopia-canvas .bc-run {
+  width:32px;
+  min-width:32px;
+  height:32px;
+  min-height:32px;
+  padding:0;
+  border-radius:50%;
+  margin:0 0 0 3px;
+  background:#f6f6f6;
+  color:#222;
+  border:0
+}
+.bottopia-canvas .bc-run:hover:not(:disabled) {
+  background:#fff;
+  color:#000
+}
+.bottopia-canvas .bc-run:disabled {
+  background:#727272;
+  color:#242424;
+  opacity:1
+}
+.bc-working-dot {
+  width:11px;
+  height:11px;
+  border:1.5px solid #555;
+  border-top-color:transparent;
+  border-radius:50%;
+  animation:bc-spin 1s linear infinite
+}
+@keyframes bc-spin {
+  to {
+    transform:rotate(360deg)
+  }
+}
+.bc-local-note {
+  color:#949494;
+  font-size:10px;
+  margin-right:auto
+}
+.bottopia-canvas .bc-small-action {
+  min-height:27px;
+  padding:4px 7px;
+  background:#383838;
+  font-size:10px
+}
+.bc-node-options {
+  position:relative;
+  flex-shrink:0
+}
+.bc-node-options summary {
+  width:23px;
+  height:28px;
+  color:#b5b5b5
+}
+.bc-node-options>div {
+  top:auto;
+  bottom:calc(100% + 7px);
+  max-height:250px;
+  overflow:auto;
+  width:245px;
+  padding:12px;
+  gap:8px
+}
+.bc-node-options small {
+  color:#969696;
+  font-size:10px;
+  line-height:1.7
+}
+.bc-field {
+  display:grid;
+  gap:5px;
+  margin:0;
+  color:#aaa;
+  font-size:10px
+}
+.bottopia-canvas .bc-field input,.bottopia-canvas .bc-field select {
+  width:100%;
+  height:31px;
+  padding:5px 7px;
+  font-size:11px
+}
+.bc-model-note {
+  margin:6px 1px 0;
+  padding-top:6px;
+  border-top:1px solid #3e3e3e;
+  color:#b1a399;
+  font-size:10px;
+  line-height:1.55
+}
+.bc-job {
+  display:flex;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  gap:4px 9px;
+  border-top:1px solid #3e3e3e;
+  margin-top:7px;
+  padding-top:7px;
+  font-size:10px;
+  color:#aaa;
+  overflow-wrap:anywhere
+}
+.bc-job strong {
+  color:#c3c3c3;
+  font-weight:500;
+  white-space:nowrap
+}
+.bc-job span {
+  min-width:0;
+  flex:1
+}
+.bc-job.failed strong,.bc-job.unknown strong {
+  color:#d8b4a5
+}
+.bottopia-canvas .bc-job button {
+  min-height:23px;
+  padding:2px 5px;
+  border:1px solid #555;
+  font-size:10px
+}
+.bc-tool-dock,.bc-view-dock {
+  position:absolute;
+  z-index:40;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  background:#292929;
+  border:1px solid #414141;
+  box-shadow:0 5px 20px #0003
+}
+.bc-tool-dock {
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  height:49px;
+  padding:7px;
+  border-radius:12px
+}
+.bottopia-canvas .bc-tool-dock button {
+  width:32px;
+  height:32px;
+  min-height:32px;
+  padding:0;
+  border-radius:8px;
+  color:#bababa
+}
+.bottopia-canvas .bc-tool-dock .bc-add-button {
+  color:#f7f7f7
+}
+.bc-dock-separator {
+  width:1px;
+  height:17px;
+  background:#434343;
+  margin:0 2px
+}
+.bc-view-dock {
+  bottom:12px;
+  left:8px;
+  height:40px;
+  padding:4px;
+  gap:1px;
+  border-radius:9px
+}
+.bottopia-canvas .bc-view-dock button {
+  width:30px;
+  height:30px;
+  min-height:30px;
+  padding:0;
+  border-radius:5px;
+  color:#aaa
+}
+.bottopia-canvas .bc-view-dock .bc-zoom-button {
+  width:65px;
+  gap:6px;
+  font-size:10px;
+  font-variant-numeric:tabular-nums
+}
+.bc-zoom-button>span {
+  color:#888;
+  font-size:12px
+}
+.bc-popup,.bc-add-menu {
+  position:absolute;
+  z-index:45;
+  border:1px solid #454545;
+  background:#292929;
+  border-radius:11px;
+  padding:7px;
+  box-shadow:0 10px 36px #0005;
+  scrollbar-width:thin;
+  overflow:auto;
+  max-height:calc(100% - 90px)
+}
+.bc-add-menu {
+  width:230px
+}
+.bc-popup {
+  bottom:73px;
+  left:50%;
+  transform:translateX(-50%);
+  width:310px
+}
+.bc-popup-view {
+  bottom:61px;
+  left:8px;
+  transform:none;
+  width:208px
+}
+.bc-popup-history {
+  width:380px
+}
+.bc-popup-guide {
+  width:380px
+}
+.bc-popup-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:29px;
+  padding:0 4px 5px 7px;
+  color:#ddd;
+  font-size:11px
+}
+.bc-popup-heading strong {
+  font-size:11px;
+  font-weight:500
+}
+.bottopia-canvas .bc-popup-heading button {
+  width:23px;
+  min-height:23px;
+  padding:0;
+  color:#999
+}
+.bottopia-canvas .bc-add-menu>button,.bottopia-canvas .bc-popup>button {
+  display:flex;
+  justify-content:flex-start;
+  width:100%;
+  gap:11px;
+  height:35px;
+  padding:7px 9px;
+  border-radius:6px;
+  font-size:12px;
+  color:#d8d8d8
+}
+.bc-add-menu>button>span {
+  flex:1;
+  text-align:left
+}
+.bc-add-menu>button>svg:first-child {
+  color:#bbb
+}
+.bc-add-menu>button>svg:last-child:not(:first-child) {
+  color:#777
+}
+.bc-add-menu hr {
+  margin:5px 3px;
+  border:0;
+  border-top:1px solid #3c3c3c
+}
+.bc-add-menu>small {
+  display:block;
+  color:#808080;
+  font-size:9px;
+  padding:7px 9px 3px
+}
+.bc-popup>p {
+  padding:16px 8px;
+  color:#999;
+  font-size:11px
+}
+.bc-popup>small {
+  display:block;
+  padding:9px 7px 4px;
+  color:#888;
+  font-size:10px;
+  line-height:1.7
+}
+.bc-zoom-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:4px 8px 10px;
+  color:#ccc;
+  font-size:12px
+}
+.bottopia-canvas .bc-zoom-row button {
+  width:28px;
+  height:28px;
+  min-height:28px;
+  background:#383838
+}
+.bc-history-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  padding:4px;
+  max-height:330px;
+  overflow:auto
+}
+.bottopia-canvas .bc-history-grid button {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:91px;
+  height:96px;
+  padding:0;
+  border:1px solid #454545;
+  border-radius:6px;
+  overflow:hidden;
+  color:#888
+}
+.bc-history-grid button>.bc-media {
+  height:66px;
+  flex:1;
+  min-height:0;
+  border-radius:5px 5px 0 0;
+  object-fit:cover
+}
+.bc-history-grid button>svg {
+  margin:auto
+}
+.bc-history-grid button>span {
+  display:block;
+  width:100%;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  padding:5px;
+  color:#b2b2b2;
+  font-size:9px;
+  text-align:left
+}
+.bc-shortcuts {
+  margin:3px 7px 7px
+}
+.bc-shortcuts>div {
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:8px 0;
+  border-bottom:1px solid #393939;
+  font-size:10px
+}
+.bc-shortcuts dt {
+  color:#bdbdbd
+}
+.bc-shortcuts dd {
+  margin:0;
+  color:#888;
+  text-align:right
+}
+.bc-guide {
+  margin:3px 9px 8px;
+  padding-left:19px;
+  color:#b5b5b5;
+  font-size:11px
+}
+.bc-guide li {
+  padding:7px 0 4px 3px
+}
+.bc-guide strong {
+  font-size:11px;
+  font-weight:500;
+  color:#ddd
+}
+.bc-guide p {
+  margin:5px 0 0;
+  color:#999;
+  font-size:10px;
+  line-height:1.8
+}
+.bc-minimap {
+  position:absolute;
+  left:8px;
+  bottom:61px;
+  z-index:38;
+  border:1px solid #4a4a4a;
+  border-radius:8px;
+  box-shadow:0 4px 18px #0004;
+  overflow:hidden
+}
+.bc-minimap:focus-within {
+  outline:2px solid #b9c7e0;
+  outline-offset:2px
+}
+.bc-connection-hint {
+  position:absolute;
+  left:50%;
+  top:14px;
+  transform:translateX(-50%);
+  pointer-events:none;
+  padding:7px 11px;
+  border:1px solid #464646;
+  border-radius:7px;
+  background:#292929;
+  color:#bdbdbd;
+  font-size:10px;
+  white-space:nowrap;
+  z-index:30
+}
+.bc-connection-hint kbd {
+  color:#777;
+  margin-left:8px;
+  font-size:9px
+}
+.bc-message {
+  position:absolute;
+  top:10px;
+  right:12px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  max-width:min(420px,calc(100% - 24px));
+  border:1px solid #555;
+  border-radius:9px;
+  background:#303030;
+  box-shadow:0 5px 20px #0004;
+  padding:10px 10px 10px 13px;
+  font-size:11px;
+  color:#d4d4d4;
+  z-index:60;
+  overflow-wrap:anywhere
+}
+.bottopia-canvas .bc-message button {
+  min-width:20px;
+  width:20px;
+  min-height:20px;
+  padding:0;
+  color:#999
+}
+.bc-loading {
+  display:grid;
+  place-items:center;
+  color:#999;
+  font-size:12px
+}
+.bottopia-canvas.bc-project-loading {
+  pointer-events:none;
+  opacity:.7
+}
+.bc-sr-only {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0
+}
+@media(max-width:850px) {
+  .bc-save-state {
+    font-size:0
+  }
+  .bc-save-state::before {
+    width:5px;
+    height:5px
+  }
+  .bc-view-dock {
+    bottom:73px
+  }
+  .bc-minimap {
+    bottom:120px
+  }
+  .bc-popup-view {
+    bottom:122px
+  }
+  .bc-project-actions select {
+    max-width:110px
+  }
+}
+@media(max-width:560px) {
+  .bottopia-canvas .bc-project-bar {
+    gap:4px
+  }
+  .bottopia-canvas .bc-tools-back {
+    gap:5px;
+    padding:3px;
+    font-size:10px
+  }
+  .bc-brand-mark {
+    width:20px;
+    height:20px;
+    font-size:12px
+  }
+  .bc-project-divider {
+    margin:0 2px
+  }
+  .bottopia-canvas .bc-title-field input {
+    padding:4px;
+    font-size:11px
+  }
+  .bottopia-canvas .bc-project-actions select {
+    max-width:80px;
+    font-size:10px
+  }
+  .bc-save-state {
+    display:none
+  }
+  .bc-empty-title {
+    font-size:18px
+  }
+  .bc-empty p {
+    font-size:10px
+  }
+  .bc-composer {
+    padding:9px;
+    max-height:calc(100% - 152px)
+  }
+  .bc-composer-footer {
+    flex-wrap:wrap;
+    gap:4px
+  }
+  .bottopia-canvas .bc-model-field select {
+    max-width:145px
+  }
+  .bottopia-canvas .bc-inline-field select {
+    font-size:9px;
+    padding-left:4px;
+    padding-right:13px
+  }
+  .bc-price-info {
+    font-size:10px
+  }
+  .bc-ref-strip>small {
+    max-width:150px;
+    overflow:hidden;
+    text-overflow:ellipsis
+  }
+  .bc-popup,.bc-popup-guide,.bc-popup-history {
+    width:min(380px,calc(100% - 16px))
+  }
+  .bc-popup-view {
+    width:208px
+  }
+  .bc-node-options>div {
+    right:0;
+    width:min(245px,calc(100vw - 48px))
+  }
+  .bc-view-dock {
+    height:36px;
+    padding:2px
+  }
+  .bc-message {
+    top:8px;
+    right:8px;
+    max-width:calc(100% - 16px)
+  }
+  .bc-connection-hint {
+    max-width:calc(100% - 16px);
+    font-size:9px;
+    white-space:normal;
+    text-align:center
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .bottopia-canvas * {
+    transition:none!important;
+    animation:none!important
+  }
+}
+/* Floating detail menus need to extend beyond the compact composer on desktop. */
+@media(min-width:561px) {
+  .bc-composer:has(.bc-node-options[open],.bc-price-info[open]) {
+    overflow:visible
+  }
+}
+@media(max-width:850px) {
+  .bc-composer {
+    max-height:calc(100% - 145px)
+  }
+}
+@media(max-width:560px) {
+  .bc-node-options[open] {
+    position:static
+  }
+  .bc-node-options>div,.bc-price-info>div {
+    position:static;
+    width:100%;
+    max-height:none;
+    box-shadow:none;
+    margin-top:8px
+  }
+  .bc-composer-footer:has(.bc-node-options[open]) {
+    flex-wrap:wrap
+  }
+  .bc-node-options[open] {
+    width:100%
+  }
+  .bc-node-options[open]>summary {
+    margin-left:auto
+  }
+  .bc-price-info[open] {
+    width:100%;
+    order:5;
+    white-space:normal
+  }
+  .bc-price-info[open] summary {
+    display:inline-block
+  }
+  .bc-composer-footer:has(.bc-price-info[open]) {
+    flex-wrap:wrap
+  }
+}

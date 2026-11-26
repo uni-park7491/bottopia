@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const read = name => readFileSync(new URL(`../app/tools/${name}`, import.meta.url),'utf8');
 test('workspace loads tools on first visit and keeps visited tools mounted',()=>{
   const source=read('CreativeTools.tsx');
-  assert.equal((source.match(/aria-pressed=/g)||[]).length,6);
+  assert.equal((source.match(/aria-pressed=/g)||[]).length,7);
   assert.doesNotMatch(source,/CharacterSheet|manual-scene-tools|'character'/);
   assert.match(source,/hidden=\{tab !== 'scenes'\}/);
   assert.match(source,/hidden=\{tab !== 'audio'\}/);

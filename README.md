@@ -12,6 +12,7 @@ AI 영상 포트폴리오, 프롬프트 아카이브, Google·네이버·카카�
 - 공개 포트폴리오, 작품별 공유 URL, 프롬프트 복사, 회원 좋아요·댓글, 프로젝트 문의 접수, 소유자 전용 `/studio`
 - `/creators` 공개 크리에이터 디렉터리, `/profile` 프로필·소셜 링크 관리, Original/Community/Remix 계보
 - `/login`: 3개 제공자 선택, 4개 언어, 실패 안내 및 안전한 원래 페이지 복귀
+- `/tools?tab=canvas`: 텍스트·이미지·영상·소리·스크립트 노드를 연결하는 캔버스. 로컬 저장과 작업 파일 가져오기/내보내기, 운영자 전용 외부 생성 API를 지원합니다. [모델별 가격·연결 설정](docs/CANVAS.md)
 
 ## 1. Supabase 설정
 
@@ -42,6 +43,8 @@ npm run dev
 2. `.env.example`의 환경 변수를 Production에 등록합니다. 서비스별 Client Secret은 앱의 공개 환경 변수에 넣지 않고 Supabase 제공자 설정에 저장합니다.
 3. Deploy 후 `NEXT_PUBLIC_SITE_URL`을 실제 배포 URL로 바꿉니다.
 4. Supabase의 허용 URL 목록과 제공자 앱의 설정을 확인하고 실제 계정으로 3개 로그인 흐름을 검수합니다.
+
+Vercel의 의존성 설치는 `vercel.json`에 지정한 `ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm ci`를 사용합니다. 브라우저 TTS는 WASM으로 실행하므로 서버 CUDA 바이너리는 필요하지 않습니다. 간접 의존성인 `onnxruntime-node@1.21.0`은 Linux x64에서 CUDA 파일을 자동 다운로드하는데, 해당 릴리스 주소가 404를 반환하면 설치 전체가 실패합니다. 이 옵션은 CUDA 추가 다운로드만 생략하며 CPU 런타임과 다른 패키지의 설치 스크립트는 유지합니다.
 
 ## 보안 모델
 
