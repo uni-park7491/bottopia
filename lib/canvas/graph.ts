@@ -1,7 +1,7 @@
 import type { CanvasEdge, CanvasKind, CanvasNode, CanvasProject, CanvasViewport } from './types.ts';
 
-export const NODE_WIDTH = 280;
-export const NODE_HEIGHT = 260;
+export const NODE_WIDTH = 320;
+export const NODE_HEIGHT = 204;
 export const MAX_NODES = 100;
 export const MAX_EDGES = 300;
 export const MAX_PROMPT_LENGTH = 32_000;
