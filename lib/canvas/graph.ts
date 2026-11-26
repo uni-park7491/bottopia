@@ -55,7 +55,7 @@ export function createNode(kind: CanvasKind, x: number, y: number): CanvasNode {
   return {
     id: crypto.randomUUID(), kind, x: number(x, -1_000_000, 1_000_000), y: number(y, -1_000_000, 1_000_000),
     title: titles[kind], text: '', modelId: kind === 'video' ? 'seedance-2-5' : 'seedream-5-5',
-    aspectRatio: '16:9', resolution: kind === 'video' ? '720p' : '1K', durationSeconds: 5,
+    aspectRatio: '16:9', resolution: kind === 'video' ? '720p' : '2K', durationSeconds: 5,
     generateAudio: false, assetIds: [],
   };
 }
