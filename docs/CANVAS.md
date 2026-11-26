@@ -1,5 +1,7 @@
 # BOTTOPIA Canvas
 
+최신 영상 API 저가순과 신규 중계·일반형 후보는 [영상 API 가격 비교](VIDEO_API_PRICING.md)에 정리했다. 기존 제공자 설정과 신규 후보의 구현 여부를 구분한다.
+
 노드에 프롬프트와 미디어를 놓고 연결해 생성 입력을 구성한다. 프로젝트와 실제 미디어는 브라우저 IndexedDB에 저장되며 계정별 공간을 나눈다. 서버 프로젝트 저장·기기간 동기화는 구현 범위에 포함되지 않는다. 다른 브라우저로 옮기거나 브라우저 데이터를 지우기 전에는 미디어가 포함된 프로젝트 파일로 내보낸다. 작업 영수증과 임시 파일 URL은 영구 보관을 대신하지 않는다.
 
 ## 서버 설정
@@ -17,7 +19,7 @@
 
 [.env.example](../.env.example)의 Canvas 키는 비어 있다. 선택적인 영상 제공자 행은 주석 처리했다. `CANVAS_VIDEO_PROVIDER`를 설정한다면 유효한 값을 명시한다. 빈 문자열은 미설정과 달리 설정 오류로 처리된다. 유료 생성을 켜는 작업은 이 문서 작성·테스트 과정에서 실행하지 않았다.
 
-OpenSand는 가격 우선 원칙에 따라 기본 선택이다. 공개 모델 표에 정확한 `doubao-seedance-2-5-260628`과 낮은 종량제 요금이 있지만, 같은 문서의 생성 요청 표는 2.0으로 표시되어 2.5 전용 요청 규격을 확정할 수 없었다. 따라서 **키와 생성 활성화 설정이 있어도 `canGenerate=false`이며, 제출·조회 어댑터는 외부 호출 없이 503을 반환한다.** 화면의 임시 참조 제한도 검증된 2.5 API 기능을 뜻하지 않는다. [OpenSand 문서](https://opensand.ai/manual/video-generation/video-doubao-seedance)
+OpenSand는 현재 코드의 기본 영상 제공자 설정이다. 공개 모델 표에 정확한 `doubao-seedance-2-5-260628`과 낮은 종량제 요금이 있지만, 같은 문서의 생성 요청 표는 2.0으로 표시되어 2.5 전용 요청 규격을 확정할 수 없었다. 따라서 **키와 생성 활성화 설정이 있어도 `canGenerate=false`이며, 제출·조회 어댑터는 외부 호출 없이 503을 반환한다.** 화면의 임시 참조 제한도 검증된 2.5 API 기능을 뜻하지 않는다. [OpenSand 문서](https://opensand.ai/manual/video-generation/video-doubao-seedance)
 
 Beat를 사용하려면 서버에서 `CANVAS_VIDEO_PROVIDER=beat`와 해당 키를 명시한다. 정확한 표준 모델 `seedance-2.5`의 문서에 맞춘 어댑터와 가짜 응답 테스트는 준비되어 있다. 실제 계정 접근·생성·품질·최종 청구를 검증한 상태는 아니다. 다른 모델이나 더 비싼 제공자로 자동 전환하지 않는다. [Beat 계약](https://docs.beatapi.io/api-reference/video-api/seedance-2-5)
 
